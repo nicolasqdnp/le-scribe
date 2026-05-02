@@ -59,7 +59,7 @@ export default function Dashboard() {
           <a href="/profil" className="block p-6 bg-white rounded-2xl border border-stone-200 hover:border-violet-400 transition group">
             <div className="text-3xl mb-4">👤</div>
             <h2 className="text-lg font-semibold text-stone-800 mb-2 group-hover:text-violet-600">Mon profil auteur</h2>
-            <p className="text-sm text-stone-500">Configure ta voix, ton style et tes préférences d'écriture.</p>
+            <p className="text-sm text-stone-500">Configure ton style d'auteur et tes préférences d'écriture.</p>
           </a>
 
           <a href="/nouveau-livre" className="block p-6 bg-violet-600 rounded-2xl border border-violet-600 hover:bg-violet-700 transition group">
