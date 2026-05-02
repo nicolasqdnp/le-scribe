@@ -3,6 +3,15 @@ import { useState, useEffect } from 'react'
 import { createClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
+function Chip({ field, val, selected, onToggle }) {
+  return (
+    <button type="button" onClick={() => onToggle(field, val)}
+      className={`px-4 py-2 rounded-full text-sm border transition ${selected ? 'bg-violet-100 border-violet-500 text-violet-800 font-medium' : 'border-stone-300 text-stone-500 hover:border-violet-400'}`}>
+      {val}
+    </button>
+  )
+}
+
 export default function Profil() {
   const [cur, setCur] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -24,7 +33,7 @@ export default function Profil() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUser(user)
-      const { data } = await supabase.from('profils_auteurs').select('*').eq('user_id', user.id).single()
+      const { data } = await supabase.from('profils_auteurs').select('*').eq('user_id', user.id).maybeSingle()
       if (data) {
         setD({
           nom: data.nom || '',
@@ -64,16 +73,6 @@ export default function Profil() {
     }))
   }
 
-  function Chip({ field, val }) {
-    const on = D[field].includes(val)
-    return (
-      <button type="button" onClick={() => toggle(field, val)}
-        className={`px-4 py-2 rounded-full text-sm border transition ${on ? 'bg-violet-100 border-violet-500 text-violet-800 font-medium' : 'border-stone-300 text-stone-500 hover:border-violet-400'}`}>
-        {val}
-      </button>
-    )
-  }
-
   async function save() {
     setLoading(true)
     const supabase = createClient()
@@ -102,7 +101,7 @@ export default function Profil() {
       youtube_3: D.yt3,
       complement: D.extra
     }
-    const { data: existing } = await supabase.from('profils_auteurs').select('id').eq('user_id', user.id).single()
+    const { data: existing } = await supabase.from('profils_auteurs').select('id').eq('user_id', user.id).maybeSingle()
     if (existing) {
       await supabase.from('profils_auteurs').update(payload).eq('user_id', user.id)
     } else {
@@ -122,11 +121,11 @@ export default function Profil() {
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Prénom et nom</label>
             <input className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" value={D.nom} onChange={e => setD({...D, nom: e.target.value})} placeholder="Jean Dupont" /></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Ton rôle <span className="text-stone-400 font-normal">(plusieurs choix)</span></label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Pasteur','Évangéliste','Enseignant biblique','Prophète','Apôtre','Auteur laïc','Autre'].map(v => <Chip key={v} field="role" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Pasteur','Évangéliste','Enseignant biblique','Prophète','Apôtre','Auteur laïc','Autre'].map(v => <Chip key={v} field="role" val={v} selected={D.role.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Années de ministère : <span className="text-violet-600 font-semibold">{D.annees} ans</span></label>
             <input type="range" min="1" max="45" value={D.annees} onChange={e => setD({...D, annees: e.target.value})} className="w-full accent-violet-600" /></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Courant théologique <span className="text-stone-400 font-normal">(plusieurs choix)</span></label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Évangélique','Pentecôtiste','Charismatique','Baptiste','Réformé','Interconfessionnel','Autre'].map(v => <Chip key={v} field="courant" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Évangélique','Pentecôtiste','Charismatique','Baptiste','Réformé','Interconfessionnel','Autre'].map(v => <Chip key={v} field="courant" val={v} selected={D.courant.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Pays / contexte culturel</label>
             <input className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" value={D.pays} onChange={e => setD({...D, pays: e.target.value})} placeholder="France, Afrique francophone..." /></div>
         </div>
@@ -138,15 +137,15 @@ export default function Profil() {
       content: (
         <div className="space-y-5">
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Ton dominant <span className="text-stone-400 font-normal">(plusieurs choix)</span></label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Pastoral et bienveillant','Prophétique et direct','Enseignant et structuré','Narratif et storytelling','Apologétique et argumenté','Exhortatif et mobilisateur'].map(v => <Chip key={v} field="ton" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Pastoral et bienveillant','Prophétique et direct','Enseignant et structuré','Narratif et storytelling','Apologétique et argumenté','Exhortatif et mobilisateur'].map(v => <Chip key={v} field="ton" val={v} selected={D.ton.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Illustrations <span className="text-stone-400 font-normal">(plusieurs choix)</span></label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Anecdotes personnelles','Exemples bibliques avant tout','Analogies du quotidien','Faits historiques','Peu d\'illustrations'].map(v => <Chip key={v} field="illus" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Anecdotes personnelles','Exemples bibliques avant tout','Analogies du quotidien','Faits historiques','Peu d\'illustrations'].map(v => <Chip key={v} field="illus" val={v} selected={D.illus.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Niveau théologique : <span className="text-violet-600 font-semibold">{['','Très accessible','Accessible','Intermédiaire','Avancé','Académique'][D.theo]}</span></label>
             <input type="range" min="1" max="5" value={D.theo} onChange={e => setD({...D, theo: e.target.value})} className="w-full accent-violet-600" /></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Structure habituelle</label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Texte → explication → application','Thèse + 3 points','Narration → révélation','Question → réponse → appel','Libre / variable'].map(v => <Chip key={v} field="struct" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Texte → explication → application','Thèse + 3 points','Narration → révélation','Question → réponse → appel','Libre / variable'].map(v => <Chip key={v} field="struct" val={v} selected={D.struct.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Questions rhétoriques</label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Oui, souvent','Parfois','Rarement'].map(v => <Chip key={v} field="rhet" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Oui, souvent','Parfois','Rarement'].map(v => <Chip key={v} field="rhet" val={v} selected={D.rhet.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Formules récurrentes</label>
             <textarea className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 min-h-20" value={D.formules} onChange={e => setD({...D, formules: e.target.value})} placeholder='"La Bible dit clairement...", "Retenez ceci..."' /></div>
         </div>
@@ -158,11 +157,11 @@ export default function Profil() {
       content: (
         <div className="space-y-5">
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Adaptation oral → écrit <span className="text-stone-400 font-normal">(plusieurs choix)</span></label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Fidèle à l\'oral','Plus structuré et épuré','Plus intime et personnel','Plus académique','Plus accessible'].map(v => <Chip key={v} field="adapt" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Fidèle à l\'oral','Plus structuré et épuré','Plus intime et personnel','Plus académique','Plus accessible'].map(v => <Chip key={v} field="adapt" val={v} selected={D.adapt.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Version biblique <span className="text-stone-400 font-normal">(plusieurs choix)</span></label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Louis Segond 1910','Segond 21','Bible du Semeur','Martin 1744','Ostervald','Variable selon passage'].map(v => <Chip key={v} field="bible" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Louis Segond 1910','Segond 21','Bible du Semeur','Martin 1744','Ostervald','Variable selon passage'].map(v => <Chip key={v} field="bible" val={v} selected={D.bible.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Langue d\'écriture <span className="text-stone-400 font-normal">(plusieurs choix)</span></label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Français','Anglais','Espagnol','Autre'].map(v => <Chip key={v} field="langue" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Français','Anglais','Espagnol','Autre'].map(v => <Chip key={v} field="langue" val={v} selected={D.langue.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">À ne jamais écrire</label>
             <textarea className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 min-h-20" value={D.jamais} onChange={e => setD({...D, jamais: e.target.value})} placeholder="Langage trop académique, références politiques..." /></div>
         </div>
@@ -174,9 +173,9 @@ export default function Profil() {
       content: (
         <div className="space-y-5">
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Profil <span className="text-stone-400 font-normal">(plusieurs choix)</span></label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Nouveaux croyants','Chrétiens en croissance','Leaders et pasteurs','Chercheurs spirituels','Grand public'].map(v => <Chip key={v} field="lecto" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Nouveaux croyants','Chrétiens en croissance','Leaders et pasteurs','Chercheurs spirituels','Grand public'].map(v => <Chip key={v} field="lecto" val={v} selected={D.lecto.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Tranches d\'âge <span className="text-stone-400 font-normal">(plusieurs choix)</span></label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Adolescents','Jeunes adultes (18–30)','Adultes (30–50)','Séniors (50+)','Tous âges'].map(v => <Chip key={v} field="age" val={v} />)}</div></div>
+            <div className="flex flex-wrap gap-2 mt-1">{['Adolescents','Jeunes adultes (18–30)','Adultes (30–50)','Séniors (50+)','Tous âges'].map(v => <Chip key={v} field="age" val={v} selected={D.age.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-sm font-medium text-stone-700 mb-1">Ta mission profonde comme auteur</label>
             <textarea className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 min-h-20" value={D.mission} onChange={e => setD({...D, mission: e.target.value})} placeholder="Ancrer la foi dans une connaissance biblique solide..." /></div>
         </div>
