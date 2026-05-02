@@ -51,7 +51,7 @@ export default function Dashboard() {
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-bold text-stone-900 mb-2">
-          Bonjour {user?.user_metadata?.nom?.split(' ')[0] || 'Pasteur'} 👋
+          Bonjour {user?.user_metadata?.nom?.split(' ')[0] || 'Auteur'} 👋
         </h1>
         <p className="text-stone-500 mb-10">Que veux-tu faire aujourd'hui ?</p>
 
