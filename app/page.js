@@ -31,7 +31,7 @@ export default function Home() {
             <span className="text-gold">en livre publié</span>
           </h1>
           <p className="text-lg text-muted max-w-xl mx-auto mb-12 leading-relaxed">
-            Le Scribe analyse tes transcriptions YouTube et t'accompagne chapitre par chapitre — dans ton style, avec ta voix.
+            Le Scribe analyse tes contenus textes et vidéos et t'accompagne chapitre par chapitre — pour créer le livre qui te ressemble
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/inscription"

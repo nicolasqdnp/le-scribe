@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 
-const WORDS = ['prédications', 'messages', 'podcast', 'enseignements', 'notes']
+const WORDS = ['prédications', 'messages', 'podcasts', 'enseignements', 'notes']
 
 export default function WordCycler() {
   const [index, setIndex] = useState(0)
