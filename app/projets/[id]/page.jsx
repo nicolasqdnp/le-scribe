@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import { createClient } from '../../../lib/supabase'
 import { useRouter, useParams } from 'next/navigation'
 
@@ -84,7 +85,7 @@ function AnalyseEnCours({ projetId }) {
   return (
     <main className="min-h-screen bg-[#f5f4f1]">
       <header className="border-b border-stone-200 bg-white px-6 py-4">
-        <a href="/dashboard" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">Le Scribe</a>
+        <Link href="/dashboard" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">Le Scribe</Link>
       </header>
       <div className="max-w-xl mx-auto px-6 py-12">
         <h1 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-stone-900 mb-2">Préparer les sources</h1>
@@ -176,7 +177,8 @@ export default function ProjetPage() {
     async function init() {
       try {
         const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const authTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 8000))
+        const { data: { user } } = await Promise.race([supabase.auth.getUser(), authTimeout])
         if (!user) { router.replace('/login'); return }
         setUser(user)
         const [{ data: proj }, { data: chaps }] = await Promise.all([
@@ -393,17 +395,17 @@ export default function ProjetPage() {
       {/* Header */}
       <header className="border-b border-stone-200 px-6 py-3 flex items-center justify-between flex-shrink-0 bg-white">
         <div className="flex items-center gap-3">
-          <a href="/dashboard" className="font-[family-name:var(--font-playfair)] text-lg font-bold text-gold">Le Scribe</a>
+          <Link href="/dashboard" className="font-[family-name:var(--font-playfair)] text-lg font-bold text-gold">Le Scribe</Link>
           <span className="text-stone-300">/</span>
           <span className="text-sm text-stone-500 truncate max-w-xs">{projet?.titre || 'Projet sans titre'}</span>
         </div>
         <div className="flex items-center gap-2">
           {saving && <span className="text-xs text-stone-400">Sauvegarde…</span>}
           <button onClick={() => saveCurrent()} className="text-xs text-stone-500 hover:text-stone-900 border border-stone-200 rounded-lg px-3 py-1.5 transition">Sauvegarder</button>
-          <a href={`/projets/${id}/edition`} className="text-xs bg-gold text-bg hover:bg-gold2 rounded-lg px-3 py-1.5 transition font-medium">
+          <Link href={`/projets/${id}/edition`} className="text-xs bg-gold text-bg hover:bg-gold2 rounded-lg px-3 py-1.5 transition font-medium">
             Mise en forme
-          </a>
-          <a href="/dashboard" className="text-xs text-stone-500 hover:text-stone-900 transition">← Accueil</a>
+          </Link>
+          <Link href="/dashboard" className="text-xs text-stone-500 hover:text-stone-900 transition">← Accueil</Link>
         </div>
       </header>
 

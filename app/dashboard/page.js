@@ -1,11 +1,13 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+
 import { createClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 function ProfileCard({ portrait }) {
   return (
-    <a href="/profil" className="block p-7 bg-surface border border-border rounded-2xl hover:border-gold/30 transition group">
+    <Link href="/profil" className="block p-7 bg-surface border border-border rounded-2xl hover:border-gold/30 transition group">
       <div className="flex items-start justify-between mb-4">
         <div className="text-xs text-gold uppercase tracking-widest font-medium">Profil analysé</div>
         <span className="text-xs bg-gold/10 text-gold px-2.5 py-0.5 rounded-full border border-gold/20">✦ Actif</span>
@@ -22,7 +24,7 @@ function ProfileCard({ portrait }) {
         </div>
       )}
       <p className="text-xs text-gold mt-4 group-hover:text-gold2 transition">Voir mon portrait →</p>
-    </a>
+    </Link>
   )
 }
 
@@ -51,7 +53,8 @@ export default function Dashboard() {
     async function init() {
       try {
         const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const authTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 8000))
+        const { data: { user } } = await Promise.race([supabase.auth.getUser(), authTimeout])
         if (!user) { router.push('/login'); return }
         setUser(user)
 
@@ -121,7 +124,7 @@ export default function Dashboard() {
     <main className="min-h-screen page-glow">
       {/* Header */}
       <header className="border-b border-border px-6 py-4 flex items-center justify-between">
-        <a href="/" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">Le Scribe</a>
+        <Link href="/" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">Le Scribe</Link>
         <div className="flex items-center gap-5">
           <span className="text-sm text-muted">{user?.user_metadata?.nom || user?.email}</span>
           <button onClick={handleLogout} className="text-xs text-muted hover:text-cream border border-border rounded-lg px-3 py-1.5 transition">
@@ -143,17 +146,17 @@ export default function Dashboard() {
           {portrait ? (
             <ProfileCard portrait={portrait} />
           ) : (
-            <a href="/profil" className="block p-7 bg-surface border border-border rounded-2xl hover:border-gold/30 transition group">
+            <Link href="/profil" className="block p-7 bg-surface border border-border rounded-2xl hover:border-gold/30 transition group">
               <div className="text-xs text-muted uppercase tracking-widest mb-4">À compléter</div>
               <h2 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-cream mb-2 group-hover:text-gold transition">
                 Mon profil auteur
               </h2>
               <p className="text-sm text-muted">Configure ton style pour que l'IA écrive vraiment comme toi.</p>
               <p className="text-xs text-gold mt-4">Créer mon profil →</p>
-            </a>
+            </Link>
           )}
 
-          <a href="/nouveau-livre" className="block p-7 bg-surface border border-gold/20 rounded-2xl hover:border-gold/50 transition group relative overflow-hidden">
+          <Link href="/nouveau-livre" className="block p-7 bg-surface border border-gold/20 rounded-2xl hover:border-gold/50 transition group relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
             <div className="text-xs text-gold uppercase tracking-widest mb-4">Nouveau projet</div>
             <h2 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-cream mb-2 group-hover:text-gold transition">
@@ -161,7 +164,7 @@ export default function Dashboard() {
             </h2>
             <p className="text-sm text-muted">Fournis tes sources et laisse l'IA générer un plan, puis rédige chapitre par chapitre.</p>
             <p className="text-xs text-gold mt-4">Commencer →</p>
-          </a>
+          </Link>
         </div>
 
         {/* Projets en cours */}
@@ -172,13 +175,13 @@ export default function Dashboard() {
               <div className="text-center py-16 text-muted">
                 <div className="text-4xl mb-4 opacity-20">📚</div>
                 <p className="text-sm mb-4">Aucun livre pour le moment.</p>
-                <a href="/nouveau-livre" className="text-xs text-gold hover:text-gold2 transition">Commencer mon premier livre →</a>
+                <Link href="/nouveau-livre" className="text-xs text-gold hover:text-gold2 transition">Commencer mon premier livre →</Link>
               </div>
             ) : (
               <div className="divide-y divide-border">
                 {projets.map(proj => (
                   <div key={proj.id} className="relative group hover:bg-surface2 transition">
-                    <a href={`/projets/${proj.id}`} className="flex items-center justify-between px-6 py-5 gap-4 pr-24">
+                    <Link href={`/projets/${proj.id}`} className="flex items-center justify-between px-6 py-5 gap-4 pr-24">
                       <div className="min-w-0 flex-1">
                         <div className="font-medium text-cream group-hover:text-gold transition truncate">{proj.titre || 'Sans titre'}</div>
                         {proj.sujet && <div className="text-xs text-muted mt-0.5 line-clamp-1">{proj.sujet}</div>}
@@ -212,7 +215,7 @@ export default function Dashboard() {
                         )}
                         <span className="text-muted group-hover:text-gold transition text-sm">→</span>
                       </div>
-                    </a>
+                    </Link>
 
                     {/* Bouton suppression */}
                     <button

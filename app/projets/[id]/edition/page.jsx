@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { createClient } from '../../../../lib/supabase'
 import { useEditor, EditorContent } from '@tiptap/react'
@@ -142,7 +143,8 @@ export default function EditionPage() {
     async function init() {
       try {
         const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const authTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 8000))
+        const { data: { user } } = await Promise.race([supabase.auth.getUser(), authTimeout])
         if (!user) return
 
         const [{ data: projet }, { data: chapitres }] = await Promise.all([
@@ -272,8 +274,8 @@ export default function EditionPage() {
             className="text-xs bg-gold text-bg hover:bg-gold2 rounded-lg px-3 py-1.5 transition disabled:opacity-50 font-medium">
             {exportLoading ? '…' : '↓ Télécharger DOCX'}
           </button>
-          <a href={`/projets/${id}`} className="text-xs text-stone-500 hover:text-stone-900 border border-stone-200 rounded-lg px-3 py-1.5 transition">Générateur</a>
-          <a href="/dashboard" className="text-xs text-stone-500 hover:text-stone-900 transition">← Accueil</a>
+          <Link href={`/projets/${id}`} className="text-xs text-stone-500 hover:text-stone-900 border border-stone-200 rounded-lg px-3 py-1.5 transition">Générateur</Link>
+          <Link href="/dashboard" className="text-xs text-stone-500 hover:text-stone-900 transition">← Accueil</Link>
         </div>
       </header>
 
