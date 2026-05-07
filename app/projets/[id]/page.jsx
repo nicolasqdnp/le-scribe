@@ -153,6 +153,7 @@ export default function ProjetPage() {
   const [chatInput, setChatInput] = useState('')
   const [loading, setLoading] = useState(true)
   const [showPaywall, setShowPaywall] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState(null)
   const [generating, setGenerating] = useState(false)
   const [chatLoading, setChatLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -239,6 +240,17 @@ export default function ProjetPage() {
       if (!intro || intro.statut === 'vide' || !conclusion || conclusion.statut === 'vide') setShowFinishBanner(true)
       else { const supabase = createClient(); await supabase.from('projets_livres').update({ statut: 'termine' }).eq('id', id); setProjet(prev => prev ? { ...prev, statut: 'termine' } : prev) }
     }
+  }
+
+  async function goCheckout(plan) {
+    setCheckoutLoading(plan)
+    try {
+      const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan }) })
+      const json = await res.json()
+      if (json.url) window.location.href = json.url
+      else alert('Erreur : ' + (json.error || 'Impossible de créer la session de paiement'))
+    } catch (e) { alert('Erreur : ' + e.message) }
+    setCheckoutLoading(null)
   }
 
   async function genererChapitre() {
@@ -405,7 +417,8 @@ export default function ProjetPage() {
                 Ton chapitre gratuit a été utilisé
               </h2>
               <p className="text-sm text-stone-500 leading-relaxed">
-                Pour continuer à rédiger ton livre, choisis une formule. Je t'envoie l'accès par email dans les 24h.
+                Pour continuer à rédiger ton livre, choisis une formule.
+                Paiement sécurisé — accès immédiat après confirmation.
               </p>
             </div>
 
@@ -417,12 +430,13 @@ export default function ProjetPage() {
                   <div className="font-[family-name:var(--font-playfair)] font-bold text-gold text-xl">59€</div>
                 </div>
                 <p className="text-xs text-stone-500 mb-3">Paiement unique · Chapitres illimités · Export DOCX</p>
-                <a
-                  href="mailto:contact@lescribe.app?subject=Commande - Par livre (59€)&body=Bonjour, je souhaite acheter la formule Par livre pour 59€. Mon email de compte Le Scribe est :"
-                  className="block text-center py-2.5 rounded-lg text-sm font-semibold bg-gold text-white hover:bg-gold2 transition"
+                <button
+                  onClick={() => goCheckout('livre')}
+                  disabled={checkoutLoading !== null}
+                  className="w-full py-2.5 rounded-lg text-sm font-semibold bg-gold text-white hover:bg-gold2 transition disabled:opacity-60"
                 >
-                  Choisir cette formule →
-                </a>
+                  {checkoutLoading === 'livre' ? '⏳ Redirection…' : 'Payer 59€ →'}
+                </button>
               </div>
 
               {/* Forfait */}
@@ -432,15 +446,19 @@ export default function ProjetPage() {
                   <div className="font-[family-name:var(--font-playfair)] font-bold text-stone-900 text-xl">99€</div>
                 </div>
                 <p className="text-xs text-stone-500 mb-3">3 mois · 5 livres max · Support dédié</p>
-                <a
-                  href="mailto:contact@lescribe.app?subject=Commande - Forfait 5 livres (99€)&body=Bonjour, je souhaite acheter le Forfait 5 livres pour 99€. Mon email de compte Le Scribe est :"
-                  className="block text-center py-2.5 rounded-lg text-sm font-medium border border-stone-200 text-stone-700 hover:border-gold/30 hover:bg-stone-50 transition"
+                <button
+                  onClick={() => goCheckout('forfait')}
+                  disabled={checkoutLoading !== null}
+                  className="w-full py-2.5 rounded-lg text-sm font-medium border border-stone-200 text-stone-700 hover:border-gold/30 hover:bg-stone-50 transition disabled:opacity-60"
                 >
-                  Choisir cette formule →
-                </a>
+                  {checkoutLoading === 'forfait' ? '⏳ Redirection…' : 'Payer 99€ →'}
+                </button>
               </div>
             </div>
 
+            <p className="text-center text-xs text-stone-400 mb-3">
+              Carte, Google Pay, Apple Pay acceptés · Paiement Stripe sécurisé 🔒
+            </p>
             <button
               onClick={() => setShowPaywall(false)}
               className="w-full text-xs text-stone-400 hover:text-stone-600 transition py-1"

@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
@@ -48,6 +48,8 @@ export default function Dashboard() {
   const [deletingId, setDeletingId] = useState(null)
   const [confirmId, setConfirmId] = useState(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const paiementOk = searchParams.get('paiement') === 'ok'
 
   useEffect(() => {
     async function init() {
@@ -122,6 +124,13 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen page-glow">
+      {/* Bannière succès paiement */}
+      {paiementOk && (
+        <div className="bg-ok/10 border-b border-ok/20 px-6 py-3 flex items-center justify-center gap-2">
+          <span className="text-ok text-sm font-medium">✓ Paiement confirmé — ton accès complet est activé. Bonne écriture !</span>
+        </div>
+      )}
+
       {/* Header */}
       <header className="border-b border-border px-6 py-4 flex items-center justify-between">
         <Link href="/" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">Le Scribe</Link>
