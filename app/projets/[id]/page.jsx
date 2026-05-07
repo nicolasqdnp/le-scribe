@@ -152,6 +152,7 @@ export default function ProjetPage() {
   const [chatMessages, setChatMessages] = useState([])
   const [chatInput, setChatInput] = useState('')
   const [loading, setLoading] = useState(true)
+  const [showPaywall, setShowPaywall] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [chatLoading, setChatLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -246,6 +247,7 @@ export default function ProjetPage() {
     try {
       const res = await fetch('/api/generate-chapter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chapitreId: chapitreActif.id }) })
       const json = await res.json()
+      if (res.status === 402) { setShowPaywall(true); setGenerating(false); return }
       if (!res.ok) throw new Error(json.error)
       setContenu(json.contenu)
       setChapitres(prev => prev.map(c => c.id === chapitreActif.id ? { ...c, statut: 'genere', contenu_ia: json.contenu } : c))
@@ -392,6 +394,63 @@ export default function ProjetPage() {
 
   return (
     <main className="h-screen flex flex-col bg-[#f5f4f1]">
+
+      {/* Paywall modal */}
+      {showPaywall && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
+            <div className="text-center mb-7">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gold/10 text-gold text-xl mb-4">✦</div>
+              <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-stone-900 mb-2">
+                Ton chapitre gratuit a été utilisé
+              </h2>
+              <p className="text-sm text-stone-500 leading-relaxed">
+                Pour continuer à rédiger ton livre, choisis une formule. Je t'envoie l'accès par email dans les 24h.
+              </p>
+            </div>
+
+            <div className="space-y-3 mb-6">
+              {/* Par livre */}
+              <div className="p-5 rounded-xl border-2 border-gold/40 bg-gold/5">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="font-semibold text-stone-900">Par livre</div>
+                  <div className="font-[family-name:var(--font-playfair)] font-bold text-gold text-xl">59€</div>
+                </div>
+                <p className="text-xs text-stone-500 mb-3">Paiement unique · Chapitres illimités · Export DOCX</p>
+                <a
+                  href="mailto:contact@lescribe.app?subject=Commande - Par livre (59€)&body=Bonjour, je souhaite acheter la formule Par livre pour 59€. Mon email de compte Le Scribe est :"
+                  className="block text-center py-2.5 rounded-lg text-sm font-semibold bg-gold text-white hover:bg-gold2 transition"
+                >
+                  Choisir cette formule →
+                </a>
+              </div>
+
+              {/* Forfait */}
+              <div className="p-5 rounded-xl border border-stone-200">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="font-semibold text-stone-900">Forfait 5 livres</div>
+                  <div className="font-[family-name:var(--font-playfair)] font-bold text-stone-900 text-xl">99€</div>
+                </div>
+                <p className="text-xs text-stone-500 mb-3">3 mois · 5 livres max · Support dédié</p>
+                <a
+                  href="mailto:contact@lescribe.app?subject=Commande - Forfait 5 livres (99€)&body=Bonjour, je souhaite acheter le Forfait 5 livres pour 99€. Mon email de compte Le Scribe est :"
+                  className="block text-center py-2.5 rounded-lg text-sm font-medium border border-stone-200 text-stone-700 hover:border-gold/30 hover:bg-stone-50 transition"
+                >
+                  Choisir cette formule →
+                </a>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowPaywall(false)}
+              className="w-full text-xs text-stone-400 hover:text-stone-600 transition py-1"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="border-b border-stone-200 px-6 py-3 flex items-center justify-between flex-shrink-0 bg-white">
         <div className="flex items-center gap-3">
