@@ -240,7 +240,7 @@ export default function NouveauLivre() {
   const pct = Math.round(((cur + 1) / 4) * 100)
 
   return (
-    <main className="min-h-screen bg-bg">
+    <main className="min-h-screen page-glow">
       <header className="border-b border-border px-6 py-4 flex items-center justify-between">
         <a href="/dashboard" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">Le Scribe</a>
         <span className="text-xs text-muted">Nouveau livre</span>

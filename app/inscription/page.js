@@ -28,7 +28,7 @@ export default function Inscription() {
   }
 
   return (
-    <main className="min-h-screen bg-bg flex items-center justify-center px-4">
+    <main className="min-h-screen page-glow flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-10">

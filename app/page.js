@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="min-h-screen bg-bg text-cream">
+    <main className="min-h-screen page-glow text-cream">
 
       {/* Navigation */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-bg/90 backdrop-blur-sm">

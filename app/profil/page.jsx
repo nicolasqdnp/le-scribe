@@ -396,13 +396,13 @@ export default function Profil() {
   const pct = Math.round(((cur + 1) / 5) * 100)
 
   if (mode === 'loading') return (
-    <main className="min-h-screen bg-bg flex items-center justify-center">
+    <main className="min-h-screen page-glow flex items-center justify-center">
       <p className="text-muted text-sm">Chargement…</p>
     </main>
   )
 
   if (mode === 'analyzing') return (
-    <main className="min-h-screen bg-bg flex items-center justify-center">
+    <main className="min-h-screen page-glow flex items-center justify-center">
       <div className="text-center max-w-sm">
         <div className="font-[family-name:var(--font-playfair)] text-5xl text-gold mb-6 animate-pulse">✦</div>
         <h2 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-cream mb-3">L'IA analyse ton profil…</h2>
@@ -412,7 +412,7 @@ export default function Profil() {
   )
 
   return (
-    <main className="min-h-screen bg-bg">
+    <main className="min-h-screen page-glow">
       <header className="border-b border-border px-6 py-4 flex items-center justify-between">
         <a href="/dashboard" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">Le Scribe</a>
         <span className="text-xs text-muted">Profil auteur</span>

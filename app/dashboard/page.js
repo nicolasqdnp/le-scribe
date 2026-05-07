@@ -107,13 +107,13 @@ export default function Dashboard() {
   }
 
   if (loading) return (
-    <main className="min-h-screen bg-bg flex items-center justify-center">
+    <main className="min-h-screen page-glow flex items-center justify-center">
       <p className="text-muted text-sm">Chargement…</p>
     </main>
   )
 
   return (
-    <main className="min-h-screen bg-bg">
+    <main className="min-h-screen page-glow">
       {/* Header */}
       <header className="border-b border-border px-6 py-4 flex items-center justify-between">
         <a href="/" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">Le Scribe</a>
