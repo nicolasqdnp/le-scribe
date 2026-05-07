@@ -124,15 +124,16 @@ html, body {
   .font-\[family-name\:var\(--font-playfair\)\] {
     font-family: var(--font-playfair, Georgia, serif);
   }
+
+  /* Effet glow pour les pages sombres (fond dégradé or subtil) */
+  .page-glow {
+    background:
+      radial-gradient(ellipse 900px 700px at -8% -10%, rgba(201, 167, 125, 0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 700px 550px at 108% 110%, rgba(201, 167, 125, 0.07) 0%, transparent 60%),
+      #0d0d0d !important;
+  }
 }
 
-/* ── Effet glow pour les pages sombres ────────────── */
-.page-glow {
-  background:
-    radial-gradient(ellipse 900px 700px at -8% -10%, rgba(201, 167, 125, 0.10) 0%, transparent 60%),
-    radial-gradient(ellipse 700px 550px at 108% 110%, rgba(201, 167, 125, 0.07) 0%, transparent 60%),
-    var(--bg);
-}
 
 /* ── Scrollbars ────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
