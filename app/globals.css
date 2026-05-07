@@ -1,1 +1,100 @@
 @import "tailwindcss";
+
+@theme {
+  /* Backgrounds */
+  --color-bg:       #0d0d0d;
+  --color-surface:  #161616;
+  --color-surface2: #1e1e1e;
+  --color-surface3: #252525;
+
+  /* Borders */
+  --color-border:   #252525;
+  --color-border2:  #1e1e1e;
+
+  /* Text */
+  --color-cream:    #ede8df;
+  --color-cream2:   #c8c3bb;
+  --color-muted:    #7a7570;
+  --color-muted2:   #4a4642;
+
+  /* Accent gold */
+  --color-gold:     #c9a77d;
+  --color-gold2:    #d4b896;
+  --color-gold3:    #b8966c;
+
+  /* Status */
+  --color-ok:       #4ade80;
+  --color-warn:     #fbbf24;
+  --color-err:      #f87171;
+}
+
+html, body {
+  background-color: #0d0d0d;
+  color: #ede8df;
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0d0d0d; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+/* ── Print : zone blanche ─────────────────────────── */
+@media print {
+  html, body { background: white !important; color: #1c1917 !important; }
+  .toolbar-print-hide { display: none !important; }
+
+  @page {
+    size: A4;
+    margin: 25mm 20mm 22mm 28mm;
+    @bottom-center {
+      content: counter(page);
+      font-family: Georgia, serif;
+      font-size: 9pt;
+      color: #888;
+    }
+  }
+
+  .print-content {
+    font-family: Georgia, serif;
+    font-size: 12pt;
+    line-height: 1.8;
+    color: #1c1917;
+    background: white;
+  }
+
+  .print-content h1 {
+    font-size: 22pt;
+    font-weight: bold;
+    margin-top: 3em;
+    margin-bottom: 0.5em;
+    page-break-before: always;
+    text-indent: 0;
+  }
+  .print-content h1:first-child { page-break-before: avoid; }
+  .print-content h2 {
+    font-size: 15pt;
+    font-weight: bold;
+    margin-top: 1.6em;
+    margin-bottom: 0.4em;
+    text-indent: 0;
+  }
+  .print-content h3 {
+    font-size: 12pt;
+    font-weight: bold;
+    font-style: italic;
+    margin-top: 1.2em;
+    margin-bottom: 0.3em;
+    text-indent: 0;
+  }
+  .print-content p {
+    text-indent: 1.5em;
+    margin: 0;
+    orphans: 3;
+    widows: 3;
+  }
+  .print-content p:first-child,
+  .print-content h1 + p { text-indent: 0; }
+}

@@ -25,52 +25,57 @@ export default function Login() {
   }
 
   return (
-    <main className="min-h-screen bg-stone-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-2xl border border-stone-200 p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <span className="text-3xl">✍️</span>
-          <h1 className="text-2xl font-bold text-stone-900 mt-2">Connexion</h1>
-          <p className="text-stone-500 text-sm mt-1">Content de te revoir !</p>
+    <main className="min-h-screen bg-bg flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-10">
+          <a href="/" className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-gold">Le Scribe</a>
+          <h1 className="text-xl font-semibold text-cream mt-4 mb-1">Connexion</h1>
+          <p className="text-sm text-muted">Content de te revoir !</p>
         </div>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="jean@exemple.fr"
-              required
-              className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Mot de passe</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="Ton mot de passe"
-              required
-              className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-            />
-          </div>
-          {message && (
-            <div className="text-sm p-3 rounded-lg bg-red-50 text-red-600">
-              {message}
+
+        <div className="bg-surface border border-border rounded-2xl p-8">
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label className="block text-xs font-medium text-muted uppercase tracking-widest mb-2">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="jean@exemple.fr"
+                required
+                className="w-full bg-surface2 border border-border rounded-lg px-4 py-3 text-sm text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition"
+              />
             </div>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-violet-600 text-white py-3 rounded-lg font-medium hover:bg-violet-700 transition disabled:opacity-50"
-          >
-            {loading ? 'Connexion...' : 'Se connecter →'}
-          </button>
-        </form>
-        <p className="text-center text-sm text-stone-500 mt-6">
+            <div>
+              <label className="block text-xs font-medium text-muted uppercase tracking-widest mb-2">Mot de passe</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Ton mot de passe"
+                required
+                className="w-full bg-surface2 border border-border rounded-lg px-4 py-3 text-sm text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition"
+              />
+            </div>
+            {message && (
+              <div className="text-sm p-3 rounded-lg bg-err/10 border border-err/20 text-err">
+                {message}
+              </div>
+            )}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gold text-bg py-3 rounded-lg font-semibold text-sm hover:bg-gold2 transition disabled:opacity-50 mt-2"
+            >
+              {loading ? 'Connexion…' : 'Se connecter →'}
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center text-sm text-muted mt-6">
           Pas encore de compte ?{' '}
-          <a href="/inscription" className="text-violet-600 hover:underline">S'inscrire gratuitement</a>
+          <a href="/inscription" className="text-gold hover:text-gold2 transition">S'inscrire gratuitement</a>
         </p>
       </div>
     </main>
