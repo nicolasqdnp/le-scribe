@@ -1,47 +1,138 @@
 @import "tailwindcss";
 
-@theme {
-  /* Backgrounds */
-  --color-bg:       #0d0d0d;
-  --color-surface:  #161616;
-  --color-surface2: #1e1e1e;
-  --color-surface3: #252525;
-
-  /* Borders */
-  --color-border:   #252525;
-  --color-border2:  #1e1e1e;
-
-  /* Text */
-  --color-cream:    #ede8df;
-  --color-cream2:   #c8c3bb;
-  --color-muted:    #7a7570;
-  --color-muted2:   #4a4642;
-
-  /* Accent gold */
-  --color-gold:     #c9a77d;
-  --color-gold2:    #d4b896;
-  --color-gold3:    #b8966c;
-
-  /* Status */
-  --color-ok:       #4ade80;
-  --color-warn:     #fbbf24;
-  --color-err:      #f87171;
+/* ── Variables CSS ─────────────────────────────────── */
+:root {
+  --bg:       #0d0d0d;
+  --surface:  #161616;
+  --surface2: #1e1e1e;
+  --surface3: #252525;
+  --border:   #252525;
+  --cream:    #ede8df;
+  --cream2:   #c8c3bb;
+  --muted:    #7a7570;
+  --muted2:   #4a4642;
+  --gold:     #c9a77d;
+  --gold2:    #d4b896;
+  --gold3:    #b8966c;
+  --ok:       #4ade80;
+  --warn:     #fbbf24;
+  --err:      #f87171;
 }
 
+/* ── Base ──────────────────────────────────────────── */
 html, body {
-  background-color: #0d0d0d;
-  color: #ede8df;
-  font-family: system-ui, -apple-system, sans-serif;
+  background-color: var(--bg) !important;
+  color: var(--cream);
+  font-family: var(--font-inter, system-ui, sans-serif);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbars */
+/* ── Classes utilitaires custom ────────────────────── */
+@layer utilities {
+  /* Backgrounds */
+  .bg-bg       { background-color: var(--bg); }
+  .bg-surface  { background-color: var(--surface); }
+  .bg-surface2 { background-color: var(--surface2); }
+  .bg-surface3 { background-color: var(--surface3); }
+
+  /* Hover backgrounds */
+  .hover\:bg-surface2:hover  { background-color: var(--surface2); }
+  .hover\:bg-surface3:hover  { background-color: var(--surface3); }
+
+  /* Textes */
+  .text-cream  { color: var(--cream); }
+  .text-cream2 { color: var(--cream2); }
+  .text-muted  { color: var(--muted); }
+  .text-muted2 { color: var(--muted2); }
+  .text-gold   { color: var(--gold); }
+  .text-gold2  { color: var(--gold2); }
+  .text-ok     { color: var(--ok); }
+  .text-warn   { color: var(--warn); }
+  .text-err    { color: var(--err); }
+
+  /* Hover textes */
+  .hover\:text-cream:hover  { color: var(--cream); }
+  .hover\:text-cream2:hover { color: var(--cream2); }
+  .hover\:text-muted:hover  { color: var(--muted); }
+  .hover\:text-gold:hover   { color: var(--gold); }
+  .hover\:text-gold2:hover  { color: var(--gold2); }
+  .hover\:text-err:hover    { color: var(--err); }
+
+  /* Bordures */
+  .border-border  { border-color: var(--border); }
+  .border-border2 { border-color: var(--surface2); }
+  .hover\:border-border2:hover { border-color: var(--surface2); }
+
+  /* Gold border + hover */
+  .border-gold\/20  { border-color: color-mix(in srgb, var(--gold) 20%, transparent); }
+  .border-gold\/30  { border-color: color-mix(in srgb, var(--gold) 30%, transparent); }
+  .border-gold\/40  { border-color: color-mix(in srgb, var(--gold) 40%, transparent); }
+  .border-gold\/50  { border-color: color-mix(in srgb, var(--gold) 50%, transparent); }
+  .border-gold\/60  { border-color: color-mix(in srgb, var(--gold) 60%, transparent); }
+  .hover\:border-gold\/20:hover { border-color: color-mix(in srgb, var(--gold) 20%, transparent); }
+  .hover\:border-gold\/30:hover { border-color: color-mix(in srgb, var(--gold) 30%, transparent); }
+  .hover\:border-gold\/40:hover { border-color: color-mix(in srgb, var(--gold) 40%, transparent); }
+  .hover\:border-gold\/50:hover { border-color: color-mix(in srgb, var(--gold) 50%, transparent); }
+
+  /* Border ok/warn/err */
+  .border-ok\/20   { border-color: color-mix(in srgb, var(--ok) 20%, transparent); }
+  .border-warn\/20 { border-color: color-mix(in srgb, var(--warn) 20%, transparent); }
+  .border-err\/20  { border-color: color-mix(in srgb, var(--err) 20%, transparent); }
+
+  /* Backgrounds avec opacité */
+  .bg-gold     { background-color: var(--gold); }
+  .bg-gold2    { background-color: var(--gold2); }
+  .bg-gold\/5  { background-color: color-mix(in srgb, var(--gold) 5%, transparent); }
+  .bg-gold\/10 { background-color: color-mix(in srgb, var(--gold) 10%, transparent); }
+  .bg-gold\/20 { background-color: color-mix(in srgb, var(--gold) 20%, transparent); }
+
+  .hover\:bg-gold:hover  { background-color: var(--gold); }
+  .hover\:bg-gold2:hover { background-color: var(--gold2); }
+  .hover\:bg-gold\/5:hover  { background-color: color-mix(in srgb, var(--gold) 5%, transparent); }
+
+  .bg-ok      { background-color: var(--ok); }
+  .bg-ok\/5   { background-color: color-mix(in srgb, var(--ok) 5%, transparent); }
+  .bg-ok\/10  { background-color: color-mix(in srgb, var(--ok) 10%, transparent); }
+  .bg-ok\/80  { background-color: color-mix(in srgb, var(--ok) 80%, transparent); }
+  .hover\:bg-ok:hover { background-color: var(--ok); }
+
+  .bg-warn     { background-color: var(--warn); }
+  .bg-warn\/10 { background-color: color-mix(in srgb, var(--warn) 10%, transparent); }
+
+  .bg-err      { background-color: var(--err); }
+  .bg-err\/10  { background-color: color-mix(in srgb, var(--err) 10%, transparent); }
+  .bg-err\/80  { background-color: color-mix(in srgb, var(--err) 80%, transparent); }
+  .hover\:bg-err:hover    { background-color: var(--err); }
+  .hover\:bg-err\/10:hover { background-color: color-mix(in srgb, var(--err) 10%, transparent); }
+
+  /* Text avec opacité gold */
+  .text-gold\/50  { color: color-mix(in srgb, var(--gold) 50%, transparent); }
+  .text-gold\/60  { color: color-mix(in srgb, var(--gold) 60%, transparent); }
+  .text-gold\/40  { color: color-mix(in srgb, var(--gold) 40%, transparent); }
+
+  /* Focus rings */
+  .focus\:border-gold\/50:focus { border-color: color-mix(in srgb, var(--gold) 50%, transparent); }
+  .focus\:border-gold\/40:focus { border-color: color-mix(in srgb, var(--gold) 40%, transparent); }
+  .focus\:ring-gold\/30:focus   { --tw-ring-color: color-mix(in srgb, var(--gold) 30%, transparent); }
+
+  /* Shadow gold */
+  .shadow-\[0_0_30px_rgba\(201\,167\,125\,0\.2\)\] {
+    box-shadow: 0 0 30px rgba(201, 167, 125, 0.2);
+  }
+
+  /* Playfair */
+  .font-\[family-name\:var\(--font-playfair\)\] {
+    font-family: var(--font-playfair, Georgia, serif);
+  }
+}
+
+/* ── Scrollbars ────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0d0d0d; }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
 
-/* ── Print : zone blanche ─────────────────────────── */
+/* ── Print ─────────────────────────────────────────── */
 @media print {
   html, body { background: white !important; color: #1c1917 !important; }
   .toolbar-print-hide { display: none !important; }
@@ -56,45 +147,4 @@ html, body {
       color: #888;
     }
   }
-
-  .print-content {
-    font-family: Georgia, serif;
-    font-size: 12pt;
-    line-height: 1.8;
-    color: #1c1917;
-    background: white;
-  }
-
-  .print-content h1 {
-    font-size: 22pt;
-    font-weight: bold;
-    margin-top: 3em;
-    margin-bottom: 0.5em;
-    page-break-before: always;
-    text-indent: 0;
-  }
-  .print-content h1:first-child { page-break-before: avoid; }
-  .print-content h2 {
-    font-size: 15pt;
-    font-weight: bold;
-    margin-top: 1.6em;
-    margin-bottom: 0.4em;
-    text-indent: 0;
-  }
-  .print-content h3 {
-    font-size: 12pt;
-    font-weight: bold;
-    font-style: italic;
-    margin-top: 1.2em;
-    margin-bottom: 0.3em;
-    text-indent: 0;
-  }
-  .print-content p {
-    text-indent: 1.5em;
-    margin: 0;
-    orphans: 3;
-    widows: 3;
-  }
-  .print-content p:first-child,
-  .print-content h1 + p { text-indent: 0; }
 }
