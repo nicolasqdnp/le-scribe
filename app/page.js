@@ -23,7 +23,7 @@ export default function Home() {
       <section className="pt-40 pb-32 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-block text-xs font-medium tracking-[0.15em] uppercase text-gold border border-gold/30 bg-gold/5 px-4 py-1.5 rounded-full mb-10">
-            Pour les pasteurs et auteurs chrétiens
+            Pour les pasteurs, influenceurs et auteurs chrétiens
           </div>
           <h1 className="font-[family-name:var(--font-playfair)] text-5xl md:text-6xl font-bold text-cream leading-tight mb-7">
             Transforme tes<br />
