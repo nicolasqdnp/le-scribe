@@ -174,22 +174,27 @@ export default function ProjetPage() {
 
   useEffect(() => {
     async function init() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.replace('/login'); return }
-      setUser(user)
-      const [{ data: proj }, { data: chaps }] = await Promise.all([
-        supabase.from('projets_livres').select('*').eq('id', id).eq('user_id', user.id).single(),
-        supabase.from('chapitres').select('*').eq('projet_id', id).order('numero', { ascending: true })
-      ])
-      if (!proj) { router.replace('/dashboard'); return }
-      setProjet(proj); setChapitres(chaps || [])
-      if (chaps?.length > 0) {
-        const premier = chaps[0]
-        setChapitreActif(premier); setContenu(premier.contenu_final || premier.contenu_ia || '')
-        setExtras(premier.extras || null); loadChat(supabase, id, premier.id)
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) { router.replace('/login'); return }
+        setUser(user)
+        const [{ data: proj }, { data: chaps }] = await Promise.all([
+          supabase.from('projets_livres').select('*').eq('id', id).eq('user_id', user.id).single(),
+          supabase.from('chapitres').select('*').eq('projet_id', id).order('numero', { ascending: true })
+        ])
+        if (!proj) { router.replace('/dashboard'); return }
+        setProjet(proj); setChapitres(chaps || [])
+        if (chaps?.length > 0) {
+          const premier = chaps[0]
+          setChapitreActif(premier); setContenu(premier.contenu_final || premier.contenu_ia || '')
+          setExtras(premier.extras || null); loadChat(supabase, id, premier.id)
+        }
+      } catch (e) {
+        console.error('Erreur chargement projet:', e)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     init()
   }, [id])

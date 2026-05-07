@@ -140,22 +140,27 @@ export default function EditionPage() {
 
   useEffect(() => {
     async function init() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
 
-      const [{ data: projet }, { data: chapitres }] = await Promise.all([
-        supabase.from('projets_livres').select('titre, plan_ia').eq('id', id).eq('user_id', user.id).single(),
-        supabase.from('chapitres').select('numero, titre, contenu_final').eq('projet_id', id).order('numero', { ascending: true }),
-      ])
-      const { data: edition } = await supabase.from('projets_livres').select('contenu_edition').eq('id', id).single()
+        const [{ data: projet }, { data: chapitres }] = await Promise.all([
+          supabase.from('projets_livres').select('titre, plan_ia').eq('id', id).eq('user_id', user.id).single(),
+          supabase.from('chapitres').select('numero, titre, contenu_final').eq('projet_id', id).order('numero', { ascending: true }),
+        ])
+        const { data: edition } = await supabase.from('projets_livres').select('contenu_edition').eq('id', id).single()
 
-      if (projet) {
-        setTitre(projet.plan_ia?.titre_final || projet.titre || 'Mon livre')
-        const html = edition?.contenu_edition || chapitresVersHTML(chapitres || [])
-        editor.commands.setContent(html || '<p>Aucun contenu trouvé.</p>')
+        if (projet) {
+          setTitre(projet.plan_ia?.titre_final || projet.titre || 'Mon livre')
+          const html = edition?.contenu_edition || chapitresVersHTML(chapitres || [])
+          editor.commands.setContent(html || '<p>Aucun contenu trouvé.</p>')
+        }
+      } catch (e) {
+        console.error('Erreur chargement édition:', e)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     if (editor) init()
   }, [editor, id])

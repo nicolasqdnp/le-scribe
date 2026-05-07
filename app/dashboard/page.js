@@ -49,41 +49,46 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function init() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
-      setUser(user)
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) { router.push('/login'); return }
+        setUser(user)
 
-      const [{ data: analysis }, { data: projetsData }, { data: chapitresData }] = await Promise.all([
-        supabase.from('author_profile_analyses').select('portrait').eq('user_id', user.id).maybeSingle(),
-        supabase.from('projets_livres').select('id, titre, sujet, statut, nb_chapitres, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10),
-        supabase.from('chapitres').select('projet_id, numero, statut').eq('user_id', user.id)
-      ])
+        const [{ data: analysis }, { data: projetsData }, { data: chapitresData }] = await Promise.all([
+          supabase.from('author_profile_analyses').select('portrait').eq('user_id', user.id).maybeSingle(),
+          supabase.from('projets_livres').select('id, titre, sujet, statut, nb_chapitres, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10),
+          supabase.from('chapitres').select('projet_id, numero, statut').eq('user_id', user.id)
+        ])
 
-      if (analysis?.portrait) setPortrait(analysis.portrait)
+        if (analysis?.portrait) setPortrait(analysis.portrait)
 
-      const chapParProjet = {}
-      for (const ch of chapitresData || []) {
-        if (!chapParProjet[ch.projet_id]) chapParProjet[ch.projet_id] = []
-        chapParProjet[ch.projet_id].push(ch)
+        const chapParProjet = {}
+        for (const ch of chapitresData || []) {
+          if (!chapParProjet[ch.projet_id]) chapParProjet[ch.projet_id] = []
+          chapParProjet[ch.projet_id].push(ch)
+        }
+
+        const projetsAvecProgression = (projetsData || []).map(proj => {
+          const chaps = chapParProjet[proj.id] || []
+          const reguliers = chaps.filter(c => c.numero > 0 && c.numero < 998)
+          const intro = chaps.find(c => c.numero === 0)
+          const conclusion = chaps.find(c => c.numero === 999)
+          const total = reguliers.length + 2
+          const valides =
+            reguliers.filter(c => c.statut === 'valide').length +
+            (intro?.statut === 'valide' ? 1 : 0) +
+            (conclusion?.statut === 'valide' ? 1 : 0)
+          const pct = total > 2 ? Math.round((valides / total) * 100) : 0
+          return { ...proj, progression: pct, chapCount: reguliers.length }
+        })
+
+        setProjets(projetsAvecProgression)
+      } catch (e) {
+        console.error('Erreur chargement dashboard:', e)
+      } finally {
+        setLoading(false)
       }
-
-      const projetsAvecProgression = (projetsData || []).map(proj => {
-        const chaps = chapParProjet[proj.id] || []
-        const reguliers = chaps.filter(c => c.numero > 0 && c.numero < 998)
-        const intro = chaps.find(c => c.numero === 0)
-        const conclusion = chaps.find(c => c.numero === 999)
-        const total = reguliers.length + 2
-        const valides =
-          reguliers.filter(c => c.statut === 'valide').length +
-          (intro?.statut === 'valide' ? 1 : 0) +
-          (conclusion?.statut === 'valide' ? 1 : 0)
-        const pct = total > 2 ? Math.round((valides / total) * 100) : 0
-        return { ...proj, progression: pct, chapCount: reguliers.length }
-      })
-
-      setProjets(projetsAvecProgression)
-      setLoading(false)
     }
     init()
   }, [])
