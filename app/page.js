@@ -1,3 +1,5 @@
+import WordCycler from './components/WordCycler'
+
 export default function Home() {
   return (
     <main className="min-h-screen page-glow text-cream">
@@ -24,7 +26,7 @@ export default function Home() {
             Pour les pasteurs et auteurs chrétiens
           </div>
           <h1 className="font-[family-name:var(--font-playfair)] text-5xl md:text-6xl font-bold text-cream leading-tight mb-7">
-            Transforme tes prédications<br />
+            Transforme tes <WordCycler /><br />
             <span className="text-gold">en livre publié</span>
           </h1>
           <p className="text-lg text-muted max-w-xl mx-auto mb-12 leading-relaxed">
