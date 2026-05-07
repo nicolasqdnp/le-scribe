@@ -91,6 +91,14 @@ function ToolbarButton({ onClick, active, title, children, disabled }) {
   )
 }
 
+const SUGGESTIONS = [
+  "Comment structurer une introduction de chapitre ?",
+  "Comment mettre en valeur une citation biblique ?",
+  "Quelle longueur idéale pour un chapitre pastoral ?",
+  "Quand utiliser des sous-titres dans un chapitre ?",
+  "Comment paginer préface, intro et conclusion ?",
+]
+
 export default function EditionPage() {
   const { id } = useParams()
   const [titre, setTitre] = useState('')
@@ -101,6 +109,13 @@ export default function EditionPage() {
   const [fontSize, setFontSize] = useState('12')
   const [currentType, setCurrentType] = useState('p')
   const containerRef = useRef(null)
+
+  // Panneau conseils mise en page
+  const [chatOpen, setChatOpen] = useState(false)
+  const [chatMessages, setChatMessages] = useState([])
+  const [chatInput, setChatInput] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const chatBottomRef = useRef(null)
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -196,6 +211,33 @@ export default function EditionPage() {
   function applySize(s) { setFontSize(s); editor?.chain().focus().setFontSize(`${s}pt`).run() }
 
   const selectCls = "text-xs bg-surface2 border border-border rounded px-2 py-1 text-cream2 focus:outline-none focus:border-gold/40 cursor-pointer"
+
+  async function sendChatMessage(text) {
+    const msg = (text || chatInput).trim()
+    if (!msg || chatLoading) return
+    setChatInput('')
+    const newMessages = [...chatMessages, { role: 'user', content: msg }]
+    setChatMessages(newMessages)
+    setChatLoading(true)
+    try {
+      const history = newMessages.slice(0, -1) // tout sauf le dernier (déjà envoyé)
+      const res = await fetch('/api/layout-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, history }),
+      })
+      const data = await res.json()
+      if (data.reply) {
+        setChatMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
+      } else {
+        setChatMessages(prev => [...prev, { role: 'assistant', content: data.error || 'Erreur inattendue.' }])
+      }
+    } catch {
+      setChatMessages(prev => [...prev, { role: 'assistant', content: 'Impossible de joindre l\'assistant.' }])
+    }
+    setChatLoading(false)
+    setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+  }
 
   if (loading) return (
     <main className="min-h-screen bg-bg flex items-center justify-center">
@@ -341,16 +383,115 @@ export default function EditionPage() {
         <ToolbarButton onClick={() => window.print()} title="Aperçu d'impression / PDF">
           Aperçu PDF
         </ToolbarButton>
+
+        {/* Bouton conseils mise en page — tout à droite */}
+        <div className="flex-1" />
+        <button
+          onClick={() => setChatOpen(o => !o)}
+          title="Conseils mise en page"
+          className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition ${
+            chatOpen
+              ? 'bg-gold/20 text-gold border border-gold/30'
+              : 'text-muted hover:text-cream hover:bg-surface2 border border-transparent'
+          }`}>
+          ✦ Mise en page
+        </button>
       </div>
 
-      {/* Zone d'édition — fond sombre autour de la feuille blanche */}
-      <div className="print-scroll-area flex-1 overflow-y-auto bg-bg py-10 px-4">
-        <div
-          ref={containerRef}
-          className="page-container bg-white shadow-[0_4px_40px_rgba(0,0,0,0.6)] mx-auto rounded-sm"
-          style={{ width: '210mm', minHeight: '297mm', padding: '25mm 20mm 25mm 28mm' }}>
-          <EditorContent editor={editor} className="h-full" />
+      {/* Zone principale : éditeur + panneau latéral */}
+      <div className="flex-1 flex overflow-hidden">
+
+        {/* Zone d'édition — fond sombre autour de la feuille blanche */}
+        <div className="print-scroll-area flex-1 overflow-y-auto bg-bg py-10 px-4">
+          <div
+            ref={containerRef}
+            className="page-container bg-white shadow-[0_4px_40px_rgba(0,0,0,0.6)] mx-auto rounded-sm"
+            style={{ width: '210mm', minHeight: '297mm', padding: '25mm 20mm 25mm 28mm' }}>
+            <EditorContent editor={editor} className="h-full" />
+          </div>
         </div>
+
+        {/* Panneau conseils mise en page */}
+        {chatOpen && (
+          <div className="toolbar-print-hide w-80 flex-shrink-0 border-l border-border bg-surface flex flex-col">
+            {/* En-tête */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border flex-shrink-0">
+              <div>
+                <p className="text-sm font-medium text-cream">✦ Mise en page</p>
+                <p className="text-xs text-muted">Conseils & bonnes pratiques</p>
+              </div>
+              <button onClick={() => setChatOpen(false)} className="text-muted2 hover:text-cream transition text-lg leading-none">×</button>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
+              {chatMessages.length === 0 && (
+                <div className="flex flex-col gap-3">
+                  <p className="text-xs text-muted leading-relaxed">
+                    Posez vos questions sur la structure, la typographie ou la présentation de votre livre.
+                  </p>
+                  <div className="flex flex-col gap-2 mt-1">
+                    {SUGGESTIONS.map(s => (
+                      <button
+                        key={s}
+                        onClick={() => sendChatMessage(s)}
+                        className="text-left text-xs text-cream2 bg-surface2 hover:bg-surface3 border border-border hover:border-gold/30 rounded-lg px-3 py-2 transition leading-relaxed">
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {chatMessages.map((m, i) => (
+                <div key={i} className={`flex flex-col gap-1 ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
+                  {m.role === 'user' ? (
+                    <div className="bg-gold/10 border border-gold/20 rounded-xl rounded-tr-sm px-3 py-2 max-w-[90%]">
+                      <p className="text-xs text-cream leading-relaxed">{m.content}</p>
+                    </div>
+                  ) : (
+                    <div className="bg-surface2 border border-border rounded-xl rounded-tl-sm px-3 py-2 max-w-[95%]">
+                      <p className="text-xs text-cream2 leading-relaxed whitespace-pre-wrap">{m.content}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {chatLoading && (
+                <div className="flex items-start">
+                  <div className="bg-surface2 border border-border rounded-xl rounded-tl-sm px-3 py-2">
+                    <div className="flex gap-1 items-center h-4">
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={chatBottomRef} />
+            </div>
+
+            {/* Input */}
+            <div className="border-t border-border px-3 py-3 flex-shrink-0">
+              <div className="flex gap-2">
+                <input
+                  value={chatInput}
+                  onChange={e => setChatInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage() } }}
+                  placeholder="Votre question…"
+                  className="flex-1 text-xs bg-surface2 border border-border rounded-lg px-3 py-2 text-cream placeholder-muted2 focus:outline-none focus:border-gold/40 transition"
+                />
+                <button
+                  onClick={() => sendChatMessage()}
+                  disabled={!chatInput.trim() || chatLoading}
+                  className="bg-gold hover:bg-gold2 text-bg rounded-lg px-3 py-2 text-xs font-medium transition disabled:opacity-40">
+                  ↑
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <style>{`
