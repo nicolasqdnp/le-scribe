@@ -246,6 +246,38 @@ export default function EditionPage() {
     setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
   }
 
+  function insertTDM() {
+    if (!editor) return
+
+    const json = editor.getJSON()
+    const titres = []
+
+    function extraire(nodes) {
+      if (!nodes) return
+      for (const node of nodes) {
+        if (node.type === 'heading' && node.attrs?.level === 1) {
+          const texte = (node.content || []).map(c => c.text || '').join('').trim()
+          if (texte) titres.push(texte)
+        }
+        if (node.content) extraire(node.content)
+      }
+    }
+    extraire(json.content)
+
+    if (titres.length === 0) {
+      alert('Aucun Titre 1 trouvé. Utilisez le style "Titre 1" pour vos chapitres.')
+      return
+    }
+
+    const tdmHTML = [
+      '<h1>Table des matières</h1>',
+      ...titres.map(t => `<p>${t}</p>`),
+      '<p></p>',
+    ].join('')
+
+    editor.chain().focus().insertContentAt(0, tdmHTML).run()
+  }
+
   if (loading) return (
     <main className="min-h-screen bg-[#f5f4f1] flex items-center justify-center">
       <p className="text-stone-500 text-sm">Chargement de l'éditeur…</p>
@@ -386,6 +418,10 @@ export default function EditionPage() {
         <ToolbarButton onClick={() => editor?.chain().focus().redo().run()} title="Rétablir (Ctrl+Y)">↪</ToolbarButton>
 
         <div className="w-px h-5 bg-border mx-1" />
+
+        <ToolbarButton onClick={insertTDM} title="Insérer la table des matières à partir des Titres 1">
+          ☰ TDM
+        </ToolbarButton>
 
         <ToolbarButton onClick={() => window.print()} title="Aperçu d'impression / PDF">
           Aperçu PDF
