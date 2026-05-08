@@ -10,6 +10,15 @@ export default function Home() {
           <a href="/" className="flex items-center gap-2.5">
             <span className="text-gold font-[family-name:var(--font-playfair)] text-xl font-bold tracking-wide">Le Scribe</span>
           </a>
+          {/* Liens navigation centre */}
+          <nav className="hidden md:flex items-center gap-1">
+            <a href="#comment" className="text-sm text-muted hover:text-cream px-4 py-2 rounded-lg hover:bg-surface transition">Comment ça marche</a>
+            <a href="#tarifs" className="text-sm text-muted hover:text-cream px-4 py-2 rounded-lg hover:bg-surface transition">Tarifs</a>
+            <a href="#tutos" className="text-sm text-muted2 hover:text-muted px-4 py-2 rounded-lg transition flex items-center gap-1.5">
+              Tutos
+              <span className="text-[10px] bg-surface2 text-muted2 border border-border px-1.5 py-0.5 rounded-full">Bientôt</span>
+            </a>
+          </nav>
           <div className="flex gap-2 items-center">
             <a href="/login" className="text-sm text-muted hover:text-cream px-4 py-2 transition">Connexion</a>
             <a href="/inscription" className="text-sm bg-gold text-bg font-medium px-5 py-2 rounded-lg hover:bg-gold2 transition">
@@ -84,7 +93,7 @@ export default function Home() {
       </div>
 
       {/* Tarifs */}
-      <section className="py-28 px-6">
+      <section id="tarifs" className="py-28 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-cream mb-3">Tarifs simples</h2>
@@ -147,7 +156,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-10 px-6 text-center">
+      <footer id="tutos" className="border-t border-border py-10 px-6 text-center">
         <div className="font-[family-name:var(--font-playfair)] text-gold text-lg font-bold mb-2">Le Scribe</div>
         <p className="text-xs text-muted2">© 2025 Le Scribe — Conçu pour les pasteurs et auteurs chrétiens francophones</p>
       </footer>
