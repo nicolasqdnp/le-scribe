@@ -138,10 +138,14 @@ export default function Home() {
             {/* Forfait */}
             <div className="p-7 rounded-2xl border border-border bg-surface">
               <div className="text-xs text-muted uppercase tracking-widest mb-2">3 mois / 5 livres</div>
-              <div className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-cream mb-1">Forfait</div>
-              <div className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-cream mb-7">99€</div>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-cream">Forfait</div>
+                <span className="text-xs font-semibold bg-ok/10 text-ok border border-ok/20 px-2 py-0.5 rounded-full">-46%</span>
+              </div>
+              <div className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-cream mb-1">159€</div>
+              <div className="text-xs text-ok mb-6">Économise 136€ vs le tarif au livre</div>
               <ul className="space-y-2.5 mb-8">
-                {['5 livres max', 'Priorité de traitement', 'Support dédié'].map(f => (
+                {['5 livres max', '31,80€ / livre', 'Support dédié'].map(f => (
                   <li key={f} className="text-sm text-muted flex items-center gap-2">
                     <span className="text-gold text-xs">✦</span> {f}
                   </li>

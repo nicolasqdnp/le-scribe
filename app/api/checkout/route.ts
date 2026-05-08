@@ -14,7 +14,7 @@ const PLANS: Record<string, { name: string; description: string; amount: number;
   forfait: {
     name: 'Le Scribe — Forfait 5 livres',
     description: '5 livres max · 3 mois · Support dédié',
-    amount: 9900, // centimes = 99€
+    amount: 15900, // centimes = 159€
     plan: 'forfait',
   },
 }

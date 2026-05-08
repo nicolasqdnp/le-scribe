@@ -445,13 +445,14 @@ export default function ProjetPage() {
                   <div className="font-semibold text-stone-900">Forfait 5 livres</div>
                   <div className="font-[family-name:var(--font-playfair)] font-bold text-stone-900 text-xl">99€</div>
                 </div>
-                <p className="text-xs text-stone-500 mb-3">3 mois · 5 livres max · Support dédié</p>
+                <p className="text-xs text-stone-500 mb-1">3 mois · 5 livres max · Support dédié</p>
+                <p className="text-xs text-ok mb-3">Économise 136€ vs le tarif au livre</p>
                 <button
                   onClick={() => goCheckout('forfait')}
                   disabled={checkoutLoading !== null}
                   className="w-full py-2.5 rounded-lg text-sm font-medium border border-stone-200 text-stone-700 hover:border-gold/30 hover:bg-stone-50 transition disabled:opacity-60"
                 >
-                  {checkoutLoading === 'forfait' ? '⏳ Redirection…' : 'Payer 99€ →'}
+                  {checkoutLoading === 'forfait' ? '⏳ Redirection…' : 'Payer 159€ →'}
                 </button>
               </div>
             </div>
