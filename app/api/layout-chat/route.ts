@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
-const anthropic = new Anthropic({ apiKey: process.env.LE_SCRIBE_CLAUDE_KEY || process.env.ANTHROPIC_API_KEY })
 const MODEL = 'claude-sonnet-4-6'
 
 async function withRetry<T>(fn: () => Promise<T>, retries = 3, delayMs = 3000): Promise<T> {
@@ -44,6 +43,7 @@ Règles de réponse :
 
 export async function POST(req: NextRequest) {
   try {
+    const anthropic = new Anthropic({ apiKey: process.env.LE_SCRIBE_CLAUDE_KEY || process.env.ANTHROPIC_API_KEY })
     const { message, history = [] } = await req.json()
 
     const messages = [
