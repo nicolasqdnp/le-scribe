@@ -20,7 +20,25 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [resetMode, setResetMode] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
   const router = useRouter()
+
+  async function handleReset(e) {
+    e.preventDefault()
+    setLoading(true)
+    setMessage('')
+    const supabase = createClient()
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) {
+      setMessage('Erreur : ' + error.message)
+    } else {
+      setResetSent(true)
+    }
+    setLoading(false)
+  }
 
   async function handleGoogle() {
     setGoogleLoading(true)
@@ -59,6 +77,48 @@ export default function Login() {
         </div>
 
         <div className="bg-surface border border-border rounded-2xl p-8">
+          {/* Mode réinitialisation */}
+          {resetMode ? (
+            resetSent ? (
+              <div className="text-center py-4">
+                <div className="text-3xl mb-4">✉️</div>
+                <p className="text-cream font-medium mb-2">Email envoyé !</p>
+                <p className="text-sm text-muted mb-6">Vérifie ta boîte mail et clique sur le lien pour réinitialiser ton mot de passe.</p>
+                <button onClick={() => { setResetMode(false); setResetSent(false) }} className="text-sm text-gold hover:text-gold2 transition">
+                  ← Retour à la connexion
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleReset} className="space-y-5">
+                <div>
+                  <p className="text-sm text-muted mb-5">Entre ton email pour recevoir un lien de réinitialisation.</p>
+                  <label className="block text-xs font-medium text-muted uppercase tracking-widest mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="jean@exemple.fr"
+                    required
+                    className="w-full bg-surface2 border border-border rounded-lg px-4 py-3 text-sm text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition"
+                  />
+                </div>
+                {message && (
+                  <div className="text-sm p-3 rounded-lg bg-err/10 border border-err/20 text-err">{message}</div>
+                )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gold text-bg py-3 rounded-lg font-semibold text-sm hover:bg-gold2 transition disabled:opacity-50"
+                >
+                  {loading ? 'Envoi…' : 'Envoyer le lien →'}
+                </button>
+                <button type="button" onClick={() => setResetMode(false)} className="w-full text-sm text-muted hover:text-cream transition">
+                  ← Retour à la connexion
+                </button>
+              </form>
+            )
+          ) : (
+          <>
           {/* Bouton Google */}
           <button
             onClick={handleGoogle}
@@ -90,7 +150,12 @@ export default function Login() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-muted uppercase tracking-widest mb-2">Mot de passe</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-medium text-muted uppercase tracking-widest">Mot de passe</label>
+                <button type="button" onClick={() => setResetMode(true)} className="text-xs text-muted hover:text-gold transition">
+                  Mot de passe oublié ?
+                </button>
+              </div>
               <input
                 type="password"
                 value={password}
@@ -113,6 +178,8 @@ export default function Login() {
               {loading ? 'Connexion…' : 'Se connecter →'}
             </button>
           </form>
+          </>
+          )}
         </div>
 
         <p className="text-center text-sm text-muted mt-6">
