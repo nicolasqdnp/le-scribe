@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServerSupabase } from '../../../lib/supabase-server'
 
-const anthropic = new Anthropic({ apiKey: process.env.LE_SCRIBE_CLAUDE_KEY || process.env.ANTHROPIC_API_KEY })
+const anthropic = new Anthropic()
 
 function fixTypo(text: string): string {
   return text

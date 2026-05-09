@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { YoutubeTranscript } from 'youtube-transcript'
 import { createServerSupabase } from '../../../lib/supabase-server'
 
-const anthropic = new Anthropic({ apiKey: process.env.LE_SCRIBE_CLAUDE_KEY || process.env.ANTHROPIC_API_KEY })
+const anthropic = new Anthropic()
 
 function extractVideoId(url: string): string | null {
   try {

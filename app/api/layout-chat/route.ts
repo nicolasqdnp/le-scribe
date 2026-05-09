@@ -43,7 +43,7 @@ Règles de réponse :
 
 export async function POST(req: NextRequest) {
   try {
-    const anthropic = new Anthropic({ apiKey: process.env.LE_SCRIBE_CLAUDE_KEY || process.env.ANTHROPIC_API_KEY })
+    const anthropic = new Anthropic()
     const { message, history = [] } = await req.json()
 
     const messages = [

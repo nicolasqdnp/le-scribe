@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { createServerSupabase } from '../../../lib/supabase-server'
 import { embedTexts } from '../../../lib/embeddings'
 
-const anthropic = new Anthropic({ apiKey: process.env.LE_SCRIBE_CLAUDE_KEY || process.env.ANTHROPIC_API_KEY })
+const anthropic = new Anthropic()
 
 const MODEL = 'claude-sonnet-4-6'
 
