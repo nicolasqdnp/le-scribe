@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '../../lib/supabase'
@@ -40,7 +40,15 @@ function statutColor(statut) {
   return 'bg-surface2 text-muted border-border'
 }
 
-export default function Dashboard() {
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen page-glow flex items-center justify-center"><p className="text-muted text-sm">Chargement…</p></main>}>
+      <Dashboard />
+    </Suspense>
+  )
+}
+
+function Dashboard() {
   const [user, setUser] = useState(null)
   const [portrait, setPortrait] = useState(null)
   const [projets, setProjets] = useState([])

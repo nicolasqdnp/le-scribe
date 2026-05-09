@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createServerSupabase } from '../../../lib/supabase-server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
 const PLANS: Record<string, { name: string; description: string; amount: number; plan: string }> = {
   livre: {
     name: 'Le Scribe — Par livre',
@@ -28,11 +26,11 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
     const planData = PLANS[plan]
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://lescribe.app'
 
     const session = await stripe.checkout.sessions.create({
-      automatic_payment_methods: { enabled: true }, // active GPay, Apple Pay, carte…
       line_items: [{
         price_data: {
           currency: 'eur',
