@@ -39,7 +39,8 @@ Règles de réponse :
 - Utilise des exemples concrets quand c'est utile
 - Adapte tes conseils au contexte pastoral/chrétien
 - Espaces insécables avant : ; ? ! (typographie française)
-- Maximum 3-4 paragraphes par réponse`
+- Maximum 3-4 paragraphes par réponse
+- N'utilise JAMAIS de markdown (pas de **, ##, *, _, etc.) — écris en texte simple et naturel`
 
 export async function POST(req: NextRequest) {
   try {
