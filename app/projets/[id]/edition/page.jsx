@@ -491,6 +491,14 @@ export default function EditionPage() {
                 </div>
               )}
 
+              {chatMessages.length > 0 && !chatLoading && (
+                <button
+                  onClick={() => setChatMessages([])}
+                  className="text-xs text-stone-400 hover:text-gold border border-stone-200 hover:border-gold/30 rounded-lg px-3 py-1.5 transition self-start">
+                  ← Autres suggestions
+                </button>
+              )}
+
               {chatMessages.map((m, i) => (
                 <div key={i} className={`flex flex-col gap-1 ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
                   {m.role === 'user' ? (
