@@ -463,7 +463,12 @@ export default function EditionPage() {
                 <p className="text-sm font-medium text-stone-900">✦ Mise en page</p>
                 <p className="text-xs text-stone-400">Conseils & bonnes pratiques</p>
               </div>
-              <button onClick={() => setChatOpen(false)} className="text-stone-400 hover:text-stone-900 transition text-lg leading-none">×</button>
+              <div className="flex items-center gap-2">
+                {chatMessages.length > 0 && (
+                  <button onClick={() => setChatMessages([])} className="text-xs text-stone-400 hover:text-gold transition">↩ Retour</button>
+                )}
+                <button onClick={() => setChatOpen(false)} className="text-stone-400 hover:text-stone-900 transition text-lg leading-none">×</button>
+              </div>
             </div>
 
             {/* Messages */}
