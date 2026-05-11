@@ -480,6 +480,9 @@ export default function ProjetPage() {
         <div className="flex items-center gap-2">
           {saving && <span className="text-xs text-stone-400">Sauvegarde…</span>}
           <button onClick={() => saveCurrent()} className="text-xs text-stone-500 hover:text-stone-900 border border-stone-200 rounded-lg px-3 py-1.5 transition">Sauvegarder</button>
+          <Link href={`/projets/${id}/couverture`} className="text-xs border border-stone-200 text-stone-600 hover:border-gold/30 hover:text-gold rounded-lg px-3 py-1.5 transition">
+            🎨 Couverture
+          </Link>
           <Link href={`/projets/${id}/edition`} className="text-xs bg-gold text-bg hover:bg-gold2 rounded-lg px-3 py-1.5 transition font-medium">
             Mise en forme
           </Link>
