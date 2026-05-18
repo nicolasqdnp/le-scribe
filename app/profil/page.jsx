@@ -31,7 +31,7 @@ const EMPTY_YOUTUBE = [
   { url: '', fullService: false, start: '', end: '' }
 ]
 
-function PortraitCard({ portrait, onEdit, onReanalyze, analyzing }) {
+function PortraitCard({ portrait, onEdit, onReanalyze, onFetchTranscripts, analyzing, fetchingTranscripts, transcriptsCount }) {
   return (
     <div className="space-y-5">
       <div className="bg-surface border border-border rounded-2xl p-8">
@@ -41,7 +41,7 @@ function PortraitCard({ portrait, onEdit, onReanalyze, analyzing }) {
             <h1 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-cream">Ton portrait stylistique</h1>
           </div>
           <div className="flex gap-2">
-            <button onClick={onReanalyze} disabled={analyzing}
+            <button onClick={onReanalyze} disabled={analyzing || fetchingTranscripts}
               className="text-xs text-muted hover:text-cream border border-border rounded-lg px-3 py-1.5 transition disabled:opacity-50">
               {analyzing ? 'Analyse…' : '↻ Ré-analyser'}
             </button>
@@ -112,6 +112,21 @@ function PortraitCard({ portrait, onEdit, onReanalyze, analyzing }) {
             <div className="text-xs text-muted italic">{portrait.confiance.note}</div>
           </div>
         )}
+
+        {transcriptsCount === 0 && (
+          <div className="mt-5 p-4 bg-warn/10 border border-warn/20 rounded-xl flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-warn">Aucune transcription récupérée</p>
+              <p className="text-xs text-muted mt-0.5">Le portrait repose uniquement sur le formulaire. Récupère les transcriptions YouTube pour l'affiner.</p>
+            </div>
+            <button
+              onClick={onFetchTranscripts}
+              disabled={fetchingTranscripts || analyzing}
+              className="flex-shrink-0 text-xs bg-warn/20 hover:bg-warn/30 text-warn border border-warn/30 px-4 py-2 rounded-lg transition disabled:opacity-50 font-medium">
+              {fetchingTranscripts ? '⏳ Récupération…' : '↓ Récupérer les transcriptions'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -134,6 +149,8 @@ export default function Profil() {
   const [saved, setSaved] = useState(false)
   const [user, setUser] = useState(null)
   const [portrait, setPortrait] = useState(null)
+  const [transcriptsCount, setTranscriptsCount] = useState(0)
+  const [fetchingTranscripts, setFetchingTranscripts] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const router = useRouter()
   const routerRef = useRef(router)
@@ -171,7 +188,7 @@ export default function Profil() {
 
       const [{ data: profile, error: profileError }, { data: analysis }] = await Promise.all([
         supabase.from('profils_auteurs').select('*').eq('user_id', user.id).maybeSingle(),
-        supabase.from('author_profile_analyses').select('portrait').eq('user_id', user.id).maybeSingle()
+        supabase.from('author_profile_analyses').select('portrait, transcripts_count').eq('user_id', user.id).maybeSingle()
       ])
 
       if (profileError) { setErrorMsg("Impossible de charger ton profil pour l'instant."); setLoading(false); setMode('form'); return }
@@ -204,7 +221,11 @@ export default function Profil() {
         })
       }
 
-      if (analysis?.portrait) { setPortrait(analysis.portrait); setMode('portrait') } else { setMode('form') }
+      if (analysis?.portrait) {
+        setPortrait(analysis.portrait)
+        setTranscriptsCount(analysis.transcripts_count ?? 0)
+        setMode('portrait')
+      } else { setMode('form') }
       setLoading(false)
     }
 
@@ -269,6 +290,28 @@ export default function Profil() {
       if (!res.ok) throw new Error(json.error || 'Erreur inconnue')
       setPortrait(json.portrait); setMode('portrait')
     } catch (e) { setErrorMsg(e?.message || 'Une erreur est survenue.'); setMode('portrait') }
+  }
+
+  async function handleFetchTranscripts() {
+    setFetchingTranscripts(true); setErrorMsg('')
+    try {
+      const res = await fetch('/api/fetch-profile-transcripts', { method: 'POST' })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Erreur')
+      if (json.fetched === 0) {
+        setErrorMsg('Impossible de récupérer les transcriptions (vidéos sans sous-titres accessibles).')
+        setFetchingTranscripts(false); return
+      }
+      // Re-analyser avec les nouvelles transcriptions
+      setFetchingTranscripts(false); setMode('analyzing')
+      const res2 = await fetch('/api/analyze-profile', { method: 'POST' })
+      const json2 = await res2.json()
+      if (!res2.ok) throw new Error(json2.error || 'Erreur analyse')
+      setPortrait(json2.portrait); setTranscriptsCount(json.fetched); setMode('portrait')
+    } catch (e) {
+      setErrorMsg(e?.message || 'Une erreur est survenue.')
+      setFetchingTranscripts(false); setMode('portrait')
+    }
   }
 
   const isEditMode = mode === 'form' && portrait !== null
@@ -424,7 +467,7 @@ export default function Profil() {
         )}
 
         {mode === 'portrait' && portrait ? (
-          <PortraitCard portrait={portrait} onEdit={() => { setCur(0); setMode('form') }} onReanalyze={handleReanalyze} analyzing={false} />
+          <PortraitCard portrait={portrait} onEdit={() => { setCur(0); setMode('form') }} onReanalyze={handleReanalyze} onFetchTranscripts={handleFetchTranscripts} analyzing={false} fetchingTranscripts={fetchingTranscripts} transcriptsCount={transcriptsCount} />
         ) : (
           <>
             {isEditMode && (
