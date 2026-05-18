@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { YoutubeTranscript } from 'youtube-transcript'
 import { createServerSupabase } from '../../../lib/supabase-server'
+import { fetchYoutubeTranscript, parseTimeToSeconds } from '../../../lib/youtube-transcript'
 
 function extractVideoId(url: string): string | null {
   try {
@@ -12,21 +12,6 @@ function extractVideoId(url: string): string | null {
   } catch { return null }
 }
 
-function parseTimeToSeconds(value: string): number | null {
-  if (!value?.trim()) return null
-  const parts = value.trim().split(':').map(Number)
-  if (parts.some(isNaN)) return null
-  if (parts.length === 2) return parts[0] * 60 + parts[1]
-  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2]
-  return null
-}
-
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
-  ])
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,21 +38,14 @@ export async function POST(req: NextRequest) {
     const startSec = meta.culteEntier ? parseTimeToSeconds(meta.debut) : null
     const endSec = meta.culteEntier ? parseTimeToSeconds(meta.fin) : null
 
-    let segments: { text: string; start?: number }[] = []
-    try {
-      segments = await withTimeout(YoutubeTranscript.fetchTranscript(videoId, { lang: 'fr' }), 30000)
-    } catch {
-      try {
-        segments = await withTimeout(YoutubeTranscript.fetchTranscript(videoId), 30000)
-      } catch {
-        return NextResponse.json({ error: 'Impossible de récupérer le transcript de cette vidéo (sous-titres désactivés ?)' }, { status: 422 })
-      }
-    }
+    let segments = await fetchYoutubeTranscript(videoId)
+    if (segments.length === 0)
+      return NextResponse.json({ error: 'Impossible de récupérer le transcript de cette vidéo (sous-titres désactivés ?)' }, { status: 422 })
 
     if (startSec != null || endSec != null) {
       segments = segments.filter(s => {
-        if (startSec != null && (s.start ?? 0) < startSec) return false
-        if (endSec != null && (s.start ?? Infinity) > endSec) return false
+        if (startSec != null && s.start < startSec) return false
+        if (endSec != null && s.start > endSec) return false
         return true
       })
     }
