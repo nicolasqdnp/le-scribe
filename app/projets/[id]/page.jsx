@@ -401,7 +401,7 @@ export default function ProjetPage() {
   }
 
   const plan = projet?.plan_ia
-  const isLocked = (ch) => userPlan === 'gratuit' && !ch?.contenu_ia && chapitresGeneresTotal >= 1
+  const isLocked = (ch) => userPlan === 'gratuit' && ch?.numero !== 1
 
   if (loading) return (
     <main className="min-h-screen bg-[#f5f4f1] flex items-center justify-center">

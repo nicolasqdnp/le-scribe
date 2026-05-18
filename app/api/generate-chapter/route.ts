@@ -48,25 +48,6 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
-    // Vérifier le plan (limite : 1 chapitre généré pour le plan gratuit)
-    const { data: userPlan } = await supabase
-      .from('user_plans')
-      .select('plan')
-      .eq('user_id', user.id)
-      .maybeSingle()
-    const planActuel = userPlan?.plan || 'gratuit'
-
-    if (planActuel === 'gratuit') {
-      const { count } = await supabase
-        .from('chapitres')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .not('contenu_ia', 'is', null)
-      if ((count || 0) >= 1) {
-        return NextResponse.json({ error: 'PLAN_LIMIT' }, { status: 402 })
-      }
-    }
-
     // Récupérer le chapitre
     const { data: chapitre } = await supabase
       .from('chapitres')
@@ -75,6 +56,18 @@ export async function POST(req: NextRequest) {
       .eq('user_id', user.id)
       .single()
     if (!chapitre) return NextResponse.json({ error: 'Chapitre introuvable' }, { status: 404 })
+
+    // Vérifier le plan : seul le chapitre 1 est gratuit
+    const { data: userPlan } = await supabase
+      .from('user_plans')
+      .select('plan')
+      .eq('user_id', user.id)
+      .maybeSingle()
+    const planActuel = userPlan?.plan || 'gratuit'
+
+    if (planActuel === 'gratuit' && chapitre.numero !== 1) {
+      return NextResponse.json({ error: 'PLAN_LIMIT' }, { status: 402 })
+    }
 
     const projet = chapitre.projets_livres as Record<string, unknown>
     const plan = projet.plan_ia as Record<string, unknown> | null
