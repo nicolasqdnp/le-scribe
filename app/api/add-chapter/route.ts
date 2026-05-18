@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     } else if (sourceType === 'pdf' && fileBuffer) {
       // Import dynamique pour éviter les problèmes de Next.js
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const pdfParse = require('pdf-parse/lib/pdf-parse.js')
+      const pdfParse = require('pdf-parse')
       const data = await pdfParse(fileBuffer)
       contenuBrut = data.text
     } else if (sourceType === 'docx' && fileBuffer) {
