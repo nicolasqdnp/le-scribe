@@ -152,6 +152,8 @@ export default function ProjetPage() {
   const [chatMessages, setChatMessages] = useState([])
   const [chatInput, setChatInput] = useState('')
   const [loading, setLoading] = useState(true)
+  const [userPlan, setUserPlan] = useState('gratuit')
+  const [chapitresGeneresTotal, setChapitresGeneresTotal] = useState(0)
   const [showPaywall, setShowPaywall] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState(null)
   const [generating, setGenerating] = useState(false)
@@ -183,12 +185,16 @@ export default function ProjetPage() {
         const { data: { user } } = await Promise.race([supabase.auth.getUser(), authTimeout])
         if (!user) { router.replace('/login'); return }
         setUser(user)
-        const [{ data: proj }, { data: chaps }] = await Promise.all([
+        const [{ data: proj }, { data: chaps }, { data: planData }, { count: genCount }] = await Promise.all([
           supabase.from('projets_livres').select('*').eq('id', id).eq('user_id', user.id).single(),
-          supabase.from('chapitres').select('*').eq('projet_id', id).order('numero', { ascending: true })
+          supabase.from('chapitres').select('*').eq('projet_id', id).order('numero', { ascending: true }),
+          supabase.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle(),
+          supabase.from('chapitres').select('id', { count: 'exact', head: true }).eq('user_id', user.id).not('contenu_ia', 'is', null)
         ])
         if (!proj) { router.replace('/dashboard'); return }
         setProjet(proj); setChapitres(chaps || [])
+        setUserPlan(planData?.plan || 'gratuit')
+        setChapitresGeneresTotal(genCount || 0)
         if (chaps?.length > 0) {
           const premier = chaps[0]
           setChapitreActif(premier); setContenu(premier.contenu_final || premier.contenu_ia || '')
@@ -395,6 +401,7 @@ export default function ProjetPage() {
   }
 
   const plan = projet?.plan_ia
+  const isLocked = (ch) => userPlan === 'gratuit' && !ch?.contenu_ia && chapitresGeneresTotal >= 1
 
   if (loading) return (
     <main className="min-h-screen bg-[#f5f4f1] flex items-center justify-center">
@@ -504,17 +511,22 @@ export default function ProjetPage() {
             ].map(({ numero, label, defaultTitre }) => {
               const ch = chapitres.find(c => c.numero === numero)
               const isActive = chapitreActif?.numero === numero
+              const locked = ch && isLocked(ch)
               return (
                 <button key={numero}
                   onClick={async () => {
+                    if (locked) { setShowPaywall(true); return }
                     if (ch) { selectChapitre(ch); return }
                     const supabase = createClient()
                     const { data: newCh } = await supabase.from('chapitres').insert({ user_id: user.id, projet_id: id, numero, titre: defaultTitre, statut: 'vide' }).select().single()
                     if (newCh) { setChapitres(prev => [newCh, ...prev].sort((a, b) => a.numero - b.numero)); selectChapitre(newCh) }
                   }}
-                  className={`w-full text-left px-4 py-2.5 text-sm transition ${isActive ? 'bg-gold/10 text-gold' : ch ? 'text-stone-900 hover:bg-stone-50' : 'text-stone-400 italic hover:bg-stone-50'}`}>
-                  <div className="font-medium">{ch ? label : `+ ${label}`}</div>
-                  {ch && <div className="mt-0.5">{statutBadge(ch.statut)}</div>}
+                  className={`w-full text-left px-4 py-2.5 text-sm transition ${isActive ? 'bg-gold/10 text-gold' : locked ? 'text-stone-400 hover:bg-stone-50' : ch ? 'text-stone-900 hover:bg-stone-50' : 'text-stone-400 italic hover:bg-stone-50'}`}>
+                  <div className="font-medium flex items-center gap-1.5">
+                    {locked && <span className="text-xs">🔒</span>}
+                    {ch ? label : `+ ${label}`}
+                  </div>
+                  {ch && <div className="mt-0.5">{locked ? <span className="text-xs text-stone-400 italic">Accès payant</span> : statutBadge(ch.statut)}</div>}
                 </button>
               )
             })}
@@ -523,12 +535,16 @@ export default function ProjetPage() {
             {chapitres.map(ch => {
               const SPECIAL = [-1, 0, 998, 999]
               if (SPECIAL.includes(ch.numero)) return null
+              const locked = isLocked(ch)
               return (
                 <div key={ch.id} className="relative group">
-                  <button onClick={() => selectChapitre(ch)}
-                    className={`w-full text-left px-4 py-2.5 pr-8 text-sm transition ${chapitreActif?.id === ch.id ? 'bg-gold/10 text-gold' : 'text-stone-900 hover:bg-stone-50'}`}>
-                    <div className="truncate font-medium">Ch. {ch.numero} — {ch.titre}</div>
-                    <div className="mt-0.5">{statutBadge(ch.statut)}</div>
+                  <button onClick={() => locked ? setShowPaywall(true) : selectChapitre(ch)}
+                    className={`w-full text-left px-4 py-2.5 pr-8 text-sm transition ${chapitreActif?.id === ch.id ? 'bg-gold/10 text-gold' : locked ? 'text-stone-400 hover:bg-stone-50' : 'text-stone-900 hover:bg-stone-50'}`}>
+                    <div className="truncate font-medium flex items-center gap-1.5">
+                      {locked && <span className="text-xs">🔒</span>}
+                      Ch. {ch.numero} — {ch.titre}
+                    </div>
+                    <div className="mt-0.5">{locked ? <span className="text-xs text-stone-400 italic">Accès payant</span> : statutBadge(ch.statut)}</div>
                   </button>
                   <button
                     onClick={e => { e.stopPropagation(); setConfirmDeleteId(ch.id) }}
@@ -565,17 +581,22 @@ export default function ProjetPage() {
             ].map(({ numero, label, defaultTitre }) => {
               const ch = chapitres.find(c => c.numero === numero)
               const isActive = chapitreActif?.numero === numero
+              const locked = ch && isLocked(ch)
               return (
                 <button key={numero}
                   onClick={async () => {
+                    if (locked) { setShowPaywall(true); return }
                     if (ch) { selectChapitre(ch); return }
                     const supabase = createClient()
                     const { data: newCh } = await supabase.from('chapitres').insert({ user_id: user.id, projet_id: id, numero, titre: defaultTitre, statut: 'vide' }).select().single()
                     if (newCh) { setChapitres(prev => [...prev, newCh].sort((a, b) => a.numero - b.numero)); selectChapitre(newCh) }
                   }}
-                  className={`w-full text-left px-4 py-2.5 text-sm transition ${isActive ? 'bg-gold/10 text-gold' : ch ? 'text-stone-900 hover:bg-stone-50' : 'text-stone-400 italic hover:bg-stone-50'}`}>
-                  <div className="font-medium">{ch ? label : `+ ${label}`}</div>
-                  {ch && <div className="mt-0.5">{statutBadge(ch.statut)}</div>}
+                  className={`w-full text-left px-4 py-2.5 text-sm transition ${isActive ? 'bg-gold/10 text-gold' : locked ? 'text-stone-400 hover:bg-stone-50' : ch ? 'text-stone-900 hover:bg-stone-50' : 'text-stone-400 italic hover:bg-stone-50'}`}>
+                  <div className="font-medium flex items-center gap-1.5">
+                    {locked && <span className="text-xs">🔒</span>}
+                    {ch ? label : `+ ${label}`}
+                  </div>
+                  {ch && <div className="mt-0.5">{locked ? <span className="text-xs text-stone-400 italic">Accès payant</span> : statutBadge(ch.statut)}</div>}
                 </button>
               )
             })}
