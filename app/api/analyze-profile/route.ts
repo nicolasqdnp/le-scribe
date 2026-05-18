@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServerSupabase } from '../../../lib/supabase-server'
+import { fetchYoutubeTranscript, filterByTime, parseTimeToSeconds } from '../../../lib/youtube-transcript'
 
 const anthropic = new Anthropic()
 
@@ -9,13 +10,11 @@ function extractVideoId(url: string): string | null {
     const u = new URL(url)
     if (u.hostname.includes('youtu.be')) return u.pathname.slice(1).split('?')[0]
     return u.searchParams.get('v')
-  } catch {
-    return null
-  }
+  } catch { return null }
 }
 
 function fixTypo(text: string): string {
-  return text.replace(/ ([:?!;])/g, ' $1')
+  return text.replace(/ ([:?!;])/g, ' $1')
 }
 
 function fixPortrait(obj: unknown): unknown {
@@ -26,134 +25,6 @@ function fixPortrait(obj: unknown): unknown {
   return obj
 }
 
-function parseTimeToSeconds(value: string): number | null {
-  if (!value?.trim()) return null
-  const parts = value.trim().split(':').map(Number)
-  if (parts.some(isNaN)) return null
-  if (parts.length === 2) return parts[0] * 60 + parts[1]
-  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2]
-  return null
-}
-
-type Segment = { text: string; start: number }
-
-async function fetchViaInnerTube(videoId: string): Promise<Segment[]> {
-  const vid = Buffer.from(videoId, 'utf8')
-  const proto = Buffer.alloc(2 + vid.length)
-  proto[0] = 0x0a
-  proto[1] = vid.length
-  vid.copy(proto, 2)
-  const params = proto.toString('base64')
-
-  for (const lang of ['fr', 'en']) {
-    try {
-      const res = await fetch('https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': `${lang}-${lang.toUpperCase()},${lang};q=0.9,en;q=0.8`,
-          'Origin': 'https://www.youtube.com',
-          'Referer': `https://www.youtube.com/watch?v=${videoId}`,
-          'X-YouTube-Client-Name': '1',
-          'X-YouTube-Client-Version': '2.20231219.04.00',
-        },
-        body: JSON.stringify({
-          context: {
-            client: { clientName: 'WEB', clientVersion: '2.20231219.04.00', hl: lang, gl: lang === 'fr' ? 'FR' : 'US' }
-          },
-          params,
-        }),
-      })
-      if (!res.ok) continue
-      const data = await res.json() as Record<string, unknown>
-      const actions = (data?.actions as Record<string, unknown>[]) || []
-      for (const action of actions) {
-        const body = (action?.updateEngagementPanelAction as Record<string, unknown>)
-        const content = (body?.content as Record<string, unknown>)
-        const renderer = (content?.transcriptRenderer as Record<string, unknown>)
-        const bodyRenderer = ((renderer?.body as Record<string, unknown>)?.transcriptBodyRenderer as Record<string, unknown>)
-        if (!bodyRenderer) continue
-        const cueGroups = (bodyRenderer.cueGroups as Record<string, unknown>[]) || []
-        const segments: Segment[] = []
-        for (const group of cueGroups) {
-          const cues = ((group?.transcriptCueGroupRenderer as Record<string, unknown>)?.cues as Record<string, unknown>[]) || []
-          for (const cue of cues) {
-            const r = cue?.transcriptCueRenderer as Record<string, unknown>
-            if (!r) continue
-            const text = ((r.cue as Record<string, unknown>)?.simpleText as string || '').trim()
-            const start = parseInt(r.startOffsetMs as string || '0') / 1000
-            if (text) segments.push({ text, start })
-          }
-        }
-        if (segments.length > 0) return segments
-      }
-    } catch { continue }
-  }
-  return []
-}
-
-async function fetchTranscriptDirect(videoId: string): Promise<Segment[]> {
-  const innertube = await fetchViaInnerTube(videoId)
-  if (innertube.length > 0) return innertube
-
-  const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
-    'Referer': `https://www.youtube.com/watch?v=${videoId}`,
-  }
-
-  for (const l of ['fr', 'en', '']) {
-    try {
-      const res = await fetch(`https://www.youtube.com/api/timedtext?v=${videoId}&lang=${l}&fmt=json3`, { headers })
-      if (!res.ok) continue
-      const data = await res.json() as { events?: { tStartMs?: number; segs?: { utf8?: string }[] }[] }
-      if (!data?.events?.length) continue
-      const segs = data.events
-        .filter(e => e.segs)
-        .map(e => ({ start: (e.tStartMs ?? 0) / 1000, text: e.segs!.map(s => s.utf8 ?? '').join('').trim() }))
-        .filter(s => s.text)
-      if (segs.length > 0) return segs
-    } catch { continue }
-  }
-
-  try {
-    const pageRes = await fetch(`https://www.youtube.com/watch?v=${videoId}`, { headers })
-    const html = await pageRes.text()
-    const match = html.match(/"captionTracks":\[.*?"baseUrl":"(https:[^"]+)"/)
-    if (match) {
-      const captionUrl = match[1].replace(/\\u0026/g, '&') + '&fmt=json3'
-      const capRes = await fetch(captionUrl, { headers })
-      if (capRes.ok) {
-        const data = await capRes.json() as { events?: { tStartMs?: number; segs?: { utf8?: string }[] }[] }
-        return (data?.events || [])
-          .filter(e => e.segs)
-          .map(e => ({ start: (e.tStartMs ?? 0) / 1000, text: e.segs!.map(s => s.utf8 ?? '').join('').trim() }))
-          .filter(s => s.text)
-      }
-    }
-  } catch { /* silence */ }
-
-  return []
-}
-
-async function fetchTranscript(videoId: string, startSec?: number | null, endSec?: number | null): Promise<string> {
-  let segments = await fetchTranscriptDirect(videoId)
-
-  if (segments.length === 0) return ''
-
-  if (startSec != null || endSec != null) {
-    segments = segments.filter(s => {
-      if (startSec != null && s.start < startSec) return false
-      if (endSec != null && s.start > endSec) return false
-      return true
-    })
-  }
-
-  const text = segments.map(s => s.text).join(' ')
-  return text.length > 6000 ? text.slice(0, 6000) + '...' : text
-}
-
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createServerSupabase()
@@ -161,14 +32,9 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
     const { data: profile } = await supabase
-      .from('profils_auteurs')
-      .select('*')
-      .eq('user_id', user.id)
-      .maybeSingle()
-
+      .from('profils_auteurs').select('*').eq('user_id', user.id).maybeSingle()
     if (!profile) return NextResponse.json({ error: 'Profil introuvable' }, { status: 404 })
 
-    // Lire les sources YouTube depuis la table sources
     const { data: sourceRows } = await supabase
       .from('sources')
       .select('url, metadata, contenu_brut')
@@ -186,7 +52,7 @@ export async function POST(req: NextRequest) {
         continue
       }
 
-      // Priorité 2 : fetch direct YouTube
+      // Priorité 2 : fetch YouTube (youtube-transcript → InnerTube → Supadata)
       const videoId = extractVideoId(source.url)
       if (!videoId) continue
 
@@ -194,8 +60,12 @@ export async function POST(req: NextRequest) {
       const startSec = meta.fullService ? parseTimeToSeconds(meta.start) : null
       const endSec = meta.fullService ? parseTimeToSeconds(meta.end) : null
 
-      const text = await fetchTranscript(videoId, startSec, endSec)
-      if (text) transcripts.push(text)
+      let segments = await fetchYoutubeTranscript(videoId)
+      if (segments.length === 0) continue
+
+      segments = filterByTime(segments, startSec, endSec)
+      const text = segments.map(s => s.text).join(' ')
+      if (text.trim()) transcripts.push(text.length > 6000 ? text.slice(0, 6000) + '...' : text)
     }
 
     const transcriptSection = transcripts.length > 0
@@ -261,10 +131,7 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans texte autour,
     portrait = fixPortrait(portrait) as Record<string, unknown>
 
     const { data: existing } = await supabase
-      .from('author_profile_analyses')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle()
+      .from('author_profile_analyses').select('id').eq('user_id', user.id).maybeSingle()
 
     const now = new Date().toISOString()
     const payload = {
