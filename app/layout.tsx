@@ -26,6 +26,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" suppressHydrationWarning className={`${playfair.variable} ${inter.variable}`}>
+      <head>
+        <style>{`button,a,[role="button"]{cursor:pointer!important}`}</style>
+      </head>
       <body suppressHydrationWarning style={{ fontFamily: "var(--font-inter, system-ui, sans-serif)" }}>
         {children}
       </body>
