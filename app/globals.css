@@ -27,8 +27,8 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-button, a, [role="button"] { cursor: pointer; }
-input, textarea, select { cursor: text; }
+button, a, [role="button"] { cursor: pointer !important; }
+input, textarea, select { cursor: text !important; }
 
 /* ── Classes utilitaires custom ────────────────────── */
 @layer utilities {
