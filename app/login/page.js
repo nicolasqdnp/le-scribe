@@ -22,6 +22,7 @@ export default function Login() {
   const [message, setMessage] = useState('')
   const [resetMode, setResetMode] = useState(false)
   const [resetSent, setResetSent] = useState(false)
+  const [stayLoggedIn, setStayLoggedIn] = useState(true)
   const router = useRouter()
 
   async function handleReset(e) {
@@ -61,6 +62,12 @@ export default function Login() {
     if (error) {
       setMessage('Erreur : ' + error.message)
     } else {
+      if (!stayLoggedIn) {
+        localStorage.setItem('ls_session_only', '1')
+        sessionStorage.setItem('ls_active', '1')
+      } else {
+        localStorage.removeItem('ls_session_only')
+      }
       router.push('/dashboard')
     }
     setLoading(false)
@@ -166,6 +173,16 @@ export default function Login() {
                 required
                 className="w-full bg-surface2 border border-border rounded-lg px-4 py-3 text-sm text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition"
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="stayLoggedIn"
+                checked={stayLoggedIn}
+                onChange={e => setStayLoggedIn(e.target.checked)}
+                className="w-4 h-4 rounded border-border accent-gold"
+              />
+              <label htmlFor="stayLoggedIn" className="text-xs text-muted">Rester connecté</label>
             </div>
             {message && (
               <div className="text-sm p-3 rounded-lg bg-err/10 border border-err/20 text-err">

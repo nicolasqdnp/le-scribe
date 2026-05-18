@@ -60,6 +60,15 @@ function Dashboard() {
   const paiementOk = searchParams.get('paiement') === 'ok'
 
   useEffect(() => {
+    // Gestion "rester connecté" : si session_only et navigateur rouvert → déconnexion
+    const sessionOnly = localStorage.getItem('ls_session_only')
+    const active = sessionStorage.getItem('ls_active')
+    if (sessionOnly === '1' && !active) {
+      const supabase = createClient()
+      supabase.auth.signOut().then(() => router.push('/login'))
+      return
+    }
+
     async function init() {
       try {
         const supabase = createClient()
