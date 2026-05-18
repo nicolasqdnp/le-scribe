@@ -128,6 +128,18 @@ function PortraitCard({ portrait, onEdit, onReanalyze, onFetchTranscripts, analy
           </div>
         )}
       </div>
+
+      {/* Appel à l'action */}
+      <div className="mt-4 p-6 bg-surface border border-gold/20 rounded-2xl relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
+        <p className="text-xs text-gold uppercase tracking-widest font-medium mb-1">Prochaine étape</p>
+        <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-cream mb-1">Commence ton premier livre</h3>
+        <p className="text-sm text-muted mb-5">Ton profil est prêt. L'IA va maintenant écrire dans ton style — chapitre par chapitre.</p>
+        <a href="/nouveau-livre"
+          className="inline-flex items-center gap-2 bg-gold text-ink font-semibold text-sm px-6 py-3 rounded-xl hover:bg-gold2 transition">
+          Créer mon livre →
+        </a>
+      </div>
     </div>
   )
 }
