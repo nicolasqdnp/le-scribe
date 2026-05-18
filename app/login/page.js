@@ -30,7 +30,7 @@ export default function Login() {
     setMessage('')
     const supabase = createClient()
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `https://lescribe.app/reset-password`,
     })
     if (error) {
       setMessage('Erreur : ' + error.message)
@@ -46,7 +46,7 @@ export default function Login() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        redirectTo: `https://lescribe.app/auth/callback?next=/dashboard`,
       },
     })
     setGoogleLoading(false)

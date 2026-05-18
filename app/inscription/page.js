@@ -27,7 +27,7 @@ export default function Inscription() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        redirectTo: `https://lescribe.app/auth/callback?next=/dashboard`,
       },
     })
     setGoogleLoading(false)
