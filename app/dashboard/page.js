@@ -181,7 +181,7 @@ function Dashboard() {
             </Link>
           )}
 
-          <Link href="/nouveau-livre" className="block p-7 bg-surface border border-gold/20 rounded-2xl hover:border-gold/50 transition group relative overflow-hidden">
+          <button onClick={() => router.push(portrait ? '/nouveau-livre' : '/profil')} className="text-left block w-full p-7 bg-surface border border-gold/20 rounded-2xl hover:border-gold/50 transition group relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
             <div className="text-xs text-gold uppercase tracking-widest mb-4">Nouveau projet</div>
             <h2 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-cream mb-2 group-hover:text-gold transition">
@@ -189,7 +189,7 @@ function Dashboard() {
             </h2>
             <p className="text-sm text-muted">Fournis tes sources et laisse l'IA générer un plan, puis rédige chapitre par chapitre.</p>
             <p className="text-xs text-gold mt-4">Commencer →</p>
-          </Link>
+          </button>
         </div>
 
         {/* Projets en cours */}
@@ -200,7 +200,7 @@ function Dashboard() {
               <div className="text-center py-16 text-muted">
                 <div className="text-4xl mb-4 opacity-20">📚</div>
                 <p className="text-sm mb-4">Aucun livre pour le moment.</p>
-                <Link href="/nouveau-livre" className="text-xs text-gold hover:text-gold2 transition">Commencer mon premier livre →</Link>
+                <button onClick={() => router.push(portrait ? '/nouveau-livre' : '/profil')} className="text-xs text-gold hover:text-gold2 transition">Commencer mon premier livre →</button>
               </div>
             ) : (
               <div className="divide-y divide-border">
