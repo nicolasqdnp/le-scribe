@@ -68,6 +68,7 @@ export default function Login() {
 
   return (
     <main className="min-h-screen page-glow flex items-center justify-center px-4">
+      <style>{`button{cursor:pointer!important}`}</style>
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-10">
