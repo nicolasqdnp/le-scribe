@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase } from '../../../lib/supabase-server'
 import { fetchYoutubeTranscript, parseTimeToSeconds } from '../../../lib/youtube-transcript'
+import { checkRateLimit } from '../../../lib/rate-limit'
 
 function extractVideoId(url: string): string | null {
   try {
@@ -21,6 +22,9 @@ export async function POST(req: NextRequest) {
     const supabase = await createServerSupabase()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+
+    const rateLimit = await checkRateLimit(supabase, user.id, 'fetch-transcript')
+    if (rateLimit) return rateLimit
 
     const { data: source } = await supabase
       .from('sources')

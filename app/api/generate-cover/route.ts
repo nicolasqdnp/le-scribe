@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase } from '../../../lib/supabase-server'
+import { checkRateLimit } from '../../../lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createServerSupabase()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+
+    const rateLimit = await checkRateLimit(supabase, user.id, 'generate-cover')
+    if (rateLimit) return rateLimit
 
     const { titre, sujet } = await req.json()
     if (!titre) return NextResponse.json({ error: 'Titre manquant' }, { status: 400 })

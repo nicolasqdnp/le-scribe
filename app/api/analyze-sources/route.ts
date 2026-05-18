@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServerSupabase } from '../../../lib/supabase-server'
+import { checkRateLimit } from '../../../lib/rate-limit'
 
 const anthropic = new Anthropic()
 
@@ -26,6 +27,9 @@ export async function POST(req: NextRequest) {
     const supabase = await createServerSupabase()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+
+    const rateLimit = await checkRateLimit(supabase, user.id, 'analyze-sources')
+    if (rateLimit) return rateLimit
 
     const [{ data: projet }, { data: analysis }, { data: sources }] = await Promise.all([
       supabase.from('projets_livres').select('*').eq('id', projetId).eq('user_id', user.id).single(),
