@@ -20,9 +20,11 @@ export async function POST() {
       .from('profils_auteurs').select('id').eq('user_id', user.id).maybeSingle()
     if (!profile) return NextResponse.json({ error: 'Profil introuvable' }, { status: 404 })
 
-    const { data: sources } = await supabase
+    const { data: sources, error: sourcesError } = await supabase
       .from('sources').select('id, url, metadata')
       .eq('profil_id', profile.id).eq('usage', 'author_style').eq('type', 'youtube')
+
+    console.error('[fetch-profile-transcripts] profil.id=', profile.id, 'sources=', sources?.length ?? 'null', 'error=', sourcesError?.message ?? 'none')
 
     let fetched = 0, failed = 0
     const results: { url: string; ok: boolean; mots?: number }[] = []
