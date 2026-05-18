@@ -35,33 +35,88 @@ function parseTimeToSeconds(value: string): number | null {
   return null
 }
 
-// Fetcher direct via l'API timedtext YouTube (moins bloquée que le scraping)
-async function fetchTranscriptDirect(videoId: string, lang = 'fr'): Promise<{ text: string; start: number }[]> {
+type Segment = { text: string; start: number }
+
+async function fetchViaInnerTube(videoId: string): Promise<Segment[]> {
+  const vid = Buffer.from(videoId, 'utf8')
+  const proto = Buffer.alloc(2 + vid.length)
+  proto[0] = 0x0a
+  proto[1] = vid.length
+  vid.copy(proto, 2)
+  const params = proto.toString('base64')
+
+  for (const lang of ['fr', 'en']) {
+    try {
+      const res = await fetch('https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept-Language': `${lang}-${lang.toUpperCase()},${lang};q=0.9,en;q=0.8`,
+          'Origin': 'https://www.youtube.com',
+          'Referer': `https://www.youtube.com/watch?v=${videoId}`,
+          'X-YouTube-Client-Name': '1',
+          'X-YouTube-Client-Version': '2.20231219.04.00',
+        },
+        body: JSON.stringify({
+          context: {
+            client: { clientName: 'WEB', clientVersion: '2.20231219.04.00', hl: lang, gl: lang === 'fr' ? 'FR' : 'US' }
+          },
+          params,
+        }),
+      })
+      if (!res.ok) continue
+      const data = await res.json() as Record<string, unknown>
+      const actions = (data?.actions as Record<string, unknown>[]) || []
+      for (const action of actions) {
+        const body = (action?.updateEngagementPanelAction as Record<string, unknown>)
+        const content = (body?.content as Record<string, unknown>)
+        const renderer = (content?.transcriptRenderer as Record<string, unknown>)
+        const bodyRenderer = ((renderer?.body as Record<string, unknown>)?.transcriptBodyRenderer as Record<string, unknown>)
+        if (!bodyRenderer) continue
+        const cueGroups = (bodyRenderer.cueGroups as Record<string, unknown>[]) || []
+        const segments: Segment[] = []
+        for (const group of cueGroups) {
+          const cues = ((group?.transcriptCueGroupRenderer as Record<string, unknown>)?.cues as Record<string, unknown>[]) || []
+          for (const cue of cues) {
+            const r = cue?.transcriptCueRenderer as Record<string, unknown>
+            if (!r) continue
+            const text = ((r.cue as Record<string, unknown>)?.simpleText as string || '').trim()
+            const start = parseInt(r.startOffsetMs as string || '0') / 1000
+            if (text) segments.push({ text, start })
+          }
+        }
+        if (segments.length > 0) return segments
+      }
+    } catch { continue }
+  }
+  return []
+}
+
+async function fetchTranscriptDirect(videoId: string): Promise<Segment[]> {
+  const innertube = await fetchViaInnerTube(videoId)
+  if (innertube.length > 0) return innertube
+
   const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
     'Referer': `https://www.youtube.com/watch?v=${videoId}`,
   }
 
-  // Essai 1 : timedtext JSON (sous-titres manuels ou auto)
-  for (const l of [lang, 'fr', 'en', '']) {
+  for (const l of ['fr', 'en', '']) {
     try {
-      const url = `https://www.youtube.com/api/timedtext?v=${videoId}&lang=${l}&fmt=json3`
-      const res = await fetch(url, { headers })
+      const res = await fetch(`https://www.youtube.com/api/timedtext?v=${videoId}&lang=${l}&fmt=json3`, { headers })
       if (!res.ok) continue
       const data = await res.json() as { events?: { tStartMs?: number; segs?: { utf8?: string }[] }[] }
       if (!data?.events?.length) continue
-      return data.events
+      const segs = data.events
         .filter(e => e.segs)
-        .map(e => ({
-          start: (e.tStartMs ?? 0) / 1000,
-          text: e.segs!.map(s => s.utf8 ?? '').join('').trim()
-        }))
+        .map(e => ({ start: (e.tStartMs ?? 0) / 1000, text: e.segs!.map(s => s.utf8 ?? '').join('').trim() }))
         .filter(s => s.text)
+      if (segs.length > 0) return segs
     } catch { continue }
   }
 
-  // Essai 2 : scraper la page pour trouver l'URL des captions
   try {
     const pageRes = await fetch(`https://www.youtube.com/watch?v=${videoId}`, { headers })
     const html = await pageRes.text()
@@ -73,10 +128,7 @@ async function fetchTranscriptDirect(videoId: string, lang = 'fr'): Promise<{ te
         const data = await capRes.json() as { events?: { tStartMs?: number; segs?: { utf8?: string }[] }[] }
         return (data?.events || [])
           .filter(e => e.segs)
-          .map(e => ({
-            start: (e.tStartMs ?? 0) / 1000,
-            text: e.segs!.map(s => s.utf8 ?? '').join('').trim()
-          }))
+          .map(e => ({ start: (e.tStartMs ?? 0) / 1000, text: e.segs!.map(s => s.utf8 ?? '').join('').trim() }))
           .filter(s => s.text)
       }
     }
