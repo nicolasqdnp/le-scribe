@@ -20,18 +20,20 @@
 }
 
 /* ── Base ──────────────────────────────────────────── */
-html, body {
-  background-color: var(--bg) !important;
-  color: var(--cream);
-  font-family: var(--font-inter, system-ui, sans-serif);
-  -webkit-font-smoothing: antialiased;
-}
+@layer base {
+  html, body {
+    background-color: var(--bg) !important;
+    color: var(--cream);
+    font-family: var(--font-inter, system-ui, sans-serif);
+    -webkit-font-smoothing: antialiased;
+  }
 
-button, a, [role="button"] {
-  cursor: pointer !important;
-  -webkit-appearance: none;
+  button, a, [role="button"] {
+    cursor: pointer !important;
+    -webkit-appearance: none;
+  }
+  input, textarea, select { cursor: text !important; }
 }
-input, textarea, select { cursor: text !important; }
 
 /* ── Classes utilitaires custom ────────────────────── */
 @layer utilities {
