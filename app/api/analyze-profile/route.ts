@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import { YoutubeTranscript } from 'youtube-transcript'
 import { createServerSupabase } from '../../../lib/supabase-server'
 
 const anthropic = new Anthropic()
@@ -36,22 +35,65 @@ function parseTimeToSeconds(value: string): number | null {
   return null
 }
 
-async function fetchTranscript(videoId: string, startSec?: number | null, endSec?: number | null): Promise<string> {
-  let segments: { text: string; start?: number }[] = []
-  try {
-    segments = await YoutubeTranscript.fetchTranscript(videoId, { lang: 'fr' })
-  } catch {
-    try {
-      segments = await YoutubeTranscript.fetchTranscript(videoId)
-    } catch {
-      return ''
-    }
+// Fetcher direct via l'API timedtext YouTube (moins bloquée que le scraping)
+async function fetchTranscriptDirect(videoId: string, lang = 'fr'): Promise<{ text: string; start: number }[]> {
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
+    'Referer': `https://www.youtube.com/watch?v=${videoId}`,
   }
+
+  // Essai 1 : timedtext JSON (sous-titres manuels ou auto)
+  for (const l of [lang, 'fr', 'en', '']) {
+    try {
+      const url = `https://www.youtube.com/api/timedtext?v=${videoId}&lang=${l}&fmt=json3`
+      const res = await fetch(url, { headers })
+      if (!res.ok) continue
+      const data = await res.json() as { events?: { tStartMs?: number; segs?: { utf8?: string }[] }[] }
+      if (!data?.events?.length) continue
+      return data.events
+        .filter(e => e.segs)
+        .map(e => ({
+          start: (e.tStartMs ?? 0) / 1000,
+          text: e.segs!.map(s => s.utf8 ?? '').join('').trim()
+        }))
+        .filter(s => s.text)
+    } catch { continue }
+  }
+
+  // Essai 2 : scraper la page pour trouver l'URL des captions
+  try {
+    const pageRes = await fetch(`https://www.youtube.com/watch?v=${videoId}`, { headers })
+    const html = await pageRes.text()
+    const match = html.match(/"captionTracks":\[.*?"baseUrl":"(https:[^"]+)"/)
+    if (match) {
+      const captionUrl = match[1].replace(/\\u0026/g, '&') + '&fmt=json3'
+      const capRes = await fetch(captionUrl, { headers })
+      if (capRes.ok) {
+        const data = await capRes.json() as { events?: { tStartMs?: number; segs?: { utf8?: string }[] }[] }
+        return (data?.events || [])
+          .filter(e => e.segs)
+          .map(e => ({
+            start: (e.tStartMs ?? 0) / 1000,
+            text: e.segs!.map(s => s.utf8 ?? '').join('').trim()
+          }))
+          .filter(s => s.text)
+      }
+    }
+  } catch { /* silence */ }
+
+  return []
+}
+
+async function fetchTranscript(videoId: string, startSec?: number | null, endSec?: number | null): Promise<string> {
+  let segments = await fetchTranscriptDirect(videoId)
+
+  if (segments.length === 0) return ''
 
   if (startSec != null || endSec != null) {
     segments = segments.filter(s => {
-      if (startSec != null && (s.start ?? 0) < startSec) return false
-      if (endSec != null && (s.start ?? Infinity) > endSec) return false
+      if (startSec != null && s.start < startSec) return false
+      if (endSec != null && s.start > endSec) return false
       return true
     })
   }
@@ -77,7 +119,7 @@ export async function POST(req: NextRequest) {
     // Lire les sources YouTube depuis la table sources
     const { data: sourceRows } = await supabase
       .from('sources')
-      .select('url, metadata')
+      .select('url, metadata, contenu_brut')
       .eq('profil_id', profile.id)
       .eq('usage', 'author_style')
       .eq('type', 'youtube')
@@ -86,6 +128,13 @@ export async function POST(req: NextRequest) {
     const transcripts: string[] = []
 
     for (const source of sourceRows || []) {
+      // Priorité 1 : contenu déjà stocké en base
+      if (source.contenu_brut?.trim()) {
+        transcripts.push(source.contenu_brut.slice(0, 6000))
+        continue
+      }
+
+      // Priorité 2 : fetch direct YouTube
       const videoId = extractVideoId(source.url)
       if (!videoId) continue
 
