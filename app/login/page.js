@@ -123,7 +123,7 @@ export default function Login() {
           <button
             onClick={handleGoogle}
             disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 bg-surface2 hover:bg-surface3 border border-border rounded-lg px-4 py-3 text-sm text-cream transition disabled:opacity-50 font-medium mb-6"
+            className="w-full flex items-center justify-center gap-3 bg-surface2 hover:bg-surface3 border border-border rounded-lg px-4 py-3 text-sm text-cream transition disabled:opacity-50 font-medium mb-6 cursor-pointer"
           >
             <GoogleIcon />
             {googleLoading ? 'Redirection…' : 'Continuer avec Google'}
@@ -152,7 +152,7 @@ export default function Login() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-xs font-medium text-muted uppercase tracking-widest">Mot de passe</label>
-                <button type="button" onClick={() => setResetMode(true)} className="text-xs text-muted hover:text-gold transition">
+                <button type="button" onClick={() => setResetMode(true)} className="text-xs text-muted hover:text-gold transition cursor-pointer">
                   Mot de passe oublié ?
                 </button>
               </div>
@@ -173,7 +173,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gold text-bg py-3 rounded-lg font-semibold text-sm hover:bg-gold2 transition disabled:opacity-50 mt-2"
+              className="w-full bg-gold text-bg py-3 rounded-lg font-semibold text-sm hover:bg-gold2 transition disabled:opacity-50 mt-2 cursor-pointer"
             >
               {loading ? 'Connexion…' : 'Se connecter →'}
             </button>
