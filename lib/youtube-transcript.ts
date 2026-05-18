@@ -2,20 +2,29 @@ import { YoutubeTranscript } from 'youtube-transcript'
 
 export type Segment = { text: string; start: number }
 
-// Méthode 1 : package youtube-transcript (même approche que fetch-transcript pour les livres)
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`timeout after ${ms}ms`)), ms))
+  ])
+}
+
+// Méthode 1 : package youtube-transcript
 async function viaYoutubeTranscriptPackage(videoId: string): Promise<Segment[]> {
   for (const lang of ['fr', 'en', undefined]) {
     try {
       const opts = lang ? { lang } : {}
-      const segs = await YoutubeTranscript.fetchTranscript(videoId, opts)
+      const segs = await withTimeout(YoutubeTranscript.fetchTranscript(videoId, opts), 15000)
       if (segs.length > 0)
         return segs.map(s => ({ text: s.text.trim(), start: s.offset ?? 0 })).filter(s => s.text)
-    } catch { continue }
+    } catch (e) {
+      console.error(`[yt-transcript] npm/lang=${lang}:`, (e as Error).message)
+    }
   }
   return []
 }
 
-// Méthode 2 : InnerTube /youtubei/v1/get_transcript (API interne YouTube)
+// Méthode 2 : InnerTube /youtubei/v1/get_transcript
 async function viaInnerTube(videoId: string): Promise<Segment[]> {
   const vid = Buffer.from(videoId, 'utf8')
   const proto = Buffer.alloc(2 + vid.length)
@@ -26,7 +35,7 @@ async function viaInnerTube(videoId: string): Promise<Segment[]> {
 
   for (const lang of ['fr', 'en']) {
     try {
-      const res = await fetch('https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false', {
+      const res = await withTimeout(fetch('https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,9 +50,8 @@ async function viaInnerTube(videoId: string): Promise<Segment[]> {
           context: { client: { clientName: 'WEB', clientVersion: '2.20231219.04.00', hl: lang, gl: lang === 'fr' ? 'FR' : 'US' } },
           params,
         }),
-        signal: AbortSignal.timeout(10000),
-      })
-      if (!res.ok) continue
+      }), 10000)
+      if (!res.ok) { console.error(`[yt-transcript] innertube/${lang}: HTTP ${res.status}`); continue }
       const data = await res.json() as Record<string, unknown>
       const actions = (data?.actions as Record<string, unknown>[]) || []
       for (const action of actions) {
@@ -66,51 +74,63 @@ async function viaInnerTube(videoId: string): Promise<Segment[]> {
         }
         if (segments.length > 0) return segments
       }
-    } catch { continue }
+      console.error(`[yt-transcript] innertube/${lang}: réponse OK mais aucun segment`)
+    } catch (e) {
+      console.error(`[yt-transcript] innertube/${lang}:`, (e as Error).message)
+    }
   }
   return []
 }
 
-// Méthode 3 : Supadata (service tiers, proxies résidentiels — fiable depuis Vercel)
-// Nécessite la variable d'env SUPADATA_API_KEY
+// Méthode 3 : Supadata (proxies résidentiels, non bloqués depuis Vercel)
 async function viaSupadata(videoId: string): Promise<Segment[]> {
   const apiKey = process.env.SUPADATA_API_KEY
-  if (!apiKey) return []
+  if (!apiKey) { console.error('[yt-transcript] supadata: SUPADATA_API_KEY absent'); return [] }
 
   try {
-    const url = `https://api.supadata.ai/v1/youtube/transcript?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}`
-    const res = await fetch(url, {
+    const url = `https://api.supadata.ai/v1/youtube/transcript?videoId=${videoId}`
+    console.error(`[yt-transcript] supadata: GET ${url}`)
+    const res = await withTimeout(fetch(url, {
       headers: { 'x-api-key': apiKey },
-      signal: AbortSignal.timeout(20000),
-    })
+    }), 25000)
+
+    const rawText = await res.text()
+    console.error(`[yt-transcript] supadata: HTTP ${res.status} — ${rawText.slice(0, 200)}`)
+
     if (!res.ok) return []
-    const data = await res.json() as { content?: { text: string; offset: number }[] | string }
+    const data = JSON.parse(rawText) as { content?: { text: string; offset: number }[] | string }
     if (!data?.content) return []
 
-    // Avec text=false (défaut) : tableau de segments avec timestamps
     if (Array.isArray(data.content)) {
       return data.content
         .map(s => ({ text: s.text.trim(), start: (s.offset ?? 0) / 1000 }))
         .filter(s => s.text)
     }
 
-    // Fallback si c'est du texte brut
     if (typeof data.content === 'string' && data.content.trim()) {
       return [{ text: data.content.trim(), start: 0 }]
     }
-  } catch { /* silence */ }
+  } catch (e) {
+    console.error('[yt-transcript] supadata:', (e as Error).message)
+  }
   return []
 }
 
 // Point d'entrée : essaie les 3 méthodes dans l'ordre
 export async function fetchYoutubeTranscript(videoId: string): Promise<Segment[]> {
+  console.error(`[yt-transcript] début pour videoId=${videoId}`)
+
   const npm = await viaYoutubeTranscriptPackage(videoId)
-  if (npm.length > 0) return npm
+  if (npm.length > 0) { console.error(`[yt-transcript] succès via npm (${npm.length} segments)`); return npm }
 
   const innertube = await viaInnerTube(videoId)
-  if (innertube.length > 0) return innertube
+  if (innertube.length > 0) { console.error(`[yt-transcript] succès via innertube (${innertube.length} segments)`); return innertube }
 
-  return viaSupadata(videoId)
+  const supadata = await viaSupadata(videoId)
+  if (supadata.length > 0) { console.error(`[yt-transcript] succès via supadata (${supadata.length} segments)`); return supadata }
+
+  console.error(`[yt-transcript] toutes les méthodes ont échoué pour videoId=${videoId}`)
+  return []
 }
 
 export function filterByTime(segments: Segment[], startSec: number | null, endSec: number | null): Segment[] {
