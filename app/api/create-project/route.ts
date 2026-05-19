@@ -4,7 +4,7 @@ import { checkRateLimit } from '../../../lib/rate-limit'
 
 // Quota de projets par plan (null = illimité)
 const PROJET_QUOTA: Record<string, number | null> = {
-  gratuit: null,   // pas de limite sur la création, mais chapitre 1 seulement
+  gratuit: 1,      // 1 livre gratuit, chapitre 1 seulement
   forfait: 5,
   premium: null,
 }

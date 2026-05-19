@@ -70,7 +70,7 @@ export default function NouveauLivre() {
         supabase.from('projets_livres').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
       ])
       const plan = planRow?.plan || 'gratuit'
-      const QUOTA = { gratuit: null, forfait: 5, premium: null }
+      const QUOTA = { gratuit: 1, forfait: 5, premium: null }
       const quota = QUOTA[plan] ?? null
       if (quota !== null && (count ?? 0) >= quota) {
         setQuotaWall({ plan, quota })
