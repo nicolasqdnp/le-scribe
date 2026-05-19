@@ -175,6 +175,34 @@ function Dashboard() {
           <p className="text-muted">Que veux-tu faire aujourd'hui ?</p>
         </div>
 
+        {/* Onboarding — visible uniquement pour les nouveaux utilisateurs */}
+        {!portrait && (
+          <div className="mb-10 bg-surface border border-gold/20 rounded-2xl p-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
+            <p className="text-xs text-gold uppercase tracking-widest font-medium mb-3">Par où commencer</p>
+            <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream mb-6">
+              Deux étapes pour écrire ton livre
+            </h2>
+            <div className="space-y-4">
+              <Link href="/profil" className="flex items-start gap-4 p-4 bg-gold/10 border border-gold/30 rounded-xl hover:bg-gold/15 transition group">
+                <div className="w-8 h-8 rounded-full bg-gold text-ink text-sm font-bold flex items-center justify-center flex-shrink-0">1</div>
+                <div>
+                  <div className="font-semibold text-cream group-hover:text-gold transition">Crée ton profil auteur</div>
+                  <div className="text-sm text-muted mt-0.5">Réponds à quelques questions sur ton style de prédication. L'IA analysera comment tu écris.</div>
+                  <div className="text-xs text-gold mt-2">Commencer le profil →</div>
+                </div>
+              </Link>
+              <div className="flex items-start gap-4 p-4 bg-surface2 border border-border rounded-xl opacity-50">
+                <div className="w-8 h-8 rounded-full bg-surface3 border border-border text-muted text-sm font-bold flex items-center justify-center flex-shrink-0">2</div>
+                <div>
+                  <div className="font-semibold text-muted">Crée ton premier livre</div>
+                  <div className="text-sm text-muted2 mt-0.5">Une fois ton profil créé, fournis tes prédications et l'IA génèrera ton livre chapitre par chapitre.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Actions principales */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
           {portrait ? (
@@ -208,8 +236,20 @@ function Dashboard() {
             {projets.length === 0 ? (
               <div className="text-center py-16 text-muted">
                 <div className="text-4xl mb-4 opacity-20">📚</div>
-                <p className="text-sm mb-4">Aucun livre pour le moment.</p>
-                <button onClick={() => router.push(portrait ? '/nouveau-livre' : '/profil')} className="text-xs text-gold hover:text-gold2 transition">Commencer mon premier livre →</button>
+                {portrait ? (
+                  <>
+                    <p className="text-sm font-medium text-cream mb-1">Ton profil est prêt !</p>
+                    <p className="text-sm mb-5">Il ne reste plus qu'à créer ton premier livre.</p>
+                    <button onClick={() => router.push('/nouveau-livre')} className="inline-flex items-center gap-2 bg-gold text-ink font-semibold text-sm px-5 py-2.5 rounded-xl hover:bg-gold2 transition">
+                      Créer mon premier livre →
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm mb-4">Aucun livre pour le moment.</p>
+                    <button onClick={() => router.push('/profil')} className="text-xs text-gold hover:text-gold2 transition">Commencer par créer mon profil →</button>
+                  </>
+                )}
               </div>
             ) : (
               <div className="divide-y divide-border">
