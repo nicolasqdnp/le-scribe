@@ -299,6 +299,10 @@ export default function Profil() {
   }
 
   async function handleSaveAndAnalyze() {
+    if (user && !user.email_confirmed_at) {
+      setErrorMsg("Confirme d'abord ton adresse email. Vérifie ta boîte mail et clique sur le lien reçu.")
+      return
+    }
     setLoading(true); setErrorMsg('')
     try {
       await saveProfile(); setLoading(false); setMode('analyzing')

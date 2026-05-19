@@ -55,9 +55,16 @@ function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState(null)
   const [confirmId, setConfirmId] = useState(null)
+  const [resendDone, setResendDone] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
   const paiementOk = searchParams.get('paiement') === 'ok'
+
+  async function resendConfirmation() {
+    const supabase = createClient()
+    await supabase.auth.resend({ type: 'signup', email: user.email })
+    setResendDone(true)
+  }
 
   useEffect(() => {
     // Gestion "rester connecté" : si session_only et navigateur rouvert → déconnexion
@@ -141,6 +148,22 @@ function Dashboard() {
 
   return (
     <main className="min-h-screen page-glow">
+      {/* Bannière email non confirmé */}
+      {user && !user.email_confirmed_at && (
+        <div className="bg-warn/10 border-b border-warn/20 px-6 py-3 flex items-center justify-center gap-3">
+          <span className="text-warn text-sm">
+            ✉️ Confirme ton adresse email pour débloquer toutes les fonctionnalités.
+          </span>
+          {resendDone ? (
+            <span className="text-xs text-ok font-medium">Email renvoyé ✓</span>
+          ) : (
+            <button onClick={resendConfirmation} className="text-xs text-warn underline hover:text-warn/80 transition font-medium">
+              Renvoyer l'email
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Bannière succès paiement */}
       {paiementOk && (
         <div className="bg-ok/10 border-b border-ok/20 px-6 py-3 flex items-center justify-center gap-2">
