@@ -2,6 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
 const LIMITS: Record<string, { max: number; windowMinutes: number }> = {
+  'create-project':          { max: 10, windowMinutes: 60 },
   'generate-chapter':        { max: 20, windowMinutes: 60 },
   'improve-chapter':         { max: 20, windowMinutes: 60 },
   'chat-project':            { max: 30, windowMinutes: 60 },

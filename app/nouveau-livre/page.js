@@ -3,6 +3,32 @@ import { useState, useEffect } from 'react'
 import { createClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
+function QuotaWall({ plan, quota }) {
+  return (
+    <main className="min-h-screen page-glow flex items-center justify-center px-6">
+      <div className="max-w-md text-center">
+        <div className="text-4xl mb-4">🔒</div>
+        <h1 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-cream mb-3">
+          Limite atteinte
+        </h1>
+        <p className="text-muted text-sm mb-6">
+          Ton forfait <span className="text-gold font-medium">{plan}</span> te permet de créer jusqu&apos;à{' '}
+          <span className="text-gold font-medium">{quota} livre{quota > 1 ? 's' : ''}</span>.
+          Pour continuer, passe à un forfait supérieur.
+        </p>
+        <div className="flex flex-col gap-3">
+          <a href="/checkout" className="bg-gold text-ink font-semibold text-sm px-6 py-3 rounded-xl hover:bg-gold2 transition">
+            Voir les forfaits →
+          </a>
+          <a href="/dashboard" className="text-sm text-muted hover:text-cream transition">
+            Retour au tableau de bord
+          </a>
+        </div>
+      </div>
+    </main>
+  )
+}
+
 function Chip({ field, val, selected, onToggle }) {
   return (
     <button type="button" onClick={() => onToggle(field, val)}
@@ -21,6 +47,7 @@ export default function NouveauLivre() {
   const [loading, setLoading] = useState(false)
   const [user, setUser] = useState(null)
   const [error, setError] = useState('')
+  const [quotaWall, setQuotaWall] = useState(null) // { plan, quota }
   const router = useRouter()
 
   const [D, setD] = useState({
@@ -33,9 +60,21 @@ export default function NouveauLivre() {
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) router.replace('/login')
-      else setUser(user)
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) { router.replace('/login'); return }
+      setUser(user)
+
+      // Vérifier le quota de projets
+      const [{ data: planRow }, { count }] = await Promise.all([
+        supabase.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle(),
+        supabase.from('projets_livres').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
+      ])
+      const plan = planRow?.plan || 'gratuit'
+      const QUOTA = { gratuit: null, forfait: 5, premium: null }
+      const quota = QUOTA[plan] ?? null
+      if (quota !== null && (count ?? 0) >= quota) {
+        setQuotaWall({ plan, quota })
+      }
     })
   }, [])
 
@@ -70,38 +109,50 @@ export default function NouveauLivre() {
   async function save() {
     if (!user) return
     setLoading(true); setError('')
-    const supabase = createClient()
 
-    const { data: projet, error: projetError } = await supabase.from('projets_livres').insert({
-      user_id: user.id, titre: D.titre, sujet: D.sujet,
-      objectif: D.objectif.join(', '), lectorat: D.lecto.join(', '),
-      transformation: D.transfo, nb_chapitres: parseInt(D.chapitres),
-      longueur: D.longueur.join(', '), structure_interne: D.struct.join(', '),
-      plan_existant: D.plan, ton: D.ton.join(', '),
-      a_inclure: D.inclure, a_eviter: D.eviter, message_cle: D.phrase,
-      statut: 'nouveau'
-    }).select().single()
-
-    if (projetError || !projet) { setError('Erreur création projet : ' + (projetError?.message || 'inconnue')); setLoading(false); return }
-
-    const sourcesPayload = []
+    const sources = []
     D.ytLinks.filter(item => item.url.trim()).forEach((item, index) => {
-      sourcesPayload.push({ user_id: user.id, projet_id: projet.id, type: 'youtube', usage: 'book_source',
+      sources.push({ type: 'youtube', usage: 'book_source',
         label: `Vidéo YouTube ${index + 1}`, url: item.url.trim(), ordre: index,
         metadata: { culteEntier: item.culteEntier, debut: item.debut, fin: item.fin } })
     })
     D.gdocLinks.filter(l => l.trim()).forEach((link, index) => {
-      sourcesPayload.push({ user_id: user.id, projet_id: projet.id, type: 'drive', usage: 'book_source',
+      sources.push({ type: 'drive', usage: 'book_source',
         label: `Google Doc ${index + 1}`, url: link.trim(), ordre: 100 + index, metadata: {} })
     })
     if (D.notes.trim()) {
-      sourcesPayload.push({ user_id: user.id, projet_id: projet.id, type: 'note', usage: 'book_source',
+      sources.push({ type: 'note', usage: 'book_source',
         label: 'Notes texte libre', contenu_brut: D.notes.trim(), ordre: 200, metadata: {} })
     }
-    if (sourcesPayload.length > 0) await supabase.from('sources').insert(sourcesPayload)
+
+    const res = await fetch('/api/create-project', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        titre: D.titre, sujet: D.sujet,
+        objectif: D.objectif.join(', '), lectorat: D.lecto.join(', '),
+        transformation: D.transfo, nb_chapitres: parseInt(D.chapitres),
+        longueur: D.longueur.join(', '), structure_interne: D.struct.join(', '),
+        plan_existant: D.plan, ton: D.ton.join(', '),
+        a_inclure: D.inclure, a_eviter: D.eviter, message_cle: D.phrase,
+        sources
+      })
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      if (data.error === 'QUOTA_LIVRES') {
+        setQuotaWall({ plan: data.plan, quota: data.quota })
+      } else {
+        setError(data.error || 'Erreur création projet')
+      }
+      setLoading(false)
+      return
+    }
 
     setLoading(false)
-    router.push(`/projets/${projet.id}`)
+    router.push(`/projets/${data.projetId}`)
   }
 
   const inputCls = "w-full bg-surface2 border border-border rounded-lg px-4 py-3 text-sm text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition"
@@ -238,6 +289,8 @@ export default function NouveauLivre() {
   ]
 
   const pct = Math.round(((cur + 1) / 4) * 100)
+
+  if (quotaWall) return <QuotaWall plan={quotaWall.plan} quota={quotaWall.quota} />
 
   return (
     <main className="min-h-screen page-glow">
