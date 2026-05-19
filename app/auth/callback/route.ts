@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { sendWelcomeEmail } from '../../../lib/email'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -23,8 +24,18 @@ export async function GET(request: Request) {
         },
       }
     )
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      // Email de bienvenue pour les nouveaux inscrits (created_at ≈ now)
+      const user = data?.session?.user
+      if (user?.email) {
+        const createdAt = new Date(user.created_at).getTime()
+        const isNew = Date.now() - createdAt < 30_000 // inscrit il y a moins de 30s
+        if (isNew) {
+          const prenom = user.user_metadata?.nom?.split(' ')[0] || ''
+          sendWelcomeEmail(user.email, prenom).catch(() => {})
+        }
+      }
       return NextResponse.redirect(`${origin}${next}`)
     }
   }

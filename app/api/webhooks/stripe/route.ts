@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
+import { sendPaymentConfirmationEmail } from '../../../../lib/email'
 
 export async function POST(req: NextRequest) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
@@ -39,6 +40,14 @@ export async function POST(req: NextRequest) {
       }
 
       console.log(`[webhook/stripe] Plan mis à jour → user ${user_id} : ${plan}`)
+
+      // Email de confirmation
+      const email = session.customer_email || ''
+      if (email) {
+        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(user_id)
+        const prenom = userData?.user?.user_metadata?.nom?.split(' ')[0] || ''
+        await sendPaymentConfirmationEmail(email, prenom, plan)
+      }
     }
   }
 
