@@ -11,6 +11,11 @@ export async function POST(req: NextRequest) {
     const rateLimit = await checkRateLimit(supabase, user.id, 'generate-cover')
     if (rateLimit) return rateLimit
 
+    const { data: planRow } = await supabase.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle()
+    if (!planRow?.plan || planRow.plan === 'gratuit') {
+      return NextResponse.json({ error: 'PLAN_LIMIT' }, { status: 402 })
+    }
+
     const { titre, sujet } = await req.json()
     if (!titre) return NextResponse.json({ error: 'Titre manquant' }, { status: 400 })
 

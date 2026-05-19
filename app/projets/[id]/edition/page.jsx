@@ -204,7 +204,15 @@ export default function EditionPage() {
     setExportLoading(true)
     try {
       const res = await fetch('/api/export', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projetId: id, html: editor.getHTML(), titre }) })
-      if (!res.ok) throw new Error('Erreur export')
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        if (data.error === 'PLAN_LIMIT') {
+          alert("L'export est réservé aux forfaits payants. Passe à un forfait supérieur sur lescribe.app/checkout pour télécharger ton livre.")
+        } else {
+          throw new Error('Erreur export')
+        }
+        return
+      }
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a'); a.href = url

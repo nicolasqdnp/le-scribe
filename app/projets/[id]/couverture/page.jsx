@@ -39,7 +39,14 @@ export default function CouverturePage() {
         body: JSON.stringify({ titre: projet?.titre, sujet: descriptionCustom }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Erreur')
+      if (!res.ok) {
+        if (data.error === 'PLAN_LIMIT') {
+          setError('La génération de couverture est réservée aux forfaits payants. Passe à un forfait supérieur pour débloquer cette fonctionnalité.')
+        } else {
+          throw new Error(data.error || 'Erreur')
+        }
+        return
+      }
       setImages(data.images || [])
     } catch (e) {
       setError(e.message)

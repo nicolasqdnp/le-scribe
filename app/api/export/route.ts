@@ -52,6 +52,11 @@ export async function GET(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
+    const { data: planRow } = await supabase.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle()
+    if (!planRow?.plan || planRow.plan === 'gratuit') {
+      return NextResponse.json({ error: 'PLAN_LIMIT' }, { status: 402 })
+    }
+
     const { data: projet } = await supabase
       .from('projets_livres').select('*').eq('id', projetId).eq('user_id', user.id).single()
     if (!projet) return NextResponse.json({ error: 'Projet introuvable' }, { status: 404 })
@@ -181,6 +186,11 @@ export async function POST(req: NextRequest) {
     const supabase = await createServerSupabase()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+
+    const { data: planRow } = await supabase.from('user_plans').select('plan').eq('user_id', user.id).maybeSingle()
+    if (!planRow?.plan || planRow.plan === 'gratuit') {
+      return NextResponse.json({ error: 'PLAN_LIMIT' }, { status: 402 })
+    }
 
     const { projetId, html, titre: titreParam } = await req.json()
     if (!html) return NextResponse.json({ error: 'Contenu manquant' }, { status: 400 })
