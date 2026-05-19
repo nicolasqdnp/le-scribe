@@ -1,9 +1,34 @@
-import { Resend } from 'resend'
+const BREVO_API = 'https://api.brevo.com/v3/smtp/email'
+const FROM = { name: 'Le Scribe', email: 'noreply@lescribe.app' }
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const FROM = 'Le Scribe <noreply@lescribe.app>'
+// ─── Envoi générique ───────────────────────────────────────────────────────────
 
-// ─── Templates ────────────────────────────────────────────────────────────────
+async function sendEmail(to: string, subject: string, html: string) {
+  const apiKey = process.env.BREVO_API_KEY
+  if (!apiKey) { console.error('[email] BREVO_API_KEY manquant'); return }
+
+  const res = await fetch(BREVO_API, {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'api-key': apiKey,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      sender: FROM,
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    }),
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    console.error('[email] Brevo error:', err)
+  }
+}
+
+// ─── Template de base ──────────────────────────────────────────────────────────
 
 function baseTemplate(content: string): string {
   return `<!DOCTYPE html>
@@ -40,21 +65,19 @@ function baseTemplate(content: string): string {
 // ─── Email : Bienvenue ─────────────────────────────────────────────────────────
 
 export async function sendWelcomeEmail(to: string, prenom: string) {
-  if (!process.env.RESEND_API_KEY) return
   try {
-    await resend.emails.send({
-      from: FROM,
+    await sendEmail(
       to,
-      subject: 'Bienvenue sur Le Scribe 🖊',
-      html: baseTemplate(`
+      'Bienvenue sur Le Scribe 🖊',
+      baseTemplate(`
         <h1>Bienvenue, ${prenom || 'Auteur'} !</h1>
         <p>Tu viens de rejoindre Le Scribe — l'assistant IA qui aide les pasteurs et prédicateurs à écrire leurs livres dans leur propre style.</p>
         <p>Pour commencer, crée ton profil auteur. L'IA analysera ton style de prédication pour écrire exactement comme toi.</p>
         <a href="https://lescribe.app/profil" class="btn">Créer mon profil auteur →</a>
         <p>Si tu as des questions, réponds directement à cet email — je lis chaque message.</p>
         <p style="color:#c9a77d;">Nicolas<br/><span style="color:#a09070;font-size:13px;">Fondateur de Le Scribe</span></p>
-      `),
-    })
+      `)
+    )
   } catch (e) {
     console.error('[email] sendWelcomeEmail error:', e)
   }
@@ -69,21 +92,19 @@ const PLAN_LABELS: Record<string, string> = {
 }
 
 export async function sendPaymentConfirmationEmail(to: string, prenom: string, plan: string) {
-  if (!process.env.RESEND_API_KEY) return
   try {
-    await resend.emails.send({
-      from: FROM,
+    await sendEmail(
       to,
-      subject: '✓ Paiement confirmé — Le Scribe',
-      html: baseTemplate(`
+      '✓ Paiement confirmé — Le Scribe',
+      baseTemplate(`
         <h1>Paiement confirmé ✓</h1>
         <p>Merci ${prenom || ''} ! Ton accès <strong style="color:#c9a77d;">${PLAN_LABELS[plan] || plan}</strong> est maintenant actif.</p>
         <p>Tu peux désormais générer tous tes chapitres, exporter ton livre en DOCX et utiliser toutes les fonctionnalités du Scribe.</p>
         <a href="https://lescribe.app/dashboard" class="btn">Aller à mon tableau de bord →</a>
         <p>Bonne écriture !</p>
         <p style="color:#c9a77d;">Nicolas<br/><span style="color:#a09070;font-size:13px;">Fondateur de Le Scribe</span></p>
-      `),
-    })
+      `)
+    )
   } catch (e) {
     console.error('[email] sendPaymentConfirmationEmail error:', e)
   }
