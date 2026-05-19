@@ -154,6 +154,8 @@ function Bloc({ title, value }) {
   )
 }
 
+const DRAFT_KEY = 'profil_auteur_draft'
+
 export default function Profil() {
   const [mode, setMode] = useState('loading')
   const [cur, setCur] = useState(0)
@@ -175,6 +177,13 @@ export default function Profil() {
     lecto: [], age: [], mission: '',
     youtube: EMPTY_YOUTUBE
   })
+
+  // Sauvegarde automatique du brouillon dans localStorage
+  useEffect(() => {
+    if (mode === 'form') {
+      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(D)) } catch {}
+    }
+  }, [D, mode])
 
   function toggle(field, val) {
     setD(prev => ({
@@ -237,7 +246,16 @@ export default function Profil() {
         setPortrait(analysis.portrait)
         setTranscriptsCount(analysis.transcripts_count ?? 0)
         setMode('portrait')
-      } else { setMode('form') }
+      } else {
+        // Pas encore de profil sauvegardé → restaurer le brouillon si dispo
+        if (!profile) {
+          try {
+            const draft = localStorage.getItem(DRAFT_KEY)
+            if (draft) setD(JSON.parse(draft))
+          } catch {}
+        }
+        setMode('form')
+      }
       setLoading(false)
     }
 
@@ -275,6 +293,9 @@ export default function Profil() {
 
     await supabase.from('sources').delete().eq('profil_id', profileId).eq('usage', 'author_style')
     if (youtubeRows.length > 0) await supabase.from('sources').insert(youtubeRows)
+
+    // Brouillon sauvegardé → on efface le localStorage
+    try { localStorage.removeItem(DRAFT_KEY) } catch {}
   }
 
   async function handleSaveAndAnalyze() {
