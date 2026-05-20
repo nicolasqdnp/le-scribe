@@ -176,14 +176,31 @@ export async function POST(req: NextRequest) {
       struct.includes('Titres') ? 'Structure le chapitre avec des titres de sous-sections (## Titre) aux vrais changements de thème ou d\'argument — 2 à 5 titres max, courts (3 à 6 mots), dans ton style. Ne commence pas le chapitre par un titre.' : '',
     ].filter(Boolean).join('\n')
 
-    const reglesBase = `Règles absolues :
-- La négation s'écrit toujours avec "ne" : "ce n'est pas", "il n'y a pas", "on ne peut pas" — jamais "c'est pas", "y a pas", "on peut pas".
-- Pas de tournures orales : "je sais pas c'est quoi" devient "je ne sais pas ce que c'est" ; "t'as vu" devient "tu as vu" ; "y'a" devient "il y a".
-- Pas de phrases sans verbe conjugué.
-- Pas de fragments isolés par un point.
+    const reglesBase = `REGISTRE : TU ÉCRIS UN LIVRE, PAS UN SERMON
+
+Les sources sont des transcriptions de prédications orales. C'est ta matière première — pas ton modèle. Extrais les idées, les arguments, les illustrations, la théologie. Réécris tout dans un registre d'écrit soigné.
+
+Interdits absolus (marqueurs du discours oral) :
+- Interpellations directes de l'auditoire : "vous savez", "regardez", "écoutez", "voyez-vous", "imaginez", "levez la main si", "je vous invite à"
+- Apostrophes à une assemblée : "frères et sœurs", "mes amis", "chers lecteurs" en milieu de développement
+- Formules de transition oratoires : "passons maintenant à", "dans notre premier point", "nous allons voir ensemble", "j'aimerais vous parler de"
+- Onomatopées et approbations : "Amen ?", "C'est bon ?", "Ok ?", "Vous voyez ?"
+- Phatiques et remplisseurs : "alors voilà", "en fait", "donc voilà", "bon alors", "hein"
+- Répétitions rhétoriques de l'oral : une idée dite trois fois de suite pour marteler — dans un livre, on ne dit qu'une fois, bien
+- Incises de commentaire : "— c'est important —", "— et ça c'est clé —", "entre parenthèses"
+- Fausse spontanéité : "je me souviens d'un jour où..." pour annoncer une anecdote → développe l'anecdote directement
+
+Ce qui est autorisé et souhaitable :
+- La voix, les idées, le style argumentatif et théologique de l'auteur
+- Les illustrations et anecdotes — réécrites en prose narrative, pas racontées comme à une assemblée
+- Le "vous" ou le "tu" pour s'adresser au lecteur — mais avec parcimonie, comme un essai, pas comme un discours
+- Les versets bibliques — intégrés naturellement dans la prose
+
+Règles de langue :
+- La négation s'écrit toujours avec "ne" : "ce n'est pas", "il n'y a pas" — jamais "c'est pas", "y a pas"
+- Pas de phrases sans verbe conjugué. Toute proposition sans verbe se rattache à la phrase précédente par une virgule ou se complète — jamais isolée par un point.
 Espaces insécables avant : ; ? !
-Texte brut uniquement — aucun formatage Markdown. Pas d'astérisques, pas de dièses, pas de tirets de liste. Les titres de sous-parties s'intègrent dans le texte en prose.
-Chaque phrase terminée par un point doit contenir au moins un verbe conjugué. Interdit absolu — même pour les énumérations, les listes et les titres intégrés dans le texte : "La première, X." "La seconde, Ésaïe." "Partout. Sans exception." "Sans lui, pas de récolte." sont toutes des fautes. Reformulations correctes : "La première est X." / "La seconde vient d'Ésaïe." / "Partout, sans exception," / "Sans lui, il n'y a pas de récolte." Règle absolue : toute proposition sans verbe conjugué doit être soit rattachée à la phrase précédente par une virgule, soit complétée par un verbe — jamais isolée par un point.`
+Texte brut uniquement — aucun formatage Markdown. Pas d'astérisques, pas de dièses, pas de tirets de liste.`
 
     const livreSection = `## Le livre
 - Titre : ${plan?.titre_final || projet.titre || ''}

@@ -275,8 +275,8 @@ export default function NouveauLivre() {
       tag: '4 / 4', title: 'Consignes spécifiques', desc: 'Instructions particulières pour ce livre.',
       content: (
         <div className="space-y-5">
-          <div><label className="block text-xs font-medium text-muted uppercase tracking-widest mb-2">Ton pour ce livre</label>
-            <div className="flex flex-wrap gap-2 mt-1">{['Identique à mes prédications','Plus accessible','Plus rigoureux et argumenté','Plus intime et personnel'].map(v => <Chip key={v} field="ton" val={v} selected={D.ton.includes(v)} onToggle={toggle} />)}</div></div>
+          <div><label className="block text-xs font-medium text-muted uppercase tracking-widest mb-2">Ton pour ce livre <span className="normal-case text-muted2 tracking-normal font-normal">(registre écrit dans tous les cas)</span></label>
+            <div className="flex flex-wrap gap-2 mt-1">{['Fidèle à mon style de prédication','Plus accessible et vulgarisé','Rigoureux et bien argumenté','Intime et personnel'].map(v => <Chip key={v} field="ton" val={v} selected={D.ton.includes(v)} onToggle={toggle} />)}</div></div>
           <div><label className="block text-xs font-medium text-muted uppercase tracking-widest mb-2">À inclure absolument</label>
             <textarea className={textareaCls} value={D.inclure} onChange={e => setD({...D, inclure: e.target.value})} placeholder="Arguments, versets, thèmes incontournables…" /></div>
           <div><label className="block text-xs font-medium text-muted uppercase tracking-widest mb-2">À éviter dans ce livre</label>
