@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
+import ThemeToggle from '../components/ThemeToggle'
 
 function ProfileCard({ portrait }) {
   return (
@@ -182,8 +183,9 @@ function Dashboard() {
             <span className="text-[10px] bg-surface2 text-muted2 border border-border px-1.5 py-0.5 rounded-full">Bientôt</span>
           </span>
         </nav>
-        <div className="flex items-center gap-5">
-          <span className="text-sm text-muted">{user?.user_metadata?.nom || user?.email}</span>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <span className="text-sm text-muted hidden md:inline">{user?.user_metadata?.nom || user?.email}</span>
           <button onClick={handleLogout} className="text-xs text-muted hover:text-cream border border-border rounded-lg px-3 py-1.5 transition">
             Déconnexion
           </button>

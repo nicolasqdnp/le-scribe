@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ── Variables CSS ─────────────────────────────────── */
+/* ── Variables CSS — Thème sombre (défaut) ─────────── */
 :root {
   --bg:       #0d0d0d;
   --surface:  #161616;
@@ -17,6 +17,20 @@
   --ok:       #4ade80;
   --warn:     #fbbf24;
   --err:      #f87171;
+}
+
+/* ── Thème clair ───────────────────────────────────── */
+.light {
+  --bg:       #f7f4ef;
+  --surface:  #eeebe5;
+  --surface2: #e5e0d8;
+  --surface3: #dbd5cc;
+  --border:   #cfc9bf;
+  --cream:    #1c1917;
+  --cream2:   #44403c;
+  --muted:    #78716c;
+  --muted2:   #a8a29e;
+  /* gold, ok, warn, err inchangés */
 }
 
 /* ── Base ──────────────────────────────────────────── */
@@ -128,12 +142,19 @@ input, textarea, select { cursor: text !important; }
     font-family: var(--font-playfair, Georgia, serif);
   }
 
-  /* Effet glow pour les pages sombres (fond dégradé or subtil) */
+  /* Effet glow — thème sombre */
   .page-glow {
     background:
       radial-gradient(ellipse 70vw 60vh at -5% -5%, rgba(201, 167, 125, 0.18) 0%, transparent 65%),
       radial-gradient(ellipse 55vw 50vh at 105% 105%, rgba(201, 167, 125, 0.13) 0%, transparent 65%),
       #0d0d0d;
+  }
+  /* Effet glow — thème clair */
+  .light .page-glow {
+    background:
+      radial-gradient(ellipse 70vw 60vh at -5% -5%, rgba(201, 167, 125, 0.10) 0%, transparent 65%),
+      radial-gradient(ellipse 55vw 50vh at 105% 105%, rgba(201, 167, 125, 0.07) 0%, transparent 65%),
+      #f7f4ef;
   }
 }
 
