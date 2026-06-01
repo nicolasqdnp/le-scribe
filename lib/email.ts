@@ -83,6 +83,52 @@ export async function sendWelcomeEmail(to: string, prenom: string) {
   }
 }
 
+// ─── Email : EPUB livré ────────────────────────────────────────────────────────
+
+export async function sendEpubEmail(to: string, downloadUrl: string) {
+  try {
+    await sendEmail(
+      to,
+      '📖 Votre livre est prêt — L\'urgence des temps',
+      baseTemplate(`
+        <h1>Merci pour votre achat !</h1>
+        <p>Votre exemplaire numérique de <strong style="color:#c9a77d;">L'urgence des temps</strong>
+        par Nicolas Salafranque est prêt à être téléchargé.</p>
+        <a href="${downloadUrl}" class="btn">Télécharger mon EPUB →</a>
+        <p style="font-size:13px;color:#7a6a50;">Ce lien est valable 48 heures. Si vous ne parvenez pas à télécharger le fichier, répondez à cet email.</p>
+        <p>Bonne lecture !</p>
+        <p style="color:#c9a77d;">Nicolas Salafranque<br/>
+        <span style="color:#a09070;font-size:13px;">Pasteur · Auteur · Fondateur des Éditions Le Scribe</span></p>
+      `)
+    )
+  } catch (e) {
+    console.error('[email] sendEpubEmail error:', e)
+  }
+}
+
+// ─── Email : Précommande physique confirmée ─────────────────────────────────────
+
+export async function sendPhysiqueConfirmationEmail(to: string, shippingName: string) {
+  try {
+    await sendEmail(
+      to,
+      '✓ Précommande confirmée — L\'urgence des temps',
+      baseTemplate(`
+        <h1>Précommande confirmée ✓</h1>
+        <p>Merci ${shippingName || ''} ! Votre précommande de <strong style="color:#c9a77d;">L'urgence des temps</strong>
+        (édition papier) a bien été enregistrée.</p>
+        <p>Dès que l'impression est disponible, votre livre vous sera expédié à l'adresse indiquée. Vous recevrez un email de confirmation d'expédition.</p>
+        <p style="font-size:13px;color:#7a6a50;">Pour toute question, répondez à cet email.</p>
+        <p>Merci pour votre confiance !</p>
+        <p style="color:#c9a77d;">Nicolas Salafranque<br/>
+        <span style="color:#a09070;font-size:13px;">Pasteur · Auteur · Éditions Le Scribe</span></p>
+      `)
+    )
+  } catch (e) {
+    console.error('[email] sendPhysiqueConfirmationEmail error:', e)
+  }
+}
+
 // ─── Email : Paiement confirmé ─────────────────────────────────────────────────
 
 const PLAN_LABELS: Record<string, string> = {
