@@ -58,10 +58,11 @@ export default function BoutiquePage() {
 
           {/* Couverture */}
           <div className="flex-shrink-0 mx-auto md:mx-0">
-            <div className="w-52 h-72 bg-surface2 border border-border rounded-xl shadow-[0_8px_40px_rgba(0,0,0,0.5)] flex items-center justify-center text-muted2 text-sm">
-              {/* Remplacer par <img src="/couverture-urgence-des-temps.jpg" alt="..." className="w-full h-full object-cover rounded-xl" /> */}
-              <span className="text-center px-4 leading-relaxed">Couverture<br />à venir</span>
-            </div>
+            <img
+              src="/lurgence-des-temps-couv.jpg"
+              alt="L'urgence des temps — Nicolas Salafranque"
+              className="w-52 rounded-xl shadow-[0_8px_40px_rgba(0,0,0,0.5)]"
+            />
           </div>
 
           {/* Infos livre */}
