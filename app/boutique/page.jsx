@@ -4,9 +4,7 @@ import ThemeToggle from '../components/ThemeToggle'
 
 export default function BoutiquePage() {
   const [emailEpub, setEmailEpub] = useState('')
-  const [emailPhysique, setEmailPhysique] = useState('')
   const [loadingEpub, setLoadingEpub] = useState(false)
-  const [loadingPhysique, setLoadingPhysique] = useState(false)
   const [error, setError] = useState('')
 
   async function handleBuy(product, email, setLoading) {
@@ -133,7 +131,7 @@ export default function BoutiquePage() {
           <div className="bg-surface border border-gold/20 rounded-2xl p-6 flex flex-col relative overflow-hidden">
             <div className="absolute top-4 right-4">
               <span className="text-xs font-medium bg-gold/10 text-gold border border-gold/30 px-2 py-0.5 rounded-full">
-                Précommande
+                Disponible
               </span>
             </div>
 
@@ -143,39 +141,33 @@ export default function BoutiquePage() {
                 <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream mt-1">
                   Livre physique
                 </h2>
-                <p className="text-muted text-xs mt-1">Expédition dès impression disponible</p>
+                <p className="text-muted text-xs mt-1">Expédié par Amazon · livraison rapide</p>
               </div>
               <div className="text-right flex-shrink-0 mt-5">
-                <span className="text-2xl font-bold text-cream">16€</span>
-                <p className="text-xs text-muted">+ 6€ port</p>
+                <span className="text-2xl font-bold text-cream">18,99€</span>
+                <p className="text-xs text-muted">+ 3€ port</p>
               </div>
             </div>
 
             <ul className="text-sm text-muted space-y-1.5 mb-6 flex-1">
-              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Impression professionnelle offset</li>
-              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> France, Belgique, Suisse, Luxembourg, Canada</li>
-              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Lettre suivie · confirmation par email</li>
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Impression et expédition par Amazon</li>
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France et international</li>
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Suivi de commande Amazon</li>
             </ul>
 
-            <input
-              type="email"
-              placeholder="ton@email.com"
-              value={emailPhysique}
-              onChange={e => setEmailPhysique(e.target.value)}
-              className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition mb-3"
-            />
-            <button
-              onClick={() => handleBuy('physique', emailPhysique, setLoadingPhysique)}
-              disabled={loadingPhysique}
-              className="w-full border border-gold/40 text-gold font-semibold text-sm py-3 rounded-xl hover:bg-gold/5 hover:border-gold/60 transition disabled:opacity-60">
-              {loadingPhysique ? 'Redirection…' : 'Précommander — 16€ + port'}
-            </button>
+            <a
+              href="https://www.amazon.fr/dp/B0H4NN4FXF"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full border border-gold/40 text-gold font-semibold text-sm py-3 rounded-xl hover:bg-gold/5 hover:border-gold/60 transition text-center">
+              Commander sur Amazon — 18,99€
+            </a>
           </div>
         </div>
 
         {/* Paiement sécurisé */}
         <p className="text-center text-xs text-muted2 mt-8">
-          Paiement sécurisé par Stripe · Carte bancaire, Apple Pay, Google Pay
+          EPUB : paiement sécurisé par Stripe · Carte bancaire, Apple Pay, Google Pay
         </p>
 
         {/* À propos de l'auteur */}
