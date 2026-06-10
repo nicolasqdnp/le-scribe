@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       .select('id')
       .single()
 
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+    const lineItems = [
       {
         price_data: {
           currency: 'eur',

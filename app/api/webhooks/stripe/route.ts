@@ -59,8 +59,9 @@ export async function POST(req: NextRequest) {
       const email = session.customer_email || ''
 
       // Marquer la commande comme payée + stocker adresse si physique
-      const shippingAddress = session.shipping_details?.address || null
-      const shippingName = session.shipping_details?.name || null
+      const shipping = (session as any).shipping_details
+      const shippingAddress = shipping?.address || null
+      const shippingName = shipping?.name || null
 
       await supabaseAdmin
         .from('orders')
