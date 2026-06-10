@@ -9,7 +9,8 @@ export default function Home() {
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-bg/90 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <a href="/" className="flex items-center gap-2.5">
-            <span className="text-gold font-[family-name:var(--font-playfair)] text-xl font-bold tracking-wide">Le Scribe</span>
+            <img src="/lescribe-logo-fond-sombre.png" alt="Le Scribe" className="logo-nav-dark h-8 w-auto" />
+            <img src="/lescribe-logo-fond-clair.png" alt="Le Scribe" className="logo-nav-light h-8 w-auto" />
           </a>
           {/* Liens navigation centre */}
           <nav className="hidden md:flex items-center gap-1">

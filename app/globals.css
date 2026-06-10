@@ -42,6 +42,12 @@ html, body {
 }
 
 button, a, [role="button"] { cursor: pointer !important; }
+
+/* ── Logo navbar : bascule selon le thème ──────────── */
+.logo-nav-dark  { display: block; }
+.logo-nav-light { display: none; }
+.light .logo-nav-dark  { display: none; }
+.light .logo-nav-light { display: block; }
 input, textarea, select { cursor: text !important; }
 
 /* ── Classes utilitaires custom ────────────────────── */
