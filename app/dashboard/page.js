@@ -178,6 +178,7 @@ function Dashboard() {
         <nav className="hidden md:flex items-center gap-1">
           <Link href="/#comment" className="text-sm text-muted hover:text-cream px-4 py-2 rounded-lg hover:bg-surface transition">Comment ça marche</Link>
           <Link href="/#tarifs" className="text-sm text-muted hover:text-cream px-4 py-2 rounded-lg hover:bg-surface transition">Tarifs</Link>
+          <Link href="/boutique" className="text-sm text-gold hover:text-gold2 px-4 py-2 rounded-lg hover:bg-surface transition">Boutique</Link>
           <span className="text-sm text-muted2 px-4 py-2 flex items-center gap-1.5">
             Tutos
             <span className="text-[10px] bg-surface2 text-muted2 border border-border px-1.5 py-0.5 rounded-full">Bientôt</span>
