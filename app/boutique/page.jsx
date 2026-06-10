@@ -67,18 +67,27 @@ export default function BoutiquePage() {
 
           {/* Infos livre */}
           <div className="flex-1">
+            <p className="text-xs font-medium text-gold/60 uppercase tracking-widest mb-3">
+              Et si nous étions la génération dont parle Jésus ?
+            </p>
             <h1 className="font-[family-name:var(--font-playfair)] text-4xl font-bold text-cream leading-tight mb-2">
               L'urgence des temps
             </h1>
             <p className="text-gold text-base mb-1">Nicolas Salafranque</p>
-            <p className="text-muted2 text-xs mb-6">Éditions Le Scribe · 2025</p>
+            <p className="text-muted2 text-xs mb-6">Éditions Le Scribe · 2026 · 211 pages · ISBN 979-1098694301</p>
 
-            <p className="text-cream2 text-sm leading-relaxed mb-4">
-              Dans un monde saturé de bruit et d'urgences fabriquées, ce livre invite à redécouvrir l'urgence
-              réelle de notre temps — celle de l'Évangile. À travers une lecture prophétique et pastorale,
-              Nicolas Salafranque appelle l'Église à relire les signes du temps à la lumière de l'Écriture.
+            <p className="text-cream2 text-sm leading-relaxed mb-3">
+              Pendant des années, des prédicateurs ont annoncé la fin du monde. Ils se sont trompés — pas par manque de zèle, mais parce qu'ils ont sauté des étapes que Jésus Lui-même a décrites dans les Évangiles.
             </p>
-            <p className="text-muted text-xs">ISBN disponible prochainement · ~200 pages</p>
+            <p className="text-cream2 text-sm leading-relaxed mb-4">
+              En croisant <strong className="text-cream">Daniel, Matthieu 24, 2 Thessaloniciens 2 et l'Apocalypse</strong>, une chronologie se dessine — cohérente, ancrée dans la Parole — qui change tout à la manière dont on aborde la fin des temps.
+            </p>
+            <ul className="text-sm text-muted space-y-1.5">
+              <li className="flex items-start gap-2"><span className="text-gold text-xs mt-0.5 flex-shrink-0">→</span> La différence cruciale entre « grande tribulation » et « colère divine »</li>
+              <li className="flex items-start gap-2"><span className="text-gold text-xs mt-0.5 flex-shrink-0">→</span> Où se situe vraiment l'enlèvement dans la séquence des sceaux</li>
+              <li className="flex items-start gap-2"><span className="text-gold text-xs mt-0.5 flex-shrink-0">→</span> Les hypothèses 2029-2032 — sans panique ni obsession des dates</li>
+              <li className="flex items-start gap-2"><span className="text-gold text-xs mt-0.5 flex-shrink-0">→</span> Le concept de « Goshen » : bâtir des lieux de refuge</li>
+            </ul>
           </div>
         </div>
 
