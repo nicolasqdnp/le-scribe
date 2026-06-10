@@ -1,4 +1,5 @@
 import WordCycler from './components/WordCycler'
+import ThemeToggle from './components/ThemeToggle'
 
 export default function Home() {
   return (
@@ -21,6 +22,7 @@ export default function Home() {
             </a>
           </nav>
           <div className="flex gap-2 items-center">
+            <ThemeToggle />
             <a href="/login" className="text-sm text-muted hover:text-cream px-4 py-2 transition">Connexion</a>
             <a href="/inscription" className="text-sm bg-gold text-bg font-medium px-5 py-2 rounded-lg hover:bg-gold2 transition">
               Commencer
