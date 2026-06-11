@@ -96,7 +96,30 @@ export async function sendEpubEmail(to: string, downloadUrl: string) {
         par Nicolas Salafranque est prêt à être téléchargé.</p>
         <a href="${downloadUrl}" class="btn">Télécharger mon EPUB →</a>
         <p style="font-size:13px;color:#7a6a50;">Ce lien est valable 48 heures. Si vous ne parvenez pas à télécharger le fichier, répondez à cet email.</p>
-        <p>Bonne lecture !</p>
+
+        <div style="margin:28px 0 0;padding:20px;background:#13120f;border-radius:12px;border:1px solid #2a2520;">
+          <p style="margin:0 0 6px;font-size:13px;font-weight:bold;color:#c9a77d;">📱 Lire sur une liseuse Kindle ?</p>
+          <p style="margin:0 0 16px;font-size:13px;color:#7a6a50;">Kindle ne lit pas directement les EPUB — voici deux façons simples de l'y envoyer :</p>
+
+          <p style="margin:0 0 4px;font-size:13px;color:#e8e0d0;font-weight:bold;">Depuis votre téléphone</p>
+          <p style="margin:0 0 4px;font-size:13px;color:#7a6a50;">1. Téléchargez l'EPUB sur votre téléphone (bouton ci-dessus)</p>
+          <p style="margin:0 0 4px;font-size:13px;color:#7a6a50;">2. Installez l'app <strong style="color:#e8e0d0;">Send to Kindle</strong> si besoin :
+            &nbsp;<a href="https://apps.apple.com/app/send-to-kindle/id1626238021" style="color:#c9a77d;">App Store</a>
+            &nbsp;·&nbsp;<a href="https://play.google.com/store/apps/details?id=com.amazon.sendtokindle" style="color:#c9a77d;">Google Play</a>
+          </p>
+          <p style="margin:0 0 18px;font-size:13px;color:#7a6a50;">3. Ouvrez le fichier → "Partager" → <em>Send to Kindle</em></p>
+
+          <p style="margin:0 0 4px;font-size:13px;color:#e8e0d0;font-weight:bold;">Depuis un ordinateur</p>
+          <p style="margin:0 0 4px;font-size:13px;color:#7a6a50;">1. Téléchargez l'EPUB sur votre ordinateur (bouton ci-dessus)</p>
+          <p style="margin:0 0 4px;font-size:13px;color:#7a6a50;">2. Allez sur <a href="https://send.amazon.com" style="color:#c9a77d;">send.amazon.com</a></p>
+          <p style="margin:0 0 18px;font-size:13px;color:#7a6a50;">3. Uploadez le fichier → il apparaît dans votre bibliothèque Kindle</p>
+
+          <a href="https://send.amazon.com" style="display:inline-block;background:#1a1814;color:#c9a77d;font-size:13px;font-weight:bold;padding:10px 20px;border-radius:8px;border:1px solid #3a2f20;text-decoration:none;">
+            Ouvrir Send to Kindle →
+          </a>
+        </div>
+
+        <p style="margin-top:24px;">Bonne lecture !</p>
         <p style="color:#c9a77d;">Nicolas Salafranque<br/>
         <span style="color:#a09070;font-size:13px;">Pasteur · Auteur · Fondateur des Éditions Le Scribe</span></p>
       `)
