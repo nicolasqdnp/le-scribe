@@ -59,7 +59,7 @@ export default function BoutiquePage() {
           {/* Couverture */}
           <div className="flex-shrink-0 mx-auto md:mx-0">
             <img
-              src="/lurgence-des-temps-couv.jpg"
+              src="/lurgence-des-temps-couv-v2.png"
               alt="L'urgence des temps — Nicolas Salafranque"
               className="w-52 rounded-xl shadow-[0_8px_40px_rgba(0,0,0,0.5)]"
             />
