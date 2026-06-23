@@ -166,6 +166,7 @@ export default function CampagnePage() {
   const [backers, setBackers]             = useState(0)
   const [tierBackers, setTierBackers]     = useState({})
   const [showAllTiers, setShowAllTiers]   = useState(false)
+  const [showAllToc, setShowAllToc]       = useState(false)
   const [modal, setModal]                 = useState(null)
   const [amount, setAmount]               = useState('')
   const [email, setEmail]                 = useState('')
@@ -416,9 +417,12 @@ export default function CampagnePage() {
 
               {/* Story */}
               <section style={{ marginBottom: '48px' }}>
-                <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '24px', fontWeight: 700, color: C.text, marginBottom: '20px' }}>
-                  Pourquoi cette campagne ?
+                <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '24px', fontWeight: 700, color: C.text, marginBottom: '8px' }}>
+                  Et si nous étions la génération dont parle Jésus ?
                 </h2>
+                <p style={{ fontSize: '15px', color: C.gold, lineHeight: 1.7, marginBottom: '20px', fontStyle: 'italic' }}>
+                  Les signes s'accumulent. Les nations s'agitent. Jamais dans l'histoire autant de ce que Jésus a décrit ne s'est aligné en même temps. Ce livre a été écrit pour un temps comme celui-ci — et plus que jamais, il doit être mis entre les mains du plus grand nombre.
+                </p>
                 <p style={{ fontSize: '15px', color: C.text2, lineHeight: 1.8, marginBottom: '16px' }}>
                   <em>L'urgence des temps</em> existe déjà en ebook et en impression à la demande. Mais ce n'est pas suffisant.
                 </p>
@@ -442,8 +446,8 @@ export default function CampagnePage() {
                   211 pages · 15 chapitres + introduction, conclusion et postface
                 </p>
                 <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: '14px', overflow: 'hidden' }}>
-                  {TOC.map((ch, i) => (
-                    <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', padding: '12px 18px', borderBottom: i < TOC.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                  {(showAllToc ? TOC : TOC.slice(0, 5)).map((ch, i) => (
+                    <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', padding: '12px 18px', borderBottom: `1px solid ${C.border}` }}>
                       <span style={{ minWidth: '28px', fontSize: '12px', color: C.text3, fontWeight: 700, paddingTop: '1px', textAlign: 'right' }}>
                         {ch.n || ''}
                       </span>
@@ -451,6 +455,11 @@ export default function CampagnePage() {
                     </div>
                   ))}
                 </div>
+                <button
+                  onClick={() => setShowAllToc(v => !v)}
+                  style={{ marginTop: '12px', width: '100%', background: 'transparent', border: `1px solid ${C.border}`, color: C.text3, fontSize: '13px', padding: '10px', borderRadius: '10px', cursor: 'pointer' }}>
+                  {showAllToc ? `Replier ↑` : `Voir les ${TOC.length} chapitres ↓`}
+                </button>
               </section>
 
               {/* Extrait */}
