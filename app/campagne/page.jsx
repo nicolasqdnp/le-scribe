@@ -470,7 +470,7 @@ export default function CampagnePage() {
                   </h2>
                   <button
                     onClick={() => setExcerptOpen(o => !o)}
-                    style={{ background: C.gold, color: C.bg, fontWeight: 700, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', border: 'none' }}
+                    style={{ background: C.gold, color: C.bg, fontWeight: 700, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', border: 'none' }}>
                     {excerptOpen ? 'Refermer ↑' : 'Lire un extrait ↓'}
                   </button>
                 </div>
