@@ -5,6 +5,7 @@ import {
   sendPaymentConfirmationEmail,
   sendEpubEmail,
   sendPhysiqueConfirmationEmail,
+  sendCampaignConfirmationEmail,
 } from '../../../../lib/email'
 
 export async function POST(req: NextRequest) {
@@ -97,6 +98,39 @@ export async function POST(req: NextRequest) {
       }
 
       console.log(`[webhook/stripe] Commande ${product} confirmée → ${email}`)
+    }
+
+    // ── Contribution crowdfunding ───────────────────────────────────────────────
+    if (session.metadata?.contribution_id) {
+      const { contribution_id, tier_id } = session.metadata
+      const email = session.customer_email || ''
+      const shipping = (session as any).shipping_details
+
+      await supabaseAdmin
+        .from('crowdfunding_contributions')
+        .update({
+          status: 'paid',
+          stripe_session_id: session.id,
+          shipping_name: shipping?.name || null,
+          shipping_address: shipping?.address || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', contribution_id)
+
+      if (tier_id === 'ebook' && email) {
+        const { data: signedUrl } = await supabaseAdmin.storage
+          .from('boutique')
+          .createSignedUrl('lurgence-des-temps.epub', 60 * 60 * 48)
+        if (signedUrl?.signedUrl) {
+          await sendEpubEmail(email, signedUrl.signedUrl)
+          await supabaseAdmin.from('crowdfunding_contributions')
+            .update({ epub_sent_at: new Date().toISOString() })
+            .eq('id', contribution_id)
+        }
+      } else if (email) {
+        await sendCampaignConfirmationEmail(email, tier_id)
+      }
+      console.log(`[webhook/stripe] Contribution ${tier_id} confirmée → ${email}`)
     }
   }
 

@@ -152,6 +152,46 @@ export async function sendPhysiqueConfirmationEmail(to: string, shippingName: st
   }
 }
 
+// ─── Email : Confirmation contribution campagne ────────────────────────────────
+
+const TIER_LABELS_EMAIL: Record<string, string> = {
+  merci:     'Soutien — Un grand merci',
+  ebook:     "L'urgence des temps — EPUB",
+  livre:     'Le livre — tarif lancement',
+  dedicace:  'Le livre dédicacé',
+  echange:   'Le livre + un échange',
+  pack3:     'Pack de 3 — à offrir',
+  eglise:    'Le pack Église (10 ex.)',
+  don_libre: 'Don libre',
+}
+
+export async function sendCampaignConfirmationEmail(to: string, tierId: string) {
+  try {
+    const tierLabel = TIER_LABELS_EMAIL[tierId] || tierId
+    const isPhysique = ['livre', 'dedicace', 'echange', 'pack3', 'eglise'].includes(tierId)
+
+    await sendEmail(
+      to,
+      '✓ Contribution confirmée — L\'urgence des temps',
+      baseTemplate(`
+        <h1>Merci pour ta contribution !</h1>
+        <p>Ta contribution à la campagne de financement de <strong style="color:#c9a77d;">L'urgence des temps</strong>
+        a bien été enregistrée.</p>
+        <p style="font-size:13px;color:#7a6a50;">Palier choisi : ${tierLabel}</p>
+        ${isPhysique
+          ? `<p>Ton livre sera expédié dès que le tirage est imprimé, à l'été 2026. Tu recevras un email de confirmation d'expédition à ce moment-là.</p>`
+          : `<p>Ta générosité rend ce projet possible. Merci du fond du cœur.</p>`
+        }
+        <p style="font-size:13px;color:#7a6a50;">Pour toute question, réponds directement à cet email.</p>
+        <p style="color:#c9a77d;">Nicolas Salafranque<br/>
+        <span style="color:#a09070;font-size:13px;">Pasteur · Auteur · Éditions Le Scribe</span></p>
+      `)
+    )
+  } catch (e) {
+    console.error('[email] sendCampaignConfirmationEmail error:', e)
+  }
+}
+
 // ─── Email : Paiement confirmé ─────────────────────────────────────────────────
 
 const PLAN_LABELS: Record<string, string> = {
