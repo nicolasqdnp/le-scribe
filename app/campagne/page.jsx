@@ -165,6 +165,7 @@ export default function CampagnePage() {
   const [displayPct, setDisplayPct]       = useState(0)
   const [backers, setBackers]             = useState(0)
   const [tierBackers, setTierBackers]     = useState({})
+  const [showAllTiers, setShowAllTiers]   = useState(false)
   const [modal, setModal]                 = useState(null)
   const [amount, setAmount]               = useState('')
   const [email, setEmail]                 = useState('')
@@ -565,7 +566,7 @@ export default function CampagnePage() {
                 Choisir une contrepartie
               </h2>
 
-              {TIERS.map(tier => {
+              {(showAllTiers ? TIERS : TIERS.slice(0, 3)).map(tier => {
                 const ship = shipLabel(tier)
                 return (
                   <div
@@ -613,6 +614,22 @@ export default function CampagnePage() {
                   </div>
                 )
               })}
+
+              {/* Voir plus / moins */}
+              {!showAllTiers ? (
+                <button
+                  onClick={() => setShowAllTiers(true)}
+                  style={{ width: '100%', background: 'transparent', border: `1px solid ${C.border}`, color: C.gold, fontSize: '13px', padding: '12px', borderRadius: '12px', cursor: 'pointer', transition: 'border-color .2s' }}
+                  className="ls-btn-outline">
+                  Voir tous les paliers ({TIERS.length}) ↓
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowAllTiers(false)}
+                  style={{ width: '100%', background: 'transparent', border: `1px solid ${C.border}`, color: C.text3, fontSize: '13px', padding: '12px', borderRadius: '12px', cursor: 'pointer' }}>
+                  Replier ↑
+                </button>
+              )}
 
               {/* Don libre */}
               <button
