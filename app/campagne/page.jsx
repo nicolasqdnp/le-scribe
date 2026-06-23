@@ -583,12 +583,14 @@ export default function CampagnePage() {
                     onClick={() => openModal(tier)}
                   >
                     {tier.tag && (
-                      <span style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '11px', fontWeight: 600, background: tier.featured ? C.gold : 'rgba(201,167,125,.15)', color: tier.featured ? C.bg : C.gold, padding: '3px 8px', borderRadius: '99px' }}>
-                        {tier.tag}
-                      </span>
+                      <div style={{ marginBottom: '6px', textAlign: 'right' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 600, background: tier.featured ? C.gold : 'rgba(201,167,125,.15)', color: tier.featured ? C.bg : C.gold, padding: '3px 8px', borderRadius: '99px' }}>
+                          {tier.tag}
+                        </span>
+                      </div>
                     )}
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px', paddingRight: tier.tag ? '80px' : '0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
                       <p style={{ fontSize: '14px', fontWeight: 700, color: C.text, margin: 0 }}>{tier.titre}</p>
                       <p style={{ fontSize: '18px', fontWeight: 700, color: C.gold, margin: '0 0 0 8px', flexShrink: 0 }}>{tier.price}€</p>
                     </div>
