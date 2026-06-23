@@ -17,7 +17,7 @@ export default function Home() {
             <a href="#comment" className="text-sm text-muted hover:text-cream px-4 py-2 rounded-lg hover:bg-surface transition">Comment ça marche</a>
             <a href="#tarifs" className="text-sm text-muted hover:text-cream px-4 py-2 rounded-lg hover:bg-surface transition">Tarifs</a>
             <a href="/boutique" className="text-sm text-gold hover:text-gold2 px-4 py-2 rounded-lg hover:bg-surface transition">Boutique</a>
-            <a href="/campagne" className="text-sm text-gold hover:text-gold2 px-4 py-2 rounded-lg hover:bg-surface transition">Campagne</a>
+            <a href="/campagne" className="text-sm text-gold hover:text-gold2 px-4 py-2 rounded-lg hover:bg-surface transition">Soutenir le projet</a>
             <a href="#tutos" className="text-sm text-muted2 hover:text-muted px-4 py-2 rounded-lg transition flex items-center gap-1.5">
               Tutos
               <span className="text-[10px] bg-surface2 text-muted2 border border-border px-1.5 py-0.5 rounded-full">Bientôt</span>
