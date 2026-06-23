@@ -446,7 +446,7 @@ export default function CampagnePage() {
                   211 pages · 15 chapitres + introduction, conclusion et postface
                 </p>
                 <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: '14px', overflow: 'hidden' }}>
-                  {(showAllToc ? TOC : TOC.slice(0, 5)).map((ch, i) => (
+                  {(showAllToc ? TOC : TOC.slice(0, 4)).map((ch, i) => (
                     <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', padding: '12px 18px', borderBottom: `1px solid ${C.border}` }}>
                       <span style={{ minWidth: '28px', fontSize: '12px', color: C.text3, fontWeight: 700, paddingTop: '1px', textAlign: 'right' }}>
                         {ch.n || ''}
@@ -458,7 +458,7 @@ export default function CampagnePage() {
                 <button
                   onClick={() => setShowAllToc(v => !v)}
                   style={{ marginTop: '12px', width: '100%', background: 'transparent', border: `1px solid ${C.border}`, color: C.text3, fontSize: '13px', padding: '10px', borderRadius: '10px', cursor: 'pointer' }}>
-                  {showAllToc ? `Replier ↑` : `Voir les ${TOC.length} chapitres ↓`}
+                  {showAllToc ? `Replier ↑` : `Voir les 15 chapitres ↓`}
                 </button>
               </section>
 
