@@ -160,10 +160,10 @@ function shipLabel(tier) {
 // ─── Composant principal ──────────────────────────────────────────────────────
 
 export default function CampagnePage() {
-  const [raised, setRaised]               = useState(470)
+  const [raised, setRaised]               = useState(0)
   const [displayRaised, setDisplayRaised] = useState(0)
   const [displayPct, setDisplayPct]       = useState(0)
-  const [backers, setBackers]             = useState(31)
+  const [backers, setBackers]             = useState(0)
   const [tierBackers, setTierBackers]     = useState({})
   const [modal, setModal]                 = useState(null)
   const [amount, setAmount]               = useState('')
