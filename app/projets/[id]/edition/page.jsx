@@ -86,7 +86,7 @@ function ToolbarButton({ onClick, active, title, children, disabled }) {
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`px-2 py-1 rounded text-sm transition ${active ? 'bg-gold/20 text-gold' : 'hover:bg-stone-200 text-stone-600'} disabled:opacity-30`}>
+      className={`px-2 py-1 rounded text-sm transition ${active ? 'bg-gold/20 text-gold' : 'hover:bg-surface2 text-cream2'} disabled:opacity-30`}>
       {children}
     </button>
   )
@@ -225,7 +225,7 @@ export default function EditionPage() {
   function applyFont(f) { setFont(f); editor?.chain().focus().setFontFamily(f).run() }
   function applySize(s) { setFontSize(s); editor?.chain().focus().setFontSize(`${s}pt`).run() }
 
-  const selectCls = "text-xs bg-white border border-stone-200 rounded px-2 py-1 text-stone-700 focus:outline-none focus:border-gold/40 cursor-pointer"
+  const selectCls = "text-xs bg-surface border border-border rounded px-2 py-1 text-cream2 focus:outline-none focus:border-gold/40 cursor-pointer"
 
   async function sendChatMessage(text) {
     const msg = (text || chatInput).trim()
@@ -287,40 +287,40 @@ export default function EditionPage() {
   }
 
   if (loading) return (
-    <main className="min-h-screen bg-[#f5f4f1] flex items-center justify-center">
-      <p className="text-stone-500 text-sm">Chargement de l'éditeur…</p>
+    <main className="min-h-screen bg-bg flex items-center justify-center">
+      <p className="text-muted text-sm">Chargement de l'éditeur…</p>
     </main>
   )
 
   return (
-    <main className="min-h-screen bg-[#f5f4f1] flex flex-col">
+    <main className="min-h-screen bg-bg flex flex-col">
       {/* Header */}
-      <header className="toolbar-print-hide border-b border-stone-200 px-6 py-3 flex items-center justify-between flex-shrink-0 sticky top-0 z-20 bg-white">
+      <header className="toolbar-print-hide border-b border-border px-6 py-3 flex items-center justify-between flex-shrink-0 sticky top-0 z-20 bg-surface">
         <div className="flex items-center gap-3">
           <a href="/dashboard" className="font-[family-name:var(--font-playfair)] text-lg font-bold text-gold">Le Scribe</a>
-          <span className="text-stone-300">/</span>
-          <span className="text-sm text-stone-500 truncate max-w-xs">{titre}</span>
+          <span className="text-muted2">/</span>
+          <span className="text-sm text-muted truncate max-w-xs">{titre}</span>
         </div>
         <div className="flex items-center gap-2">
-          {saving && <span className="text-xs text-stone-400">Sauvegarde…</span>}
-          <button onClick={save} className="text-xs text-stone-500 hover:text-stone-900 border border-stone-200 rounded-lg px-3 py-1.5 transition">
+          {saving && <span className="text-xs text-muted2">Sauvegarde…</span>}
+          <button onClick={save} className="text-xs text-muted hover:text-cream border border-border rounded-lg px-3 py-1.5 transition">
             Sauvegarder
           </button>
           <button onClick={() => window.print()}
-            className="text-xs border border-stone-200 text-stone-500 hover:text-stone-900 hover:border-gold/30 rounded-lg px-3 py-1.5 transition">
+            className="text-xs border border-border text-muted hover:text-cream hover:border-gold/30 rounded-lg px-3 py-1.5 transition">
             PDF
           </button>
           <button onClick={exportDocx} disabled={exportLoading}
             className="text-xs bg-gold text-bg hover:bg-gold2 rounded-lg px-3 py-1.5 transition disabled:opacity-50 font-medium">
             {exportLoading ? '…' : '↓ Télécharger DOCX'}
           </button>
-          <Link href={`/projets/${id}`} className="text-xs text-stone-500 hover:text-stone-900 border border-stone-200 rounded-lg px-3 py-1.5 transition">Générateur</Link>
-          <Link href="/dashboard" className="text-xs text-stone-500 hover:text-stone-900 transition">← Accueil</Link>
+          <Link href={`/projets/${id}`} className="text-xs text-muted hover:text-cream border border-border rounded-lg px-3 py-1.5 transition">Générateur</Link>
+          <Link href="/dashboard" className="text-xs text-muted hover:text-cream transition">← Accueil</Link>
         </div>
       </header>
 
       {/* Toolbar */}
-      <div className="toolbar-print-hide bg-stone-50 border-b border-stone-200 px-4 py-2 flex items-center gap-1 flex-wrap flex-shrink-0 sticky top-[57px] z-10">
+      <div className="toolbar-print-hide bg-surface2 border-b border-border px-4 py-2 flex items-center gap-1 flex-wrap flex-shrink-0 sticky top-[57px] z-10">
 
         {/* Type de texte */}
         <select value={currentType}
@@ -443,7 +443,7 @@ export default function EditionPage() {
           className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition ${
             chatOpen
               ? 'bg-gold/20 text-gold border border-gold/30'
-              : 'text-stone-500 hover:text-stone-900 hover:bg-stone-200 border border-transparent'
+              : 'text-muted hover:text-cream hover:bg-surface2 border border-transparent'
           }`}>
           ✦ Mise en page
         </button>
@@ -464,18 +464,18 @@ export default function EditionPage() {
 
         {/* Panneau conseils mise en page */}
         {chatOpen && (
-          <div className="toolbar-print-hide w-80 flex-shrink-0 border-l border-stone-200 bg-white flex flex-col">
+          <div className="toolbar-print-hide w-80 flex-shrink-0 border-l border-border bg-surface flex flex-col">
             {/* En-tête */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-stone-200 flex-shrink-0">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border flex-shrink-0">
               <div>
-                <p className="text-sm font-medium text-stone-900">✦ Mise en page</p>
-                <p className="text-xs text-stone-400">Conseils & bonnes pratiques</p>
+                <p className="text-sm font-medium text-cream">✦ Mise en page</p>
+                <p className="text-xs text-muted2">Conseils & bonnes pratiques</p>
               </div>
               <div className="flex items-center gap-2">
                 {chatMessages.length > 0 && (
-                  <button onClick={() => setChatMessages([])} className="text-xs text-stone-400 hover:text-gold transition">↩ Retour</button>
+                  <button onClick={() => setChatMessages([])} className="text-xs text-muted2 hover:text-gold transition">↩ Retour</button>
                 )}
-                <button onClick={() => setChatOpen(false)} className="text-stone-400 hover:text-stone-900 transition text-lg leading-none">×</button>
+                <button onClick={() => setChatOpen(false)} className="text-muted2 hover:text-cream transition text-lg leading-none">×</button>
               </div>
             </div>
 
@@ -483,7 +483,7 @@ export default function EditionPage() {
             <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
               {chatMessages.length === 0 && (
                 <div className="flex flex-col gap-3">
-                  <p className="text-xs text-stone-400 leading-relaxed">
+                  <p className="text-xs text-muted2 leading-relaxed">
                     Posez vos questions sur la structure, la typographie ou la présentation de votre livre.
                   </p>
                   <div className="flex flex-col gap-2 mt-1">
@@ -491,7 +491,7 @@ export default function EditionPage() {
                       <button
                         key={s}
                         onClick={() => sendChatMessage(s)}
-                        className="text-left text-xs text-stone-600 bg-stone-50 hover:bg-stone-100 border border-stone-200 hover:border-gold/30 rounded-lg px-3 py-2 transition leading-relaxed">
+                        className="text-left text-xs text-cream2 bg-surface2 hover:bg-surface2 border border-border hover:border-gold/30 rounded-lg px-3 py-2 transition leading-relaxed">
                         {s}
                       </button>
                     ))}
@@ -502,7 +502,7 @@ export default function EditionPage() {
               {chatMessages.length > 0 && !chatLoading && (
                 <button
                   onClick={() => setChatMessages([])}
-                  className="text-xs text-stone-400 hover:text-gold border border-stone-200 hover:border-gold/30 rounded-lg px-3 py-1.5 transition self-start">
+                  className="text-xs text-muted2 hover:text-gold border border-border hover:border-gold/30 rounded-lg px-3 py-1.5 transition self-start">
                   ← Autres suggestions
                 </button>
               )}
@@ -514,8 +514,8 @@ export default function EditionPage() {
                       <p className="text-xs text-stone-800 leading-relaxed">{m.content}</p>
                     </div>
                   ) : (
-                    <div className="bg-stone-100 border border-stone-200 rounded-xl rounded-tl-sm px-3 py-2 max-w-[95%]">
-                      <p className="text-xs text-stone-700 leading-relaxed whitespace-pre-wrap">{m.content}</p>
+                    <div className="bg-surface2 border border-border rounded-xl rounded-tl-sm px-3 py-2 max-w-[95%]">
+                      <p className="text-xs text-cream2 leading-relaxed whitespace-pre-wrap">{m.content}</p>
                     </div>
                   )}
                 </div>
@@ -523,11 +523,11 @@ export default function EditionPage() {
 
               {chatLoading && (
                 <div className="flex items-start">
-                  <div className="bg-stone-100 border border-stone-200 rounded-xl rounded-tl-sm px-3 py-2">
+                  <div className="bg-surface2 border border-border rounded-xl rounded-tl-sm px-3 py-2">
                     <div className="flex gap-1 items-center h-4">
-                      <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 </div>
@@ -537,14 +537,14 @@ export default function EditionPage() {
             </div>
 
             {/* Input */}
-            <div className="border-t border-stone-200 px-3 py-3 flex-shrink-0">
+            <div className="border-t border-border px-3 py-3 flex-shrink-0">
               <div className="flex gap-2">
                 <input
                   value={chatInput}
                   onChange={e => setChatInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage() } }}
                   placeholder="Votre question…"
-                  className="flex-1 text-xs bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-gold/40 transition"
+                  className="flex-1 text-xs bg-surface border border-border rounded-lg px-3 py-2 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/40 transition"
                 />
                 <button
                   onClick={() => sendChatMessage()}

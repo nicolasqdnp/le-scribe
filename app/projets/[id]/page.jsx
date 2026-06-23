@@ -10,19 +10,19 @@ function NoteEditoriale({ note }) {
   const [open, setOpen] = useState(false)
   const phrases = note.split(/(?<=[.!])\s+/).filter(s => s.trim().length > 10)
   return (
-    <div className="border-t border-stone-200">
+    <div className="border-t border-border">
       <button onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-stone-50 transition group">
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-surface2 transition group">
         <div>
-          <p className="text-xs font-medium text-stone-500 uppercase tracking-widest">Note éditoriale</p>
-          <p className="text-xs text-stone-400 mt-0.5">{open ? 'Cliquer pour fermer' : 'Cliquer pour lire'}</p>
+          <p className="text-xs font-medium text-muted uppercase tracking-widest">Note éditoriale</p>
+          <p className="text-xs text-muted2 mt-0.5">{open ? 'Cliquer pour fermer' : 'Cliquer pour lire'}</p>
         </div>
         <span className={`text-gold text-sm transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
       </button>
       {open && (
         <ul className="px-4 pb-4 space-y-2 max-h-96 overflow-y-auto">
           {phrases.map((phrase, i) => (
-            <li key={i} className="text-xs text-stone-500 leading-relaxed flex gap-1.5">
+            <li key={i} className="text-xs text-muted leading-relaxed flex gap-1.5">
               <span className="text-gold/40 flex-shrink-0 mt-0.5">·</span>
               <span>{phrase.trim()}</span>
             </li>
@@ -77,19 +77,19 @@ function AnalyseEnCours({ projetId }) {
   }
 
   if (loadingSources) return (
-    <main className="min-h-screen bg-[#f5f4f1] flex items-center justify-center">
-      <p className="text-stone-500 text-sm">Chargement…</p>
+    <main className="min-h-screen bg-bg flex items-center justify-center">
+      <p className="text-muted text-sm">Chargement…</p>
     </main>
   )
 
   return (
-    <main className="min-h-screen bg-[#f5f4f1]">
-      <header className="border-b border-stone-200 bg-white px-6 py-4">
+    <main className="min-h-screen bg-bg">
+      <header className="border-b border-border bg-surface px-6 py-4">
         <Link href="/dashboard" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">Le Scribe</Link>
       </header>
       <div className="max-w-xl mx-auto px-6 py-12">
-        <h1 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-stone-900 mb-2">Préparer les sources</h1>
-        <p className="text-stone-500 text-sm mb-8">Transcris chaque vidéo une par une, puis génère le plan du livre.</p>
+        <h1 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-cream mb-2">Préparer les sources</h1>
+        <p className="text-muted text-sm mb-8">Transcris chaque vidéo une par une, puis génère le plan du livre.</p>
 
         <div className="space-y-3 mb-8">
           {ytSources.map((source, i) => {
@@ -98,14 +98,14 @@ function AnalyseEnCours({ projetId }) {
             const err = errors[source.id]
             const isNext = !done && source.id === nextToTranscribe?.id
             return (
-              <div key={source.id} className={`rounded-xl border p-4 flex items-center justify-between gap-4 ${done ? 'border-ok/30 bg-ok/5' : 'border-stone-200 bg-white'}`}>
+              <div key={source.id} className={`rounded-xl border p-4 flex items-center justify-between gap-4 ${done ? 'border-ok/30 bg-ok/5' : 'border-border bg-surface'}`}>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${done ? 'bg-ok/10 text-ok border-ok/20' : 'bg-stone-100 text-stone-500 border-stone-200'}`}>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${done ? 'bg-ok/10 text-ok border-ok/20' : 'bg-surface2 text-muted border-border'}`}>
                       {done ? '✓ Transcrite' : `Vidéo ${i + 1}`}
                     </span>
                   </div>
-                  <p className="text-xs text-stone-400 mt-1 truncate">{source.url}</p>
+                  <p className="text-xs text-muted2 mt-1 truncate">{source.url}</p>
                   {err && <p className="text-xs text-err mt-1">{err}</p>}
                 </div>
                 {!done && (
@@ -404,26 +404,26 @@ export default function ProjetPage() {
   const isLocked = (ch) => userPlan === 'gratuit' && ch?.numero !== 1
 
   if (loading) return (
-    <main className="min-h-screen bg-[#f5f4f1] flex items-center justify-center">
-      <p className="text-stone-500 text-sm">Chargement du projet…</p>
+    <main className="min-h-screen bg-bg flex items-center justify-center">
+      <p className="text-muted text-sm">Chargement du projet…</p>
     </main>
   )
 
   if (projet?.statut === 'analyse_en_cours' || projet?.statut === 'nouveau') return <AnalyseEnCours projetId={id} />
 
   return (
-    <main className="h-screen flex flex-col bg-[#f5f4f1]">
+    <main className="h-screen flex flex-col bg-bg">
 
       {/* Paywall modal */}
       {showPaywall && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
+          <div className="bg-surface rounded-2xl max-w-md w-full p-8 shadow-2xl">
             <div className="text-center mb-7">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gold/10 text-gold text-xl mb-4">✦</div>
-              <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-stone-900 mb-2">
+              <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream mb-2">
                 Ton chapitre gratuit a été utilisé
               </h2>
-              <p className="text-sm text-stone-500 leading-relaxed">
+              <p className="text-sm text-muted leading-relaxed">
                 Pour continuer à rédiger ton livre, choisis une formule.
                 Paiement sécurisé — accès immédiat après confirmation.
               </p>
@@ -447,12 +447,12 @@ export default function ProjetPage() {
               </div>
 
               {/* Forfait */}
-              <div className="p-5 rounded-xl border border-stone-200">
+              <div className="p-5 rounded-xl border border-border">
                 <div className="flex items-center justify-between mb-1">
-                  <div className="font-semibold text-stone-900">Forfait 5 livres</div>
-                  <div className="font-[family-name:var(--font-playfair)] font-bold text-stone-900 text-xl">99€</div>
+                  <div className="font-semibold text-cream">Forfait 5 livres</div>
+                  <div className="font-[family-name:var(--font-playfair)] font-bold text-cream text-xl">159€</div>
                 </div>
-                <p className="text-xs text-stone-500 mb-1">3 mois · 5 livres max · Support dédié</p>
+                <p className="text-xs text-muted mb-1">3 mois · 5 livres max · Support dédié</p>
                 <p className="text-xs text-ok mb-3">Économise 136€ vs le tarif au livre</p>
                 <button
                   onClick={() => goCheckout('forfait')}
@@ -464,12 +464,12 @@ export default function ProjetPage() {
               </div>
             </div>
 
-            <p className="text-center text-xs text-stone-400 mb-3">
+            <p className="text-center text-xs text-muted2 mb-3">
               Carte, Google Pay, Apple Pay acceptés · Paiement Stripe sécurisé 🔒
             </p>
             <button
               onClick={() => setShowPaywall(false)}
-              className="w-full text-xs text-stone-400 hover:text-stone-600 transition py-1"
+              className="w-full text-xs text-muted2 hover:text-muted transition py-1"
             >
               Fermer
             </button>
@@ -478,30 +478,30 @@ export default function ProjetPage() {
       )}
 
       {/* Header */}
-      <header className="border-b border-stone-200 px-6 py-3 flex items-center justify-between flex-shrink-0 bg-white">
+      <header className="border-b border-border px-6 py-3 flex items-center justify-between flex-shrink-0 bg-surface">
         <div className="flex items-center gap-3">
           <Link href="/dashboard" className="font-[family-name:var(--font-playfair)] text-lg font-bold text-gold">Le Scribe</Link>
-          <span className="text-stone-300">/</span>
-          <span className="text-sm text-stone-500 truncate max-w-xs">{projet?.titre || 'Projet sans titre'}</span>
+          <span className="text-muted2">/</span>
+          <span className="text-sm text-muted truncate max-w-xs">{projet?.titre || 'Projet sans titre'}</span>
         </div>
         <div className="flex items-center gap-2">
-          {saving && <span className="text-xs text-stone-400">Sauvegarde…</span>}
-          <button onClick={() => saveCurrent()} className="text-xs text-stone-500 hover:text-stone-900 border border-stone-200 rounded-lg px-3 py-1.5 transition">Sauvegarder</button>
-          <Link href={`/projets/${id}/couverture`} className="text-xs border border-stone-200 text-stone-600 hover:border-gold/30 hover:text-gold rounded-lg px-3 py-1.5 transition">
+          {saving && <span className="text-xs text-muted2">Sauvegarde…</span>}
+          <button onClick={() => saveCurrent()} className="text-xs text-muted hover:text-cream border border-border rounded-lg px-3 py-1.5 transition">Sauvegarder</button>
+          <Link href={`/projets/${id}/couverture`} className="text-xs border border-border text-cream2 hover:border-gold/30 hover:text-gold rounded-lg px-3 py-1.5 transition">
             🎨 Couverture
           </Link>
           <Link href={`/projets/${id}/edition`} className="text-xs bg-gold text-bg hover:bg-gold2 rounded-lg px-3 py-1.5 transition font-medium">
             Mise en forme
           </Link>
-          <Link href="/dashboard" className="text-xs text-stone-500 hover:text-stone-900 transition">← Accueil</Link>
+          <Link href="/dashboard" className="text-xs text-muted hover:text-cream transition">← Accueil</Link>
         </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar plan */}
-        <aside className="w-64 bg-white border-r border-stone-200 flex flex-col overflow-hidden flex-shrink-0">
-          <div className="p-4 border-b border-stone-200">
-            <p className="text-xs font-medium text-stone-500 uppercase tracking-widest">Plan du livre</p>
+        <aside className="w-64 bg-surface border-r border-border flex flex-col overflow-hidden flex-shrink-0">
+          <div className="p-4 border-b border-border">
+            <p className="text-xs font-medium text-muted uppercase tracking-widest">Plan du livre</p>
           </div>
           <div className="flex-1 overflow-y-auto py-1">
             {/* Préface + Introduction */}
@@ -521,12 +521,12 @@ export default function ProjetPage() {
                     const { data: newCh } = await supabase.from('chapitres').insert({ user_id: user.id, projet_id: id, numero, titre: defaultTitre, statut: 'vide' }).select().single()
                     if (newCh) { setChapitres(prev => [newCh, ...prev].sort((a, b) => a.numero - b.numero)); selectChapitre(newCh) }
                   }}
-                  className={`w-full text-left px-4 py-2.5 text-sm transition ${isActive ? 'bg-gold/10 text-gold' : locked ? 'text-stone-400 hover:bg-stone-50' : ch ? 'text-stone-900 hover:bg-stone-50' : 'text-stone-400 italic hover:bg-stone-50'}`}>
+                  className={`w-full text-left px-4 py-2.5 text-sm transition ${isActive ? 'bg-gold/10 text-gold' : locked ? 'text-muted2 hover:bg-surface2' : ch ? 'text-cream hover:bg-surface2' : 'text-muted2 italic hover:bg-surface2'}`}>
                   <div className="font-medium flex items-center gap-1.5">
                     {locked && <span className="text-xs">🔒</span>}
                     {ch ? label : `+ ${label}`}
                   </div>
-                  {ch && <div className="mt-0.5">{locked ? <span className="text-xs text-stone-400 italic">Accès payant</span> : statutBadge(ch.statut)}</div>}
+                  {ch && <div className="mt-0.5">{locked ? <span className="text-xs text-muted2 italic">Accès payant</span> : statutBadge(ch.statut)}</div>}
                 </button>
               )
             })}
@@ -539,12 +539,12 @@ export default function ProjetPage() {
               return (
                 <div key={ch.id} className="relative group">
                   <button onClick={() => locked ? setShowPaywall(true) : selectChapitre(ch)}
-                    className={`w-full text-left px-4 py-2.5 pr-8 text-sm transition ${chapitreActif?.id === ch.id ? 'bg-gold/10 text-gold' : locked ? 'text-stone-400 hover:bg-stone-50' : 'text-stone-900 hover:bg-stone-50'}`}>
+                    className={`w-full text-left px-4 py-2.5 pr-8 text-sm transition ${chapitreActif?.id === ch.id ? 'bg-gold/10 text-gold' : locked ? 'text-muted2 hover:bg-surface2' : 'text-cream hover:bg-surface2'}`}>
                     <div className="truncate font-medium flex items-center gap-1.5">
                       {locked && <span className="text-xs">🔒</span>}
                       Ch. {ch.numero} — {ch.titre}
                     </div>
-                    <div className="mt-0.5">{locked ? <span className="text-xs text-stone-400 italic">Accès payant</span> : statutBadge(ch.statut)}</div>
+                    <div className="mt-0.5">{locked ? <span className="text-xs text-muted2 italic">Accès payant</span> : statutBadge(ch.statut)}</div>
                   </button>
                   <button
                     onClick={e => { e.stopPropagation(); setConfirmDeleteId(ch.id) }}
@@ -554,10 +554,10 @@ export default function ProjetPage() {
                     </svg>
                   </button>
                   {confirmDeleteId === ch.id && (
-                    <div className="absolute left-4 right-2 top-full z-20 bg-white border border-stone-200 rounded-xl shadow-lg p-3 mt-1">
-                      <p className="text-xs text-stone-900 font-medium mb-2">Supprimer ce chapitre ?</p>
+                    <div className="absolute left-4 right-2 top-full z-20 bg-surface border border-border rounded-xl shadow-lg p-3 mt-1">
+                      <p className="text-xs text-cream font-medium mb-2">Supprimer ce chapitre ?</p>
                       <div className="flex gap-2">
-                        <button onClick={() => setConfirmDeleteId(null)} className="flex-1 text-xs text-stone-500 border border-stone-200 rounded-lg py-1.5 hover:bg-stone-50 transition">Annuler</button>
+                        <button onClick={() => setConfirmDeleteId(null)} className="flex-1 text-xs text-muted border border-border rounded-lg py-1.5 hover:bg-surface2 transition">Annuler</button>
                         <button onClick={() => deleteChapter(ch.id)} className="flex-1 text-xs bg-err/80 text-white rounded-lg py-1.5 hover:bg-err transition">Supprimer</button>
                       </div>
                     </div>
@@ -591,12 +591,12 @@ export default function ProjetPage() {
                     const { data: newCh } = await supabase.from('chapitres').insert({ user_id: user.id, projet_id: id, numero, titre: defaultTitre, statut: 'vide' }).select().single()
                     if (newCh) { setChapitres(prev => [...prev, newCh].sort((a, b) => a.numero - b.numero)); selectChapitre(newCh) }
                   }}
-                  className={`w-full text-left px-4 py-2.5 text-sm transition ${isActive ? 'bg-gold/10 text-gold' : locked ? 'text-stone-400 hover:bg-stone-50' : ch ? 'text-stone-900 hover:bg-stone-50' : 'text-stone-400 italic hover:bg-stone-50'}`}>
+                  className={`w-full text-left px-4 py-2.5 text-sm transition ${isActive ? 'bg-gold/10 text-gold' : locked ? 'text-muted2 hover:bg-surface2' : ch ? 'text-cream hover:bg-surface2' : 'text-muted2 italic hover:bg-surface2'}`}>
                   <div className="font-medium flex items-center gap-1.5">
                     {locked && <span className="text-xs">🔒</span>}
                     {ch ? label : `+ ${label}`}
                   </div>
-                  {ch && <div className="mt-0.5">{locked ? <span className="text-xs text-stone-400 italic">Accès payant</span> : statutBadge(ch.statut)}</div>}
+                  {ch && <div className="mt-0.5">{locked ? <span className="text-xs text-muted2 italic">Accès payant</span> : statutBadge(ch.statut)}</div>}
                 </button>
               )
             })}
@@ -604,23 +604,23 @@ export default function ProjetPage() {
 
           {plan?.note_editoriale && <NoteEditoriale note={plan.note_editoriale} />}
 
-          <div className="px-3 py-3 border-t border-stone-200">
+          <div className="px-3 py-3 border-t border-border">
             <button onClick={indexerSources} disabled={indexing}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs text-stone-500 hover:text-stone-900 hover:bg-stone-50 rounded-lg transition disabled:opacity-50">
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs text-muted hover:text-cream hover:bg-surface2 rounded-lg transition disabled:opacity-50">
               {indexing ? '⏳ Indexation…' : indexingDone ? '✓ Sources indexées' : '↺ Indexer les sources'}
             </button>
           </div>
         </aside>
 
         {/* Zone centrale */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden bg-[#f7f4ef]">
           {showFinishBanner && (
             <div className="bg-gold/10 border-b border-gold/20 px-6 py-3 flex-shrink-0 flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold text-gold">Tous tes chapitres sont validés !</p>
-                <p className="text-xs text-stone-500 mt-0.5">Il est temps de rédiger l&apos;introduction et la conclusion.</p>
+                <p className="text-xs text-muted mt-0.5">Il est temps de rédiger l&apos;introduction et la conclusion.</p>
               </div>
-              <button onClick={() => setShowFinishBanner(false)} className="text-stone-400 hover:text-stone-900 text-lg leading-none flex-shrink-0">×</button>
+              <button onClick={() => setShowFinishBanner(false)} className="text-muted2 hover:text-cream text-lg leading-none flex-shrink-0">×</button>
             </div>
           )}
 
@@ -842,15 +842,15 @@ export default function ProjetPage() {
         </div>
 
         {/* Chat assistant */}
-        <aside className="w-80 bg-white border-l border-stone-200 flex flex-col flex-shrink-0">
-          <div className="p-4 border-b border-stone-200 flex-shrink-0">
-            <p className="text-xs font-medium text-stone-500 uppercase tracking-widest">Assistant</p>
-            <p className="text-xs text-stone-400 mt-0.5">Demande-moi de reformuler, développer, resserrer…</p>
+        <aside className="w-80 bg-surface border-l border-border flex flex-col flex-shrink-0">
+          <div className="p-4 border-b border-border flex-shrink-0">
+            <p className="text-xs font-medium text-muted uppercase tracking-widest">Assistant</p>
+            <p className="text-xs text-muted2 mt-0.5">Demande-moi de reformuler, développer, resserrer…</p>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {chatMessages.length === 0 && (
-              <div className="text-xs text-stone-400 text-center mt-4">
+              <div className="text-xs text-muted2 text-center mt-4">
                 <p>Je connais ton style et ton plan.</p>
                 <p className="mt-1">Dis-moi ce que tu veux améliorer.</p>
               </div>
@@ -886,7 +886,7 @@ export default function ProjetPage() {
               return (
                 <div key={i} className="flex flex-col gap-2 items-start">
                   {parts.filter(p => p.text).map((p, j) => p.type === 'comment' ? (
-                    <div key={j} className="max-w-[85%] text-sm px-3 py-2 rounded-xl rounded-bl-sm leading-relaxed bg-stone-100 text-stone-700 whitespace-pre-wrap">
+                    <div key={j} className="max-w-[85%] text-sm px-3 py-2 rounded-xl rounded-bl-sm leading-relaxed bg-surface2 text-cream2 whitespace-pre-wrap">
                       {p.text}
                     </div>
                   ) : (
@@ -904,7 +904,7 @@ export default function ProjetPage() {
                           <span id={`copy-${i}-${j}`}>Copier</span>
                         </button>
                       </div>
-                      <div className="px-3 py-2 text-sm leading-relaxed text-stone-700 whitespace-pre-wrap bg-stone-50">
+                      <div className="px-3 py-2 text-sm leading-relaxed text-cream2 whitespace-pre-wrap bg-surface2">
                         {p.text}
                       </div>
                     </div>
@@ -914,16 +914,16 @@ export default function ProjetPage() {
             })}
             {chatLoading && (
               <div className="flex justify-start">
-                <div className="bg-stone-100 text-stone-500 text-sm px-3 py-2 rounded-xl rounded-bl-sm">…</div>
+                <div className="bg-surface2 text-muted text-sm px-3 py-2 rounded-xl rounded-bl-sm">…</div>
               </div>
             )}
             <div ref={chatEndRef} />
           </div>
 
-          <div className="p-3 border-t border-stone-200 flex-shrink-0">
+          <div className="p-3 border-t border-border flex-shrink-0">
             <div className="flex gap-2 items-end">
               <textarea ref={chatInputRef}
-                className="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-gold/40 resize-none overflow-hidden min-h-[40px] max-h-40 transition"
+                className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-sm text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/40 resize-none overflow-hidden min-h-[40px] max-h-40 transition"
                 rows={1} value={chatInput}
                 onChange={e => { setChatInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px' }}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat() } }}
@@ -941,32 +941,32 @@ export default function ProjetPage() {
       {/* Modal ajout chapitre */}
       {showAddChapter && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) { setShowAddChapter(false); setAddTranscribing(null) } }}>
-          <div className="bg-white border border-stone-200 rounded-2xl shadow-2xl w-full max-w-md p-6">
-            <h2 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-stone-900 mb-5">Ajouter un chapitre</h2>
+          <div className="bg-surface border border-border rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h2 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-cream mb-5">Ajouter un chapitre</h2>
 
             {addTranscribing ? (
               <div className="text-center py-4">
-                <p className="text-sm text-stone-500 mb-5">Chapitre créé. Lance la transcription de la vidéo YouTube pour alimenter ce chapitre.</p>
+                <p className="text-sm text-muted mb-5">Chapitre créé. Lance la transcription de la vidéo YouTube pour alimenter ce chapitre.</p>
                 <button onClick={transcribeNewSource} disabled={addLoading}
                   className="w-full bg-gold text-bg py-2.5 rounded-xl text-sm font-medium hover:bg-gold2 transition disabled:opacity-40">
                   {addLoading ? 'Transcription en cours…' : 'Transcrire la vidéo →'}
                 </button>
-                <button onClick={() => { setShowAddChapter(false); setAddTranscribing(null) }} className="mt-2 w-full text-sm text-stone-500 hover:text-stone-900 py-2 transition">Passer (transcrire plus tard)</button>
+                <button onClick={() => { setShowAddChapter(false); setAddTranscribing(null) }} className="mt-2 w-full text-sm text-muted hover:text-cream py-2 transition">Passer (transcrire plus tard)</button>
               </div>
             ) : (
               <>
                 <div className="mb-4">
-                  <label className="text-xs font-medium text-stone-500 uppercase tracking-widest mb-2 block">Titre du chapitre</label>
-                  <input className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-gold/40 transition"
+                  <label className="text-xs font-medium text-muted uppercase tracking-widest mb-2 block">Titre du chapitre</label>
+                  <input className="w-full bg-surface2 border border-border rounded-lg px-3 py-2.5 text-sm text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/40 transition"
                     placeholder="Ex : Le pardon comme libération"
                     value={addForm.titre} onChange={e => setAddForm(f => ({ ...f, titre: e.target.value }))} />
                 </div>
                 <div className="mb-4">
-                  <label className="text-xs font-medium text-stone-500 uppercase tracking-widest mb-2 block">Source</label>
+                  <label className="text-xs font-medium text-muted uppercase tracking-widest mb-2 block">Source</label>
                   <div className="flex gap-1.5 flex-wrap">
                     {[{ key: 'youtube', label: 'YouTube' }, { key: 'note', label: 'Note' }, { key: 'pdf', label: 'PDF' }, { key: 'docx', label: 'Word' }, { key: 'drive', label: 'Drive' }, { key: 'none', label: 'Aucune' }].map(opt => (
                       <button key={opt.key} onClick={() => setAddForm(f => ({ ...f, sourceType: opt.key }))}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border ${addForm.sourceType === opt.key ? 'bg-gold/10 border-gold/40 text-gold' : 'bg-stone-50 border-stone-200 text-stone-500 hover:border-gold/20 hover:text-stone-900'}`}>
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border ${addForm.sourceType === opt.key ? 'bg-gold/10 border-gold/40 text-gold' : 'bg-surface2 border-border text-muted hover:border-gold/20 hover:text-cream'}`}>
                         {opt.label}
                       </button>
                     ))}
@@ -974,36 +974,36 @@ export default function ProjetPage() {
                 </div>
                 {addForm.sourceType === 'youtube' && (
                   <div className="mb-4">
-                    <label className="text-xs font-medium text-stone-500 uppercase tracking-widest mb-2 block">URL YouTube</label>
-                    <input className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-gold/40 transition"
+                    <label className="text-xs font-medium text-muted uppercase tracking-widest mb-2 block">URL YouTube</label>
+                    <input className="w-full bg-surface2 border border-border rounded-lg px-3 py-2.5 text-sm text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/40 transition"
                       placeholder="https://youtube.com/watch?v=…" value={addForm.sourceUrl} onChange={e => setAddForm(f => ({ ...f, sourceUrl: e.target.value }))} />
                   </div>
                 )}
                 {addForm.sourceType === 'note' && (
                   <div className="mb-4">
-                    <label className="text-xs font-medium text-stone-500 uppercase tracking-widest mb-2 block">Texte / Notes</label>
-                    <textarea className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-gold/40 resize-none transition"
+                    <label className="text-xs font-medium text-muted uppercase tracking-widest mb-2 block">Texte / Notes</label>
+                    <textarea className="w-full bg-surface2 border border-border rounded-lg px-3 py-2.5 text-sm text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/40 resize-none transition"
                       rows={5} placeholder="Colle ici tes notes, idées, plan…" value={addForm.sourceText} onChange={e => setAddForm(f => ({ ...f, sourceText: e.target.value }))} />
                   </div>
                 )}
                 {(addForm.sourceType === 'pdf' || addForm.sourceType === 'docx') && (
                   <div className="mb-4">
-                    <label className="text-xs font-medium text-stone-500 uppercase tracking-widest mb-2 block">Fichier {addForm.sourceType.toUpperCase()}</label>
+                    <label className="text-xs font-medium text-muted uppercase tracking-widest mb-2 block">Fichier {addForm.sourceType.toUpperCase()}</label>
                     <input type="file" accept={addForm.sourceType === 'pdf' ? '.pdf' : '.docx,.doc'}
                       onChange={e => setAddFile(e.target.files?.[0] || null)}
-                      className="w-full text-sm text-stone-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gold/10 file:text-gold hover:file:bg-gold/20" />
+                      className="w-full text-sm text-muted file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gold/10 file:text-gold hover:file:bg-gold/20" />
                   </div>
                 )}
                 {addForm.sourceType === 'drive' && (
                   <div className="mb-4">
-                    <label className="text-xs font-medium text-stone-500 uppercase tracking-widest mb-2 block">Lien Google Docs / Drive</label>
-                    <input className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-gold/40 transition"
+                    <label className="text-xs font-medium text-muted uppercase tracking-widest mb-2 block">Lien Google Docs / Drive</label>
+                    <input className="w-full bg-surface2 border border-border rounded-lg px-3 py-2.5 text-sm text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/40 transition"
                       placeholder="https://docs.google.com/document/d/…" value={addForm.sourceUrl} onChange={e => setAddForm(f => ({ ...f, sourceUrl: e.target.value }))} />
-                    <p className="text-xs text-stone-400 mt-1">Le document doit être accessible à toute personne ayant le lien.</p>
+                    <p className="text-xs text-muted2 mt-1">Le document doit être accessible à toute personne ayant le lien.</p>
                   </div>
                 )}
                 <div className="flex gap-2 mt-4">
-                  <button onClick={() => setShowAddChapter(false)} className="flex-1 py-2.5 rounded-xl text-sm border border-stone-200 text-stone-500 hover:text-stone-900 hover:border-gold/30 transition">Annuler</button>
+                  <button onClick={() => setShowAddChapter(false)} className="flex-1 py-2.5 rounded-xl text-sm border border-border text-muted hover:text-cream hover:border-gold/30 transition">Annuler</button>
                   <button onClick={addChapter} disabled={addLoading || !addForm.titre.trim()}
                     className="flex-1 py-2.5 rounded-xl text-sm bg-gold text-bg font-medium hover:bg-gold2 transition disabled:opacity-40">
                     {addLoading ? 'Ajout en cours…' : 'Ajouter le chapitre'}
