@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Next.js Dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "Fournitures 6e",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-p", "4321", "/private/tmp/claude-501/-Users-nicolas-le-scribe/45ab7393-c9d1-499b-aebf-e3e8921afcf9/scratchpad"],
+      "port": 4321
+    }
+  ]
+}

@@ -91,8 +91,8 @@ export async function POST(req: NextRequest) {
       line_items: lineItems,
       mode: 'payment',
       customer_email: email,
-      success_url: `${origin}/campagne/merci?tier=${tier_id}`,
-      cancel_url: `${origin}/campagne`,
+      success_url: `${origin}/soutenir/merci?tier=${tier_id}`,
+      cancel_url: `${origin}/soutenir`,
       metadata: {
         contribution_id: contribution.id,
         tier_id,

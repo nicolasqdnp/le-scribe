@@ -1,0 +1,784 @@
+'use client'
+import { useState, useEffect } from 'react'
+import { createClient } from '../../lib/supabase'
+import { useRouter } from 'next/navigation'
+
+function Chip({ field, val, selected, onToggle }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onToggle(field, val)}
+      className={`px-4 py-2 rounded-full text-sm border transition ${
+        selected
+          ? 'bg-violet-100 border-violet-500 text-violet-800 font-medium'
+          : 'border-stone-300 text-stone-500 hover:border-violet-400'
+      }`}
+    >
+      {val}
+    </button>
+  )
+}
+
+export default function NouveauLivre() {
+  const [cur, setCur] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState(null)
+  const router = useRouter()
+
+  const [D, setD] = useState({
+    titre: '',
+    sujet: '',
+    objectif: [],
+    lecto: [],
+    transfo: '',
+    chapitres: 7,
+    longueur: [],
+    struct: [],
+    plan: '',
+    ytLinks: [
+      {
+        url: '',
+        culteEntier: false,
+        debut: '',
+        fin: ''
+      }
+    ],
+    gdocLinks: [''],
+    uploadedFiles: [],
+    notes: '',
+    ton: [],
+    inclure: '',
+    eviter: '',
+    phrase: ''
+  })
+
+  useEffect(() => {
+    let mounted = true
+
+    async function getUser() {
+      const supabase = createClient()
+
+      const {
+        data: { user },
+        error
+      } = await supabase.auth.getUser()
+
+      if (!mounted) return
+
+      if (error || !user) {
+        setLoading(false)
+        router.replace('/login')
+        return
+      }
+
+      setUser(user)
+      setLoading(false)
+    }
+
+    getUser()
+
+    return () => {
+      mounted = false
+    }
+  }, [router])
+
+  function toggle(field, val) {
+    setD(prev => ({
+      ...prev,
+      [field]: prev[field].includes(val)
+        ? prev[field].filter(v => v !== val)
+        : [...prev[field], val]
+    }))
+  }
+
+  function addYtLink() {
+    setD(prev => ({
+      ...prev,
+      ytLinks: [
+        ...prev.ytLinks,
+        {
+          url: '',
+          culteEntier: false,
+          debut: '',
+          fin: ''
+        }
+      ]
+    }))
+  }
+
+  function removeYtLink(i) {
+    setD(prev => ({
+      ...prev,
+      ytLinks: prev.ytLinks.filter((_, idx) => idx !== i)
+    }))
+  }
+
+  function updateYtLink(i, field, val) {
+    setD(prev => {
+      const links = [...prev.ytLinks]
+      links[i] = {
+        ...links[i],
+        [field]: val
+      }
+      return { ...prev, ytLinks: links }
+    })
+  }
+
+  function toggleCulteEntier(i) {
+    setD(prev => {
+      const links = [...prev.ytLinks]
+      const current = links[i].culteEntier
+
+      links[i] = {
+        ...links[i],
+        culteEntier: !current,
+        debut: !current ? links[i].debut : '',
+        fin: !current ? links[i].fin : ''
+      }
+
+      return { ...prev, ytLinks: links }
+    })
+  }
+
+  function addGdocLink() {
+    setD(prev => ({ ...prev, gdocLinks: [...prev.gdocLinks, ''] }))
+  }
+
+  function removeGdocLink(i) {
+    setD(prev => ({
+      ...prev,
+      gdocLinks: prev.gdocLinks.filter((_, idx) => idx !== i)
+    }))
+  }
+
+  function updateGdocLink(i, val) {
+    setD(prev => {
+      const links = [...prev.gdocLinks]
+      links[i] = val
+      return { ...prev, gdocLinks: links }
+    })
+  }
+
+  function handleFileUpload(e) {
+    const files = Array.from(e.target.files || [])
+    setD(prev => ({
+      ...prev,
+      uploadedFiles: [...prev.uploadedFiles, ...files]
+    }))
+  }
+
+  function removeFile(i) {
+    setD(prev => ({
+      ...prev,
+      uploadedFiles: prev.uploadedFiles.filter((_, idx) => idx !== i)
+    }))
+  }
+
+  async function save() {
+    if (!user) return
+
+    setLoading(true)
+    const supabase = createClient()
+
+    function parseTimeToSeconds(value) {
+      if (!value || !value.trim()) return null
+
+      const parts = value.trim().split(':').map(Number)
+      if (parts.some(isNaN)) return null
+
+      if (parts.length === 2) {
+        const [mm, ss] = parts
+        return mm * 60 + ss
+      }
+
+      if (parts.length === 3) {
+        const [hh, mm, ss] = parts
+        return hh * 3600 + mm * 60 + ss
+      }
+
+      return null
+    }
+
+    const { data: projet, error: projetError } = await supabase
+      .from('projets_livres')
+      .insert({
+        user_id: user.id,
+        titre: D.titre,
+        sujet: D.sujet,
+        objectif: D.objectif.join(', '),
+        lectorat: D.lecto.join(', '),
+        transformation: D.transfo,
+        nb_chapitres: parseInt(D.chapitres),
+        longueur: D.longueur.join(', '),
+        structure_interne: D.struct.join(', '),
+        plan_existant: D.plan,
+        ton: D.ton.join(', '),
+        a_inclure: D.inclure,
+        a_eviter: D.eviter,
+        message_cle: D.phrase
+      })
+      .select()
+      .single()
+
+    if (projetError || !projet) {
+      console.error('Erreur création projet :', projetError)
+      setLoading(false)
+      alert('Erreur création projet : ' + (projetError?.message || 'inconnue'))
+      return
+    }
+
+    const sourcesPayload = []
+
+    D.ytLinks
+      .filter(item => item.url.trim() !== '')
+      .forEach((item, index) => {
+        sourcesPayload.push({
+          user_id: user.id,
+          projet_id: projet.id,
+          type: 'youtube',
+          usage: 'book_source',
+          label: `Vidéo YouTube ${index + 1}`,
+          url: item.url.trim(),
+          video_start_seconds: item.culteEntier ? parseTimeToSeconds(item.debut) : null,
+          video_end_seconds: item.culteEntier ? parseTimeToSeconds(item.fin) : null,
+          is_full_service: item.culteEntier,
+          ordre: index,
+          metadata: {}
+        })
+      })
+
+    D.gdocLinks
+      .filter(link => link.trim() !== '')
+      .forEach((link, index) => {
+        sourcesPayload.push({
+          user_id: user.id,
+          projet_id: projet.id,
+          type: 'drive',
+          usage: 'book_source',
+          label: `Google Doc ${index + 1}`,
+          url: link.trim(),
+          ordre: 100 + index,
+          metadata: {}
+        })
+      })
+
+    if (D.notes.trim()) {
+      sourcesPayload.push({
+        user_id: user.id,
+        projet_id: projet.id,
+        type: 'note',
+        usage: 'book_source',
+        label: 'Notes texte libre',
+        contenu_brut: D.notes.trim(),
+        ordre: 200,
+        metadata: {}
+      })
+    }
+
+    if (sourcesPayload.length > 0) {
+      const { error: sourcesError } = await supabase
+        .from('sources')
+        .insert(sourcesPayload)
+
+      if (sourcesError) {
+        console.error('Erreur création sources :', sourcesError)
+        setLoading(false)
+        alert('Projet créé, mais erreur sur les sources : ' + sourcesError.message)
+        return
+      }
+    }
+
+    setLoading(false)
+    router.push('/dashboard')
+  }
+
+  const sections = [
+    {
+      tag: '1 / 4',
+      title: 'Le livre',
+      desc: 'Définis le projet précis — spécifique à ce livre.',
+      content: (
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Titre provisoire
+            </label>
+            <input
+              className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+              value={D.titre}
+              onChange={e => setD({ ...D, titre: e.target.value })}
+              placeholder="Ex : Peut-on prouver l'existence de Dieu ?"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Sujet central
+            </label>
+            <textarea
+              className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 min-h-20"
+              value={D.sujet}
+              onChange={e => setD({ ...D, sujet: e.target.value })}
+              placeholder="En 2-3 phrases : quel est le cœur du message ?"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Objectif principal <span className="text-stone-400 font-normal">(plusieurs choix)</span>
+            </label>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {[
+                'Affermir la foi',
+                "Équiper pour l'évangélisation",
+                'Répondre aux questions difficiles',
+                'Formation de disciples',
+                'Toucher les non-croyants'
+              ].map(v => (
+                <Chip
+                  key={v}
+                  field="objectif"
+                  val={v}
+                  selected={D.objectif.includes(v)}
+                  onToggle={toggle}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Lectorat cible <span className="text-stone-400 font-normal">(plusieurs choix)</span>
+            </label>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {[
+                'Nouveaux croyants',
+                'Chrétiens en croissance',
+                "Leaders d'église",
+                'Chercheurs spirituels',
+                'Grand public',
+                'Tous profils'
+              ].map(v => (
+                <Chip
+                  key={v}
+                  field="lecto"
+                  val={v}
+                  selected={D.lecto.includes(v)}
+                  onToggle={toggle}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Transformation visée
+            </label>
+            <textarea
+              className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 min-h-20"
+              value={D.transfo}
+              onChange={e => setD({ ...D, transfo: e.target.value })}
+              placeholder="Qu'est-ce que le lecteur doit emporter après ce livre ?"
+            />
+          </div>
+        </div>
+      )
+    },
+    {
+      tag: '2 / 4',
+      title: 'Structure et format',
+      desc: 'Quelques paramètres pour cadrer la génération du plan.',
+      content: (
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Nombre de chapitres : <span className="text-violet-600 font-semibold">{D.chapitres}</span>
+            </label>
+            <input
+              type="range"
+              min="3"
+              max="20"
+              value={D.chapitres}
+              onChange={e => setD({ ...D, chapitres: e.target.value })}
+              className="w-full accent-violet-600"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Longueur cible
+            </label>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {[
+                'Livret (30–50 pages)',
+                'Court (80–120 pages)',
+                'Moyen (120–200 pages)',
+                'Long (200+ pages)'
+              ].map(v => (
+                <Chip
+                  key={v}
+                  field="longueur"
+                  val={v}
+                  selected={D.longueur.includes(v)}
+                  onToggle={toggle}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Structure interne <span className="text-stone-400 font-normal">(plusieurs choix)</span>
+            </label>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {[
+                'Intro + développement + conclusion',
+                'Questions de réflexion',
+                'Versets encadrés',
+                'Points clés à retenir',
+                'Prière de conclusion'
+              ].map(v => (
+                <Chip
+                  key={v}
+                  field="struct"
+                  val={v}
+                  selected={D.struct.includes(v)}
+                  onToggle={toggle}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Plan existant <span className="text-stone-400 font-normal">(optionnel)</span>
+            </label>
+            <textarea
+              className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 min-h-24"
+              value={D.plan}
+              onChange={e => setD({ ...D, plan: e.target.value })}
+              placeholder="Colle un plan existant ou décris une structure..."
+            />
+          </div>
+        </div>
+      )
+    },
+    {
+      tag: '3 / 4',
+      title: 'Tes sources',
+      desc: 'Les matières premières du livre.',
+      content: (
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-3">
+              Liens YouTube <span className="text-stone-400 font-normal">(autant que nécessaire)</span>
+            </label>
+
+            {D.ytLinks.map((link, i) => (
+              <div key={i} className="mb-4 rounded-xl border border-stone-200 p-4 bg-stone-50">
+                <div className="flex gap-2 mb-3">
+                  <input
+                    className="flex-1 border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
+                    value={link.url}
+                    onChange={e => updateYtLink(i, 'url', e.target.value)}
+                    placeholder={`Lien ${i + 1} — https://youtu.be/...`}
+                  />
+                  {D.ytLinks.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeYtLink(i)}
+                      className="text-stone-400 hover:text-red-500 px-2 text-lg transition"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+
+                <label className="flex items-center gap-2 text-sm text-stone-600 mb-3">
+                  <input
+                    type="checkbox"
+                    checked={link.culteEntier}
+                    onChange={() => toggleCulteEntier(i)}
+                    className="accent-violet-600"
+                  />
+                  Cette vidéo correspond à un culte entier
+                </label>
+
+                {link.culteEntier && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-stone-700 mb-1">
+                        Début de la prédication
+                      </label>
+                      <input
+                        className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
+                        value={link.debut}
+                        onChange={e => updateYtLink(i, 'debut', e.target.value)}
+                        placeholder="Ex : 32:15"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-stone-700 mb-1">
+                        Fin de la prédication
+                      </label>
+                      <input
+                        className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
+                        value={link.fin}
+                        onChange={e => updateYtLink(i, 'fin', e.target.value)}
+                        placeholder="Ex : 1:18:40"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={addYtLink}
+              className="mt-1 text-sm text-violet-600 hover:text-violet-800"
+            >
+              + Ajouter un lien YouTube
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-3">
+              Liens Google Docs <span className="text-stone-400 font-normal">(autant que nécessaire)</span>
+            </label>
+            {D.gdocLinks.map((link, i) => (
+              <div key={i} className="flex gap-2 mb-2">
+                <input
+                  className="flex-1 border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  value={link}
+                  onChange={e => updateGdocLink(i, e.target.value)}
+                  placeholder={`Lien ${i + 1} — https://docs.google.com/...`}
+                />
+                {D.gdocLinks.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeGdocLink(i)}
+                    className="text-stone-400 hover:text-red-500 px-2 text-lg transition"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addGdocLink}
+              className="mt-1 text-sm text-violet-600 hover:text-violet-800"
+            >
+              + Ajouter un lien Google Doc
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-2">
+              Fichiers PDF ou Word
+            </label>
+            <p className="text-xs text-stone-400 mb-3">
+              Notes de prédication, plans, outlines — formats acceptés : PDF, DOC, DOCX
+            </p>
+            <label className="flex items-center gap-3 border-2 border-dashed border-stone-300 rounded-xl px-4 py-6 cursor-pointer hover:border-violet-400 transition">
+              <span className="text-2xl">📎</span>
+              <div>
+                <div className="text-sm font-medium text-stone-700">
+                  Clique pour choisir des fichiers
+                </div>
+                <div className="text-xs text-stone-400">
+                  PDF, DOC, DOCX — max 10MB par fichier
+                </div>
+              </div>
+              <input
+                type="file"
+                multiple
+                accept=".pdf,.doc,.docx"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
+
+            {D.uploadedFiles.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {D.uploadedFiles.map((f, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between bg-stone-50 rounded-lg px-3 py-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">📄</span>
+                      <span className="text-sm text-stone-700">{f.name}</span>
+                      <span className="text-xs text-stone-400">
+                        {(f.size / 1024 / 1024).toFixed(1)}MB
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(i)}
+                      className="text-stone-400 hover:text-red-500 transition"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Notes texte libre
+            </label>
+            <textarea
+              className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 min-h-32"
+              value={D.notes}
+              onChange={e => setD({ ...D, notes: e.target.value })}
+              placeholder="Colle directement tes notes ici..."
+            />
+          </div>
+        </div>
+      )
+    },
+    {
+      tag: '4 / 4',
+      title: 'Consignes spécifiques',
+      desc: 'Instructions particulières pour ce livre.',
+      content: (
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Ton pour ce livre
+            </label>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {[
+                'Identique à mes prédications',
+                'Plus accessible',
+                'Plus rigoureux et argumenté',
+                'Plus intime et personnel'
+              ].map(v => (
+                <Chip
+                  key={v}
+                  field="ton"
+                  val={v}
+                  selected={D.ton.includes(v)}
+                  onToggle={toggle}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              À inclure absolument
+            </label>
+            <textarea
+              className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 min-h-20"
+              value={D.inclure}
+              onChange={e => setD({ ...D, inclure: e.target.value })}
+              placeholder="Arguments, versets, thèmes incontournables..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              À éviter dans ce livre
+            </label>
+            <textarea
+              className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 min-h-20"
+              value={D.eviter}
+              onChange={e => setD({ ...D, eviter: e.target.value })}
+              placeholder="Sujets, références, tournures à éviter..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Message clé que le lecteur doit retenir
+            </label>
+            <textarea
+              className="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 min-h-20"
+              value={D.phrase}
+              onChange={e => setD({ ...D, phrase: e.target.value })}
+              placeholder="La phrase ou idée centrale du livre..."
+            />
+          </div>
+        </div>
+      )
+    }
+  ]
+
+  const pct = Math.round(((cur + 1) / 4) * 100)
+
+  return (
+    <main className="min-h-screen bg-stone-50">
+      <header className="bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between">
+        <a href="/dashboard" className="flex items-center gap-2">
+          <span className="text-2xl">✍️</span>
+          <span className="text-xl font-semibold text-stone-800">Le Scribe</span>
+        </a>
+        <span className="text-sm text-stone-400">Nouveau livre</span>
+      </header>
+
+      <div className="max-w-2xl mx-auto px-6 py-10">
+        <div className="mb-8">
+          <div className="flex justify-between text-xs text-stone-400 mb-2">
+            <span>Étape {cur + 1} sur 4</span>
+            <span>{pct}%</span>
+          </div>
+          <div className="h-1.5 bg-stone-200 rounded-full">
+            <div
+              className="h-full bg-violet-600 rounded-full transition-all"
+              style={{ width: pct + '%' }}
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-stone-200 p-8">
+          <div className="text-xs font-semibold text-violet-600 uppercase tracking-widest mb-1">
+            {sections[cur].tag}
+          </div>
+          <h1 className="text-2xl font-bold text-stone-900 mb-1">
+            {sections[cur].title}
+          </h1>
+          <p className="text-stone-500 text-sm mb-8">
+            {sections[cur].desc}
+          </p>
+          {sections[cur].content}
+        </div>
+
+        <div className="flex justify-between items-center mt-6">
+          {cur > 0 ? (
+            <button
+              onClick={() => setCur(cur - 1)}
+              className="text-sm text-stone-500 hover:text-stone-800"
+            >
+              ← Retour
+            </button>
+          ) : (
+            <div />
+          )}
+
+          {cur < 3 ? (
+            <button
+              onClick={() => setCur(cur + 1)}
+              className="bg-violet-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700 transition"
+            >
+              Continuer →
+            </button>
+          ) : (
+            <button
+              onClick={save}
+              disabled={loading}
+              className="bg-violet-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700 transition disabled:opacity-50"
+            >
+              {loading ? 'Sauvegarde...' : 'Créer le projet →'}
+            </button>
+          )}
+        </div>
+      </div>
+    </main>
+  )
+}

@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Batch Cooking — Poulet au four</title>
+
+<!-- PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Batch Cooking">
+<meta name="theme-color" content="#2a2118">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%232a2118'/%3E%3Ctext x='256' y='340' text-anchor='middle' font-size='280' font-family='serif'%3E🍗%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Batch%20Cooking%22%2C%22short_name%22%3A%22Poulet%20au%20four%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f1e6%22%2C%22theme_color%22%3A%22%232a2118%22%7D">
+<style>
+:root {
+  --paper: #f7f1e6;
+  --ink: #2a2118;
+  --ink-soft: #6b5d4a;
+  --line: #d9cbb2;
+  --gold: #b8842b;
+  --bg-card: #fffdf8;
+  --c1: #c25b3a;
+  --c2: #4e7c3f;
+  --c3: #caa12e;
+  --c4: #7a4a2b;
+  --c5: #3f8a6e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  font-size: 19px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* NAV */
+nav {
+  background: var(--ink);
+  display: flex;
+  align-items: stretch;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 2px solid var(--gold);
+}
+.brand {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--paper);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  border-right: 1px solid rgba(255,255,255,.1);
+}
+.brand em { color: var(--gold); font-style: italic; }
+.nav-tabs { display: flex; flex: 1; overflow-x: auto; scrollbar-width: none; }
+.nav-tabs::-webkit-scrollbar { display: none; }
+nav button {
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  color: rgba(247,241,230,.5);
+  cursor: pointer;
+  padding: 14px 14px;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  font-weight: 600;
+  transition: color .15s;
+}
+nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* VIEWS */
+.view { display: none; padding: 24px 16px 80px; max-width: 700px; margin: 0 auto; }
+.view.active { display: block; }
+
+.sec-title {
+  font-family: Georgia, serif;
+  font-size: 38px;
+  font-weight: bold;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.sec-title em { font-style: italic; color: var(--gold); font-weight: normal; }
+.sec-sub { color: var(--ink-soft); font-size: 15px; margin-bottom: 20px; }
+
+/* MULTIPLICATEUR */
+.mult-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f1e7d4;
+  border-radius: 7px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.mult-label {
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.mult-btns { display: flex; gap: 4px; }
+.mult-btn {
+  border: 1.5px solid var(--line);
+  background: var(--bg-card);
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--ink);
+  transition: background .12s, border-color .12s;
+}
+.mult-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.mult-qty {
+  font-family: Georgia, serif;
+  font-weight: bold;
+  font-size: 13px;
+  margin-left: auto;
+}
+.mult-qty span { font-size: 11px; font-weight: 400; color: var(--ink-soft); font-family: -apple-system, sans-serif; }
+
+/* RECIPE CARDS */
+.recipe-list { display: flex; flex-direction: column; gap: 16px; }
+
+.recipe-card {
+  border: 1.5px solid var(--ink);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.recipe-card-head {
+  padding: 16px 18px 12px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.recipe-card-head-text { flex: 1; }
+.recipe-card-no { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; opacity: .75; font-weight: 600; }
+.recipe-card-head h3 { font-family: Georgia, serif; font-size: 28px; font-weight: bold; margin: 4px 0 3px; }
+.recipe-card-head .sub { font-size: 14px; opacity: .9; font-style: italic; }
+.kcal-badge {
+  background: rgba(255,255,255,.18);
+  border: 1.5px solid rgba(255,255,255,.35);
+  border-radius: 10px;
+  padding: 6px 10px;
+  text-align: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
+}
+.kcal-badge .kcal-val { font-family: Georgia, serif; font-size: 22px; font-weight: bold; line-height: 1; display: block; }
+.kcal-badge .kcal-lbl { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .8; }
+
+.recipe-card-body { padding: 14px 18px 16px; }
+
+.params-mini { display: flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+.param-mini { flex: 1; text-align: center; padding: 8px 4px; }
+.param-mini + .param-mini { border-left: 1px solid var(--line); }
+.param-mini .lbl { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); display: block; margin-bottom: 2px; font-weight: 600; }
+.param-mini .val { font-family: Georgia, serif; font-weight: bold; font-size: 15px; line-height: 1.2; }
+.param-mini .val small { font-size: 11px; font-weight: 400; color: var(--ink-soft); font-family: -apple-system, sans-serif; }
+
+.macros-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.macro-chip {
+  background: #f1e7d4;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: ui-monospace, 'Courier New', monospace;
+}
+.macro-chip span { font-size: 11px; font-weight: 400; color: var(--ink-soft); margin-left: 2px; }
+
+/* DETAIL (accordéon) */
+.detail { display: none; border-top: 1px solid var(--line); margin: 0 -18px; padding: 16px 18px 4px; }
+.detail.open { display: block; }
+.detail-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+@media (max-width: 400px) { .detail-cols { grid-template-columns: 1fr; } }
+.block-title { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid var(--line); font-weight: 700; }
+ul.ingr { list-style: none; font-size: 17px; }
+ul.ingr li { padding: 4px 0; }
+ul.ingr li::before { content: "—"; color: var(--gold); margin-right: 6px; }
+ol.steps { font-size: 17px; padding-left: 18px; }
+ol.steps li { padding: 4px 0; }
+
+.macros-detail { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+.macros-detail-head { background: #f1e7d4; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; }
+.macros-detail-head b { font-family: Georgia, serif; font-size: 15px; }
+.macros-detail-head span { font-size: 11px; color: var(--ink-soft); font-weight: 600; }
+.macros-detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+.md-macro { padding: 8px 4px; text-align: center; }
+.md-macro + .md-macro { border-left: 1px solid var(--line); }
+.md-macro .mv { font-family: ui-monospace, monospace; font-weight: 700; font-size: 18px; }
+.md-macro .ml { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; }
+
+.astuce-box { background: #fbf4e3; border-left: 4px solid var(--gold); border-radius: 6px; padding: 13px 15px; font-size: 15px; margin-bottom: 14px; }
+.astuce-box b { font-family: Georgia, serif; font-size: 16px; display: block; margin-bottom: 4px; }
+
+.toggle-btn {
+  width: 100%;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  cursor: pointer;
+  margin-bottom: 2px;
+  transition: background .15s;
+}
+.toggle-btn:active { background: #f1e7d4; }
+
+.add-plan-btn {
+  width: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 6px;
+  padding: 11px 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.add-plan-btn:active { background: var(--gold); }
+
+/* PLANNER */
+.summary-bar {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.s-label { font-size: 9px; letter-spacing: .13em; text-transform: uppercase; color: rgba(247,241,230,.5); font-weight: 600; }
+.s-val { font-family: Georgia, serif; font-size: 22px; font-weight: bold; }
+
+.week-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+
+.day-row {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.day-header {
+  background: var(--ink);
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  gap: 10px;
+}
+.day-name { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; opacity: .6; font-weight: 700; }
+.day-num { font-family: Georgia, serif; font-size: 20px; font-weight: bold; line-height: 1; }
+.day-slots { display: flex; gap: 8px; padding: 10px 12px; }
+
+.meal-slot {
+  flex: 1;
+  border: 1.5px dashed var(--line);
+  border-radius: 6px;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  cursor: pointer;
+  position: relative;
+}
+.meal-slot:active { background: #fbf4e3; }
+.slot-label { font-size: 8px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 3px; font-weight: 700; }
+
+.meal-pill {
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  position: relative;
+}
+.remove-meal {
+  position: absolute;
+  top: -7px; right: -7px;
+  width: 18px; height: 18px;
+  background: var(--ink);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* BOTTOM SHEET PICKER */
+.sheet-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(42,33,24,.5);
+  z-index: 200;
+}
+.sheet-overlay.open { display: block; }
+.sheet {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg-card);
+  border-top: 2px solid var(--ink);
+  border-radius: 16px 16px 0 0;
+  padding: 16px 16px 40px;
+  z-index: 201;
+  transform: translateY(100%);
+  transition: transform .25s cubic-bezier(.4,0,.2,1);
+}
+.sheet.open { transform: translateY(0); }
+.sheet-handle { width: 36px; height: 4px; background: var(--line); border-radius: 2px; margin: 0 auto 16px; }
+.sheet-title { font-family: Georgia, serif; font-size: 18px; font-weight: bold; margin-bottom: 14px; }
+.picker-list { display: flex; flex-direction: column; gap: 8px; }
+.picker-item {
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--paper);
+}
+.picker-item:active { background: #f1e7d4; border-color: var(--gold); }
+.picker-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.picker-item-name { font-weight: 700; font-size: 14px; flex: 1; }
+.picker-item-kcal { font-size: 11px; color: var(--ink-soft); font-family: ui-monospace, monospace; }
+.sheet-cancel {
+  width: 100%;
+  margin-top: 12px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--ink-soft);
+  padding: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* COURSES */
+.courses-intro { color: var(--ink-soft); font-size: 13px; margin-bottom: 18px; }
+.course-section { margin-bottom: 22px; }
+.course-section h3 { font-family: Georgia, serif; font-size: 18px; font-weight: bold; margin-bottom: 10px; padding-bottom: 7px; border-bottom: 2px solid var(--line); }
+.course-list { list-style: none; }
+.course-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 16px;
+}
+.course-list li:last-child { border-bottom: none; }
+.course-list li input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--gold); flex-shrink: 0; cursor: pointer; }
+.course-list li label { cursor: pointer; flex: 1; }
+.course-list li.checked label { text-decoration: line-through; color: var(--ink-soft); }
+.course-qty { font-family: ui-monospace, monospace; font-size: 11px; color: var(--gold); font-weight: 700; }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--ink-soft); }
+.empty-state .big { font-family: Georgia, serif; font-size: 24px; font-weight: bold; display: block; margin-bottom: 8px; color: var(--ink); }
+.empty-state a { color: var(--gold); cursor: pointer; text-decoration: underline; }
+
+.btn {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  border: 1.5px solid var(--ink);
+  background: none;
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 10px 18px;
+  cursor: pointer;
+  margin-right: 8px;
+  margin-bottom: 20px;
+}
+.btn.primary { background: var(--ink); color: var(--paper); }
+
+/* CALIBRAGE */
+.info-block {
+  display: flex;
+  gap: 14px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.info-block-label {
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.info-block strong { color: #fff; }
+
+/* CUISSON EN DÉS */
+.des-block {
+  border: 1.5px solid var(--gold);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 22px;
+  background: var(--bg-card);
+}
+.des-title {
+  font-size: 9.5px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.des-intro { font-size: 13px; margin-bottom: 14px; line-height: 1.5; }
+.des-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+}
+.des-table th {
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 700;
+  text-align: left;
+  padding: 5px 8px;
+  border-bottom: 1.5px solid var(--line);
+}
+.des-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.des-table tbody tr:last-child td { border-bottom: none; }
+.des-table td:first-child { font-weight: 600; }
+.des-table td:not(:first-child) { font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--ink-soft); }
+.des-tip {
+  background: #fbf4e3;
+  border-left: 4px solid var(--gold);
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Poulet <em>&nbsp;au four</em></div>
+  <div class="nav-tabs">
+    <button class="active" onclick="showView('recettes',this)">Recettes</button>
+    <button onclick="showView('planner',this)">Planning</button>
+    <button onclick="showView('courses',this)">Courses</button>
+  </div>
+</nav>
+
+<!-- RECETTES -->
+<div class="view active" id="view-recettes">
+  <p class="sec-title">5 marinades,<br><em>un seul secret</em></p>
+  <p class="sec-sub">Appuyez sur la couleur pour voir les détails.</p>
+
+  <!-- CALIBRAGE -->
+  <div class="info-block">
+    <div class="info-block-label">Calibrage</div>
+    <p>Chaque recette est prévue pour <strong>4 blancs de poulet d'environ 150–180 g pièce</strong> (soit ≈ 600–700 g), d'une <strong>épaisseur de 2 à 2,5 cm</strong>. Les temps de cuisson des fiches valent pour des <strong>filets entiers</strong> de cette épaisseur. Plus épais → ajoutez quelques minutes ; plus fin → retirez-en. C'est l'épaisseur, pas le poids, qui dicte le temps.</p>
+  </div>
+
+  <!-- CUISSON EN DÉS -->
+  <div class="des-block">
+    <div class="des-title">Tu coupes en dés ? Ajuste la cuisson</div>
+    <p class="des-intro"><strong>Oui, ça change tout.</strong> Des dés de 2–2,5 cm cuisent ~30–40 % plus vite, mais sèchent aussi plus vite. Température du four inchangée — on raccourcit seulement la durée et on remue à mi-cuisson.</p>
+    <table class="des-table">
+      <thead>
+        <tr><th>Marinade</th><th>Four</th><th>Filet entier</th><th>Dés 2–2,5 cm</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Yaourt & épices</td><td>200 °C</td><td>20–22 min</td><td>13–15 min</td></tr>
+        <tr><td>Citron & herbes</td><td>190 °C</td><td>~22 min</td><td>14–16 min</td></tr>
+        <tr><td>Moutarde & miel</td><td>175 °C</td><td>26–28 min</td><td>16–18 min</td></tr>
+        <tr><td>Soja & gingembre</td><td>180 °C</td><td>~24 min</td><td>15–17 min</td></tr>
+        <tr><td>Ail & citron vert</td><td>190 °C</td><td>~22 min</td><td>14–16 min</td></tr>
+      </tbody>
+    </table>
+    <div class="des-tip"><strong>3 réflexes en dés —</strong> ① Ne pas entasser (étalez, espacez). ② La <strong>fécule de maïs</strong> (1 c.c. par blanc de poulet) devient quasi obligatoire pour toutes les marinades en dés : la découpe multiplie la surface exposée à la chaleur et accélère la perte d'eau — la fécule forme un film protecteur. C'est la technique de la fiche 04 étendue à toutes. ③ Pour le batch, tirez les dés <strong>1–2 min plus tôt</strong> : la réchauffe achève sans assécher.</div>
+  </div>
+
+  <div class="recipe-list" id="recipe-list"></div>
+</div>
+
+<!-- PLANNER -->
+<div class="view" id="view-planner">
+  <p class="sec-title">Ma <em>semaine</em></p>
+  <p class="sec-sub">Appuyez sur un créneau pour assigner une recette.</p>
+  <div class="summary-bar">
+    <div><div class="s-label">Repas</div><div class="s-val" id="s-count">0</div></div>
+    <div><div class="s-label">Batchs</div><div class="s-val" id="s-batch">0</div></div>
+    <div><div class="s-label">Prot. moy.</div><div class="s-val" id="s-prot">—</div></div>
+  </div>
+  <div style="margin-bottom:16px">
+    <button class="btn" onclick="clearAll()">Tout effacer</button>
+    <button class="btn primary" onclick="showView('courses',document.querySelectorAll('nav button')[2])">→ Courses</button>
+  </div>
+  <div class="week-grid" id="week-grid"></div>
+</div>
+
+<!-- COURSES -->
+<div class="view" id="view-courses">
+  <p class="sec-title">Liste de <em>courses</em></p>
+  <p class="sec-sub">Générée depuis votre planning. Cochez au fur et à mesure.</p>
+  <div id="courses-content"></div>
+</div>
+
+<!-- BOTTOM SHEET -->
+<div class="sheet-overlay" id="sheet-overlay" onclick="closePicker()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Choisir une recette</div>
+  <div class="picker-list" id="picker-list"></div>
+  <button class="sheet-cancel" onclick="closePicker()">Annuler</button>
+</div>
+
+<!-- BANDEAU INSTALL -->
+<div id="install-banner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:300; background:var(--ink); color:var(--paper); padding:16px 18px 32px; border-top:2px solid var(--gold); font-size:15px; line-height:1.55;">
+  <button onclick="dismissBanner()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--paper);font-size:22px;cursor:pointer;opacity:.55;">✕</button>
+  <div style="font-family:Georgia,serif;font-size:18px;font-weight:bold;margin-bottom:8px;">📲 Installer sur l'écran d'accueil</div>
+  <div id="install-instructions" style="color:rgba(247,241,230,.8);"></div>
+  <button id="install-btn" style="display:none;margin-top:14px;width:100%;background:var(--gold);color:#fff;border:none;border-radius:8px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;">Installer l'application</button>
+</div>
+
+<script>
+let deferredPrompt = null;
+
+function dismissBanner() {
+  document.getElementById('install-banner').style.display = 'none';
+  localStorage.setItem('install-banner-shown', '1');
+}
+
+// Android Chrome : intercepter le prompt natif
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showBanner('android-prompt');
+});
+
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    dismissBanner();
+  }
+});
+
+function showBanner(mode) {
+  const banner = document.getElementById('install-banner');
+  const instructions = document.getElementById('install-instructions');
+  const btn = document.getElementById('install-btn');
+  const bannerShown = localStorage.getItem('install-banner-shown');
+  if (bannerShown) return;
+
+  if (mode === 'android-prompt') {
+    instructions.innerHTML = 'Chrome peut installer cette app directement sur votre écran d\'accueil.';
+    btn.style.display = 'block';
+  } else if (mode === 'android-manual') {
+    instructions.innerHTML = '1️⃣ Appuyez sur l\'icône <strong style="color:var(--gold);">⬇ télécharger</strong> en haut de Chrome pour sauvegarder le fichier sur votre téléphone.<br><br>2️⃣ Ouvrez l\'app <strong style="color:var(--gold);">Fichiers</strong> (ou Mes fichiers), trouvez le fichier dans Téléchargements, appuyez dessus pour l\'ouvrir dans Chrome.<br><br>3️⃣ Depuis cette page, appuyez sur <strong style="color:var(--gold);">⋮</strong> puis <strong style="color:var(--gold);">"Ajouter à l\'écran d\'accueil"</strong>.';
+  } else if (mode === 'ios') {
+    instructions.innerHTML = 'Appuyez sur <strong style="color:var(--gold);">⎋ Partager</strong> en bas de Safari, puis <strong style="color:var(--gold);">"Sur l\'écran d\'accueil"</strong>.';
+  }
+
+  setTimeout(() => { banner.style.display = 'block'; }, 1500);
+}
+
+// Détection plateforme
+const ua = navigator.userAgent;
+const isIOS = /iphone|ipad|ipod/i.test(ua);
+const isAndroid = /android/i.test(ua);
+const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+const bannerShown = localStorage.getItem('install-banner-shown');
+
+if (!isStandalone && !bannerShown) {
+  if (isIOS) showBanner('ios');
+  else if (isAndroid) {
+    // beforeinstallprompt se déclenche si Chrome le supporte,
+    // sinon on guide vers le menu manuel après 3s
+    setTimeout(() => {
+      if (!deferredPrompt) showBanner('android-manual');
+    }, 3000);
+  }
+}
+
+const RECIPES = [
+  {
+    id:1, name:"Yaourt & épices", sub:"façon tandoori", color:"#c25b3a",
+    marinade:"12–24 h", four:"200 °C", cuisson:"20–22 min", coeur:"70 °C",
+    ingredients:["200 g de yaourt grec","2 c.c. paprika fumé · cumin · curcuma","1 c.c. gingembre + 2 gousses d'ail râpées","Jus ½ citron · 1 c.c. sel"],
+    steps:["Inciser légèrement les blancs, enrober de marinade.","Sur grille + plaque, espacés.","Retourner à mi-cuisson."],
+    kcal:150, proteines:28, lipides:4, glucides:2,
+    astuce:"La gangue de yaourt forme une croûte protéique qui scelle l'humidité. À la réchauffe, ne dépassez jamais 65 °C.",
+    courses:{"Frais & frigo":["Yaourt grec (200 g)","Blancs de poulet (4)"],"Épicerie":["Paprika fumé","Cumin","Curcuma","Gingembre en poudre"],"Fruits & légumes":["Ail (2 gousses)","Citron (½)"]}
+  },
+  {
+    id:2, name:"Citron & herbes", sub:"méditerranéen", color:"#4e7c3f",
+    marinade:"1–2 h max", four:"190 °C", cuisson:"~22 min", coeur:"70 °C",
+    ingredients:["4 c.s. huile d'olive","Jus + zeste d'1 citron","Thym, romarin, origan (1 c.c. chacun)","2 gousses d'ail · sel · poivre"],
+    steps:["Ne pas dépasser 2 h (acide fort = surface cotonneuse).","Éponger l'excédent avant cuisson."],
+    kcal:175, proteines:29, lipides:7, glucides:1,
+    astuce:"L'huile d'olive enrobe la fibre d'un film hydrophobe. Réchauffez à couvert avec 1 c.s. d'eau.",
+    courses:{"Frais & frigo":["Blancs de poulet (4)"],"Épicerie":["Huile d'olive","Thym séché","Romarin séché","Origan séché","Sel · poivre"],"Fruits & légumes":["Citron (1)","Ail (2 gousses)"]}
+  },
+  {
+    id:3, name:"Moutarde & miel", sub:"glaçage doux", color:"#caa12e",
+    marinade:"2–4 h", four:"175 °C", cuisson:"26–28 min", coeur:"70 °C",
+    ingredients:["3 c.s. moutarde de Dijon","2 c.s. miel","2 c.s. huile · 1 c.s. vinaigre de cidre","1 gousse d'ail · sel"],
+    steps:["175 °C impératif : le miel brûle vite plus haut.","Badigeonner le glaçage restant à mi-cuisson."],
+    kcal:170, proteines:28, lipides:5, glucides:4,
+    astuce:"Pour la réchauffe : poêle couverte, feu doux, avec 1 c.s. d'eau — le glaçage refond et nappe la viande.",
+    courses:{"Frais & frigo":["Blancs de poulet (4)"],"Épicerie":["Moutarde de Dijon","Miel","Huile neutre","Vinaigre de cidre","Sel"],"Fruits & légumes":["Ail (1 gousse)"]}
+  },
+  {
+    id:4, name:"Soja & gingembre", sub:"velveting oriental", color:"#7a4a2b",
+    marinade:"2–6 h (8 h max)", four:"180 °C", cuisson:"~24 min", coeur:"70 °C",
+    ingredients:["4 c.s. sauce soja","1 c.s. gingembre frais râpé + 2 gousses ail","1 c.s. huile de sésame · 1 c.s. miel","1 c.s. vinaigre de riz (ou mirin)"],
+    steps:["Plus c'est long, plus c'est juteux (jusqu'à 8 h).","Réduire le sel ajouté (sodium élevé).","1 c.c. fécule de maïs juste avant d'enfourner."],
+    kcal:155, proteines:29, lipides:3.5, glucides:2,
+    astuce:"La fécule de maïs forme un film qui gélifie à la chaleur (velveting). Supporte le mieux 4 jours de frigo.",
+    courses:{"Frais & frigo":["Blancs de poulet (4)","Gingembre frais"],"Épicerie":["Sauce soja","Huile de sésame","Miel","Vinaigre de riz / mirin","Fécule de maïs"],"Fruits & légumes":["Ail (2 gousses)"]}
+  },
+  {
+    id:5, name:"Ail & citron vert", sub:"saumure éclair", color:"#3f8a6e",
+    marinade:"1–3 h + saumure", four:"190 °C", cuisson:"~22 min", coeur:"70 °C",
+    ingredients:["3 c.s. huile","Jus + zeste de 2 citrons verts","3 gousses ail · coriandre · cumin","Pincée piment · sel"],
+    steps:["Saumure éclair 15 min : 1 c.s. sel / 500 ml eau.","Égoutter, sécher, puis mariner 1–3 h."],
+    kcal:170, proteines:29, lipides:6, glucides:1,
+    astuce:"La saumure éclair fait pénétrer l'eau salée dans les fibres (osmose) : moelleux garanti au 4ᵉ jour de frigo.",
+    courses:{"Épicerie":["Huile neutre","Cumin","Coriandre moulue","Piment","Sel"],"Frais & frigo":["Blancs de poulet (4)"],"Fruits & légumes":["Citrons verts (2)","Ail (3 gousses)"]}
+  }
+];
+
+// Multiplicateurs par recette (défaut ×1 = 4 blancs)
+let mults = {1:1, 2:1, 3:1, 4:1, 5:1};
+
+// Scale les quantités d'un ingrédient (texte) par un multiplicateur
+function scaleIngr(str, m) {
+  if (m === 1) return str;
+  return str.replace(/(\d+(?:[.,]\d+)?)/g, (n) => {
+    const v = parseFloat(n.replace(',', '.')) * m;
+    if (Number.isInteger(v)) return v;
+    // Arrondi au quart le plus proche pour les mesures
+    const rounded = Math.round(v * 4) / 4;
+    return Number.isInteger(rounded) ? rounded : rounded.toString().replace('.', ',');
+  });
+}
+
+function setMult(id, m) {
+  mults[id] = m;
+  renderRecipes();
+  // Réouvrir le détail si il était ouvert
+  const detail = document.getElementById(`detail-${id}`);
+  if (detail) detail.classList.add('open');
+  const btn = document.getElementById(`toggle-${id}`);
+  if (btn) btn.textContent = '▲ Masquer';
+}
+
+const DAYS = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
+const SLOTS = ["Midi","Soir"];
+
+let plan = {};
+DAYS.forEach(d => SLOTS.forEach(s => { plan[`${d}-${s}`] = null; }));
+let pendingSlot = null;
+
+// RENDER RECIPES
+function renderRecipes() {
+  document.getElementById('recipe-list').innerHTML = RECIPES.map(r => `
+    <div class="recipe-card">
+      <div class="recipe-card-head" style="background:${r.color}" onclick="toggleDetail(${r.id})">
+        <div class="recipe-card-head-text">
+          <div class="recipe-card-no">FICHE 0${r.id} / 05</div>
+          <h3>${r.name}</h3>
+          <div class="sub">${r.sub}</div>
+        </div>
+        <div class="kcal-badge">
+          <span class="kcal-val">${r.kcal}</span>
+          <span class="kcal-lbl">kcal / 100g</span>
+        </div>
+      </div>
+      <div class="recipe-card-body">
+        <div class="mult-bar">
+          <span class="mult-label">Quantité</span>
+          <div class="mult-btns">
+            ${[1,2,3,4].map(m=>`<button class="mult-btn ${mults[r.id]===m?'active':''}" onclick="setMult(${r.id},${m})">×${m}</button>`).join('')}
+          </div>
+          <span class="mult-qty">${mults[r.id]*4} blancs <span>≈ ${mults[r.id]*160} g</span></span>
+        </div>
+        <div class="params-mini">
+          <div class="param-mini"><span class="lbl">Marinade</span><span class="val">${r.marinade}</span></div>
+          <div class="param-mini"><span class="lbl">Four</span><span class="val">${r.four}</span></div>
+          <div class="param-mini"><span class="lbl">Cuisson</span><span class="val">${r.cuisson}</span></div>
+        </div>
+        <div class="macros-row">
+          <span class="macro-chip">${r.kcal}<span>kcal</span></span>
+          <span class="macro-chip">${r.proteines}g<span>prot.</span></span>
+          <span class="macro-chip">${r.lipides}g<span>lip.</span></span>
+          <span class="macro-chip">${r.glucides}g<span>glu.</span></span>
+        </div>
+        <div class="detail" id="detail-${r.id}">
+          <div class="detail-cols">
+            <div>
+              <div class="block-title">Marinade (${mults[r.id]*4} blancs)</div>
+              <ul class="ingr">${r.ingredients.map(i=>`<li>${scaleIngr(i, mults[r.id])}</li>`).join('')}</ul>
+            </div>
+            <div>
+              <div class="block-title">Méthode</div>
+              <ol class="steps">${r.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+            </div>
+          </div>
+          <div class="macros-detail">
+            <div class="macros-detail-head"><b>Macros</b><span>~ par 100 g cuit</span></div>
+            <div class="macros-detail-grid">
+              <div class="md-macro"><div class="mv">${r.kcal}</div><div class="ml">kcal</div></div>
+              <div class="md-macro"><div class="mv">${r.proteines}g</div><div class="ml">prot.</div></div>
+              <div class="md-macro"><div class="mv">${r.lipides}g</div><div class="ml">lip.</div></div>
+              <div class="md-macro"><div class="mv">${r.glucides}g</div><div class="ml">glu.</div></div>
+            </div>
+          </div>
+          <div class="astuce-box"><b>L'astuce moelleux</b>${r.astuce}</div>
+        </div>
+        <button class="toggle-btn" id="toggle-${r.id}" onclick="toggleDetail(${r.id})">▼ Voir la recette</button>
+        <button class="add-plan-btn" onclick="quickAdd(${r.id})">+ Ajouter au planning</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleDetail(id) {
+  const d = document.getElementById(`detail-${id}`);
+  const b = document.getElementById(`toggle-${id}`);
+  const open = d.classList.toggle('open');
+  b.textContent = open ? '▲ Masquer' : '▼ Voir la recette';
+}
+
+// PLANNER
+function renderPlanner() {
+  document.getElementById('week-grid').innerHTML = DAYS.map((day, di) => `
+    <div class="day-row">
+      <div class="day-header">
+        <div class="day-num">${di+1}</div>
+        <div class="day-name">${day}</div>
+      </div>
+      <div class="day-slots">
+        ${SLOTS.map(slot => {
+          const key = `${day}-${slot}`;
+          const rid = plan[key];
+          const r = rid ? RECIPES.find(x=>x.id===rid) : null;
+          return `
+            <div class="meal-slot" onclick="openPicker('${key}')">
+              <span class="slot-label">${slot}</span>
+              ${r ? `
+                <div class="meal-pill" style="background:${r.color}" onclick="event.stopPropagation()">
+                  ${r.name.split(' ')[0]}
+                  <div class="remove-meal" onclick="event.stopPropagation();removeMeal('${key}')">×</div>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+  updateSummary();
+}
+
+function updateSummary() {
+  const meals = Object.values(plan).filter(Boolean);
+  const count = meals.length;
+  const ids = [...new Set(meals)];
+  const avgProt = count ? Math.round(meals.reduce((s,id)=>s+RECIPES.find(r=>r.id===id).proteines,0)/count) : null;
+  document.getElementById('s-count').textContent = count;
+  document.getElementById('s-batch').textContent = ids.length;
+  document.getElementById('s-prot').textContent = avgProt ? avgProt+'g' : '—';
+}
+
+function openPicker(key) {
+  pendingSlot = key;
+  document.getElementById('picker-list').innerHTML = RECIPES.map(r=>`
+    <div class="picker-item" onclick="assignRecipe(${r.id})">
+      <div class="picker-dot" style="background:${r.color}"></div>
+      <div class="picker-item-name">${r.name}</div>
+      <div class="picker-item-kcal">${r.kcal} kcal · ${r.proteines}g</div>
+    </div>
+  `).join('');
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+
+function closePicker() {
+  pendingSlot = null;
+  document.getElementById('sheet-overlay').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+}
+
+function assignRecipe(id) {
+  if (pendingSlot) { plan[pendingSlot] = id; closePicker(); renderPlanner(); renderCourses(); }
+}
+
+function quickAdd(id) {
+  const firstEmpty = Object.keys(plan).find(k=>!plan[k]);
+  if (firstEmpty) {
+    plan[firstEmpty] = id;
+    showView('planner', document.querySelectorAll('nav button')[1]);
+    renderPlanner(); renderCourses();
+  } else {
+    showView('planner', document.querySelectorAll('nav button')[1]);
+  }
+}
+
+function removeMeal(key) { plan[key]=null; renderPlanner(); renderCourses(); }
+
+function clearAll() {
+  Object.keys(plan).forEach(k=>{ plan[k]=null; });
+  renderPlanner(); renderCourses();
+}
+
+// COURSES
+function renderCourses() {
+  const container = document.getElementById('courses-content');
+  const usedIds = [...new Set(Object.values(plan).filter(Boolean))];
+  if (!usedIds.length) {
+    container.innerHTML = `<div class="empty-state"><span class="big">Aucun repas planifié</span>Ajoutez des recettes à votre <a onclick="showView('planner',document.querySelectorAll('nav button')[1])">planning</a> pour générer la liste.</div>`;
+    return;
+  }
+  const cats = {};
+  usedIds.forEach(id => {
+    const r = RECIPES.find(x=>x.id===id);
+    const count = Object.values(plan).filter(x=>x===id).length;
+    Object.entries(r.courses).forEach(([cat, items]) => {
+      if (!cats[cat]) cats[cat]={};
+      items.forEach(item => {
+        if (item.includes('poulet') || item.includes('Blancs')) {
+          cats[cat]['Blancs de poulet'] = `${count*4} blancs`;
+        } else {
+          cats[cat][item] = count>1 ? `×${count}` : '';
+        }
+      });
+    });
+  });
+  const names = usedIds.map(id=>RECIPES.find(r=>r.id===id).name).join(', ');
+  container.innerHTML = `
+    <p class="courses-intro">Recettes : <b>${names}</b></p>
+    ${Object.entries(cats).map(([cat,items])=>`
+      <div class="course-section">
+        <h3>${cat}</h3>
+        <ul class="course-list">
+          ${Object.entries(items).map(([item,qty],i)=>`
+            <li id="li-${cat.replace(/\s/g,'')}-${i}">
+              <input type="checkbox" id="cb-${cat.replace(/\s/g,'')}-${i}" onchange="this.closest('li').classList.toggle('checked',this.checked)">
+              <label for="cb-${cat.replace(/\s/g,'')}-${i}">${item}</label>
+              ${qty?`<span class="course-qty">${qty}</span>`:''}
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    `).join('')}
+  `;
+}
+
+// NAV
+function showView(id, btn) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(`view-${id}`).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+renderRecipes();
+renderPlanner();
+renderCourses();
+</script>
+</body>
+</html>

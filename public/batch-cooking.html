@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Batch Cooking — Planificateur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #f7f1e6;
+  --ink: #2a2118;
+  --ink-soft: #6b5d4a;
+  --line: #d9cbb2;
+  --gold: #b8842b;
+  --bg-card: #fffdf8;
+  --c-yaourt: #c25b3a;
+  --c-citron: #4e7c3f;
+  --c-miel: #caa12e;
+  --c-soja: #7a4a2b;
+  --c-vert: #3f8a6e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Figtree', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* NAV */
+nav {
+  background: var(--ink);
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 2px solid var(--gold);
+}
+nav .brand {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 900;
+  padding: 14px 0;
+  margin-right: 32px;
+  white-space: nowrap;
+}
+nav .brand em { color: var(--gold); font-style: italic; font-weight: 500; }
+nav button {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  color: rgba(247,241,230,.55);
+  cursor: pointer;
+  padding: 18px 16px;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+nav button:hover { color: var(--paper); }
+nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* LAYOUT */
+.view { display: none; max-width: 900px; margin: 0 auto; padding: 40px 28px 80px; }
+.view.active { display: block; }
+
+/* SECTION TITLE */
+.sec-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 900;
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.sec-title em { font-style: italic; font-weight: 500; color: var(--gold); }
+.sec-sub { color: var(--ink-soft); font-size: 14.5px; margin-bottom: 32px; }
+
+/* ===== RECETTES ===== */
+.recipe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 640px) { .recipe-grid { grid-template-columns: 1fr; } }
+
+.recipe-card {
+  border: 1.5px solid var(--ink);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.recipe-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(42,33,24,.12); }
+.recipe-card-head {
+  padding: 18px 20px 14px;
+  color: #fff;
+}
+.recipe-card-no {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  opacity: .8;
+}
+.recipe-card-head h3 { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; margin: 3px 0 2px; }
+.recipe-card-head .sub { font-size: 12.5px; opacity: .9; font-style: italic; }
+.recipe-card-body { padding: 16px 20px 18px; }
+.params-mini { display: flex; gap: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
+.param-mini { flex: 1; text-align: center; padding: 8px 4px; }
+.param-mini + .param-mini { border-left: 1px solid var(--line); }
+.param-mini .lbl { font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); display: block; margin-bottom: 2px; }
+.param-mini .val { font-family: 'Fraunces', serif; font-weight: 600; font-size: 14px; }
+.macros-mini { display: flex; gap: 8px; flex-wrap: wrap; }
+.macro-chip {
+  background: #f1e7d4;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+.macro-chip span { font-size: 9px; font-weight: 400; color: var(--ink-soft); margin-left: 2px; }
+.add-plan-btn {
+  margin-top: 14px;
+  width: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 6px;
+  padding: 9px 0;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .15s;
+}
+.add-plan-btn:hover { background: var(--gold); }
+
+/* DETAIL MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(42,33,24,.55);
+  z-index: 200;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg-card);
+  border: 1.5px solid var(--ink);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 560px;
+  width: 100%;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 12px; right: 14px;
+  background: rgba(0,0,0,.25);
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.modal-head { padding: 24px 28px 18px; color: #fff; }
+.modal-head .fno { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .2em; opacity: .8; }
+.modal-head h2 { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; margin: 3px 0 4px; }
+.modal-head .sub { font-style: italic; font-size: 13px; opacity: .9; }
+.modal-body { padding: 20px 28px 26px; }
+.modal-params { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-bottom: 18px; }
+.modal-param { padding: 10px 8px; text-align: center; }
+.modal-param + .modal-param { border-left: 1px solid var(--line); }
+.modal-param .lbl { font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); display: block; margin-bottom: 3px; }
+.modal-param .val { font-family: 'Fraunces', serif; font-weight: 600; font-size: 15px; }
+.modal-param .val small { font-size: 10px; font-weight: 400; color: var(--ink-soft); }
+.modal-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 16px; }
+.block-title { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+ul.ingr { list-style: none; font-size: 13px; }
+ul.ingr li { padding: 2px 0; }
+ul.ingr li::before { content: "—"; color: var(--gold); margin-right: 7px; }
+ol.steps { font-size: 13px; padding-left: 16px; }
+ol.steps li { padding: 2px 0; }
+.modal-macros { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
+.modal-macros-head { background: #f1e7d4; padding: 7px 12px; display: flex; justify-content: space-between; align-items: baseline; }
+.modal-macros-head b { font-family: 'Fraunces', serif; font-size: 13px; }
+.modal-macros-head span { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--ink-soft); }
+.modal-macros-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+.modal-macro { padding: 9px 6px; text-align: center; }
+.modal-macro + .modal-macro { border-left: 1px solid var(--line); }
+.modal-macro .mv { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 16px; }
+.modal-macro .ml { font-size: 9.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; }
+.astuce-box { background: #fbf4e3; border-left: 4px solid var(--gold); border-radius: 6px; padding: 12px 14px; font-size: 13px; }
+.astuce-box b { font-family: 'Fraunces', serif; font-size: 14px; display: block; margin-bottom: 3px; }
+
+/* ===== PLANIFICATEUR ===== */
+.planner-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.btn {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  border: 1.5px solid var(--ink);
+  background: none;
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.btn:hover, .btn.primary { background: var(--ink); color: var(--paper); }
+.btn.danger { border-color: #c25b3a; color: #c25b3a; }
+.btn.danger:hover { background: #c25b3a; color: #fff; }
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 28px;
+}
+@media (max-width: 700px) { .week-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.day-col { background: var(--bg-card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.day-header {
+  background: var(--ink);
+  color: var(--paper);
+  text-align: center;
+  padding: 8px 6px;
+}
+.day-header .day-name { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .15em; text-transform: uppercase; opacity: .7; }
+.day-header .day-num { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 900; line-height: 1; }
+.day-slots { padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 100px; }
+
+.meal-slot {
+  border: 1.5px dashed var(--line);
+  border-radius: 6px;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  position: relative;
+}
+.meal-slot:hover { border-color: var(--gold); background: #fbf4e3; }
+.meal-slot .slot-label { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 2px; }
+
+.meal-pill {
+  border-radius: 4px;
+  padding: 4px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+}
+.meal-pill .remove-meal {
+  position: absolute;
+  top: -6px; right: -6px;
+  width: 16px; height: 16px;
+  background: var(--ink);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.meal-pill:hover .remove-meal { opacity: 1; }
+
+/* RECIPE PICKER (inline panel) */
+.picker-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+}
+.picker-overlay.open { display: block; }
+.picker-panel {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg-card);
+  border-top: 2px solid var(--ink);
+  padding: 20px 24px;
+  z-index: 151;
+  display: none;
+}
+.picker-panel.open { display: block; }
+.picker-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; margin-bottom: 14px; }
+.picker-list { display: flex; gap: 10px; flex-wrap: wrap; }
+.picker-item {
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: border-color .15s, transform .1s;
+  background: var(--paper);
+  display: flex; align-items: center; gap: 10px;
+}
+.picker-item:hover { border-color: var(--ink); transform: translateY(-1px); }
+.picker-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.picker-item-name { font-weight: 600; font-size: 13.5px; }
+.picker-item-kcal { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--ink-soft); }
+.picker-cancel {
+  margin-top: 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* SUMMARY BAR */
+.summary-bar {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 10px;
+  padding: 18px 22px;
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.summary-bar .s-label { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: .15em; text-transform: uppercase; color: rgba(247,241,230,.55); }
+.summary-bar .s-val { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 900; }
+.summary-bar .s-unit { font-size: 12px; color: rgba(247,241,230,.6); }
+
+/* ===== COURSES ===== */
+.courses-intro { color: var(--ink-soft); font-size: 14px; margin-bottom: 22px; max-width: 50ch; }
+.course-section { margin-bottom: 26px; }
+.course-section h3 { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+.course-list { list-style: none; }
+.course-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.course-list li:last-child { border-bottom: none; }
+.course-list li input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--gold); flex-shrink: 0; cursor: pointer; }
+.course-list li label { cursor: pointer; flex: 1; }
+.course-list li.checked label { text-decoration: line-through; color: var(--ink-soft); }
+.course-qty { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--gold); font-weight: 700; }
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--ink-soft);
+}
+.empty-state .big { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; display: block; margin-bottom: 8px; }
+.empty-state a { color: var(--gold); cursor: pointer; text-decoration: underline; }
+
+/* PRINT */
+@media print {
+  nav, .planner-controls, .picker-overlay, .picker-panel, .add-plan-btn { display: none !important; }
+  .view { display: block !important; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Poulet <em>au four</em></div>
+  <button class="active" onclick="showView('recettes', this)">Recettes</button>
+  <button onclick="showView('planner', this)">Planificateur</button>
+  <button onclick="showView('courses', this)">Liste de courses</button>
+</nav>
+
+<!-- ==================== RECETTES ==================== -->
+<div class="view active" id="view-recettes">
+  <p class="sec-title">5 marinades, <em>un seul secret</em></p>
+  <p class="sec-sub">Cliquez sur une fiche pour les détails complets. Ajoutez-les directement à votre semaine.</p>
+
+  <div class="recipe-grid" id="recipe-grid"></div>
+</div>
+
+<!-- ==================== PLANNER ==================== -->
+<div class="view" id="view-planner">
+  <p class="sec-title">Ma <em>semaine</em></p>
+  <p class="sec-sub">Cliquez sur un créneau pour y assigner une recette.</p>
+
+  <div class="summary-bar" id="summary-bar">
+    <div>
+      <div class="s-label">Repas planifiés</div>
+      <div class="s-val" id="s-count">0</div>
+    </div>
+    <div>
+      <div class="s-label">Blancs de poulet</div>
+      <div class="s-val" id="s-poulet">0 <span class="s-unit">× 4</span></div>
+    </div>
+    <div>
+      <div class="s-label">Protéines moy./100 g</div>
+      <div class="s-val" id="s-prot">—</div>
+    </div>
+  </div>
+
+  <div class="planner-controls">
+    <button class="btn" onclick="clearAll()">Tout effacer</button>
+    <button class="btn primary" onclick="showView('courses', document.querySelector('nav button:nth-child(4)'))">→ Voir les courses</button>
+  </div>
+
+  <div class="week-grid" id="week-grid"></div>
+</div>
+
+<!-- ==================== COURSES ==================== -->
+<div class="view" id="view-courses">
+  <p class="sec-title">Liste de <em>courses</em></p>
+  <p class="sec-sub">Générée automatiquement depuis vos recettes planifiées. Cochez au fur et à mesure.</p>
+  <div id="courses-content"></div>
+</div>
+
+<!-- MODAL DÉTAIL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<!-- PICKER (sélection recette) -->
+<div class="picker-overlay" id="picker-overlay" onclick="closePicker()"></div>
+<div class="picker-panel" id="picker-panel">
+  <div class="picker-title">Choisir une recette</div>
+  <div class="picker-list" id="picker-list"></div>
+  <button class="picker-cancel" onclick="closePicker()">Annuler</button>
+</div>
+
+<script>
+// ===== DATA =====
+const RECIPES = [
+  {
+    id: 1,
+    name: "Yaourt & épices",
+    sub: "façon tandoori",
+    color: "#c25b3a",
+    marinade: "12–24 h", four: "200 °C", cuisson: "20–22 min", coeur: "70 °C",
+    ingredients: [
+      "200 g de yaourt grec",
+      "2 c. à c. paprika fumé · 1 cumin · 1 curcuma",
+      "1 c. à c. gingembre + 2 gousses d'ail râpées",
+      "Jus d'½ citron · 1 c. à c. de sel"
+    ],
+    steps: [
+      "Inciser légèrement les blancs, enrober de marinade.",
+      "Sur grille + plaque, espacés.",
+      "Retourner à mi-cuisson."
+    ],
+    kcal: 150, proteines: 28, lipides: 4, glucides: 2,
+    astuce: "La gangue de yaourt forme une croûte protéique qui scelle l'humidité. À la réchauffe, ne dépassez jamais 65 °C : la croûte garde la vapeur prisonnière.",
+    courses: {
+      "Frais & frigo": ["Yaourt grec (200 g)", "Blancs de poulet (4 pièces)"],
+      "Épicerie": ["Paprika fumé", "Cumin", "Curcuma", "Gingembre en poudre"],
+      "Fruits & légumes": ["Ail (2 gousses)", "Citron (½)"]
+    }
+  },
+  {
+    id: 2,
+    name: "Citron & herbes",
+    sub: "méditerranéen",
+    color: "#4e7c3f",
+    marinade: "1–2 h", four: "190 °C", cuisson: "~22 min", coeur: "70 °C",
+    ingredients: [
+      "4 c. à s. huile d'olive",
+      "Jus + zeste d'1 citron",
+      "Thym, romarin, origan (1 c. à c. chacun)",
+      "2 gousses d'ail · sel · poivre"
+    ],
+    steps: [
+      "Ne pas dépasser 2 h : l'acide fort cotonnerait la surface.",
+      "Éponger l'excédent avant cuisson."
+    ],
+    kcal: 175, proteines: 29, lipides: 7, glucides: 1,
+    astuce: "L'huile d'olive enrobe la fibre d'un film hydrophobe qui freine l'évaporation. Réchauffez à couvert avec 1 c. à s. d'eau — l'huile et la vapeur recréent une ambiance moelleuse.",
+    courses: {
+      "Frais & frigo": ["Blancs de poulet (4 pièces)"],
+      "Épicerie": ["Huile d'olive", "Thym séché", "Romarin séché", "Origan séché", "Sel · poivre"],
+      "Fruits & légumes": ["Citron (1)", "Ail (2 gousses)"]
+    }
+  },
+  {
+    id: 3,
+    name: "Moutarde & miel",
+    sub: "glaçage doux",
+    color: "#caa12e",
+    marinade: "2–4 h", four: "175 °C (basse)", cuisson: "26–28 min", coeur: "70 °C",
+    ingredients: [
+      "3 c. à s. moutarde de Dijon",
+      "2 c. à s. miel",
+      "2 c. à s. huile · 1 c. à s. vinaigre de cidre",
+      "1 gousse d'ail · sel"
+    ],
+    steps: [
+      "175 °C impératif : le miel brunit (et brûle) vite à plus haut.",
+      "Badigeonner le glaçage restant à mi-cuisson seulement."
+    ],
+    kcal: 170, proteines: 28, lipides: 5, glucides: 4,
+    astuce: "Pour la réchauffe, oubliez le four : poêle couverte, feu doux, avec une cuillère d'eau — le glaçage refond et nappe la viande au lieu de croûter.",
+    courses: {
+      "Épicerie": ["Moutarde de Dijon (3 c. à s.)", "Miel (2 c. à s.)", "Huile neutre", "Vinaigre de cidre", "Sel"],
+      "Frais & frigo": ["Blancs de poulet (4 pièces)"],
+      "Fruits & légumes": ["Ail (1 gousse)"]
+    }
+  },
+  {
+    id: 4,
+    name: "Soja & gingembre",
+    sub: "velveting oriental",
+    color: "#7a4a2b",
+    marinade: "2–6 h", four: "180 °C", cuisson: "~24 min", coeur: "70 °C",
+    ingredients: [
+      "4 c. à s. sauce soja",
+      "1 c. à s. gingembre frais râpé + 2 gousses d'ail",
+      "1 c. à s. huile de sésame · 1 c. à s. miel",
+      "1 c. à s. vinaigre de riz (ou mirin)"
+    ],
+    steps: [
+      "Le soja saumure la viande : plus c'est long, plus c'est juteux (jusqu'à 8 h).",
+      "Réduire le sel ajouté ailleurs (sodium élevé).",
+      "Saupoudrer 1 c. à c. de fécule de maïs juste avant d'enfourner."
+    ],
+    kcal: 155, proteines: 29, lipides: 3.5, glucides: 2,
+    astuce: "Saupoudrez 1 c. à c. de fécule de maïs juste avant d'enfourner : la fécule forme un film qui gélifie à la chaleur et verrouille les jus (technique du velveting chinois). C'est la marinade qui supporte le mieux 4 jours de frigo.",
+    courses: {
+      "Frais & frigo": ["Blancs de poulet (4 pièces)", "Gingembre frais"],
+      "Épicerie": ["Sauce soja (4 c. à s.)", "Huile de sésame", "Miel", "Vinaigre de riz / mirin", "Fécule de maïs"],
+      "Fruits & légumes": ["Ail (2 gousses)"]
+    }
+  },
+  {
+    id: 5,
+    name: "Ail & citron vert",
+    sub: "saumure éclair",
+    color: "#3f8a6e",
+    marinade: "1–3 h + saumure", four: "190 °C", cuisson: "~22 min", coeur: "70 °C",
+    ingredients: [
+      "3 c. à s. huile",
+      "Jus + zeste de 2 citrons verts",
+      "3 gousses d'ail · coriandre · cumin",
+      "Pincée de piment · sel"
+    ],
+    steps: [
+      "Saumure éclair 15 min (1 c. à s. sel / 500 ml eau).",
+      "Égoutter, sécher, puis mariner 1–3 h."
+    ],
+    kcal: 170, proteines: 29, lipides: 6, glucides: 1,
+    astuce: "La saumure éclair avant la marinade fait pénétrer l'eau salée dans les fibres (osmose) : elles en retiennent davantage à la cuisson et restent moelleuses même réchauffées au 4ᵉ jour. C'est l'assurance-vie du batch cooking.",
+    courses: {
+      "Épicerie": ["Huile neutre", "Cumin", "Coriandre moulue", "Piment", "Sel"],
+      "Frais & frigo": ["Blancs de poulet (4 pièces)"],
+      "Fruits & légumes": ["Citrons verts (2)", "Ail (3 gousses)"]
+    }
+  }
+];
+
+const DAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+const SLOTS = ["Midi", "Soir"];
+
+// State
+let plan = {}; // "day-slot" => recipeId or null
+let pendingSlot = null;
+
+// Init
+DAYS.forEach(d => SLOTS.forEach(s => { plan[`${d}-${s}`] = null; }));
+
+// ===== RENDER RECIPES =====
+function renderRecipes() {
+  const grid = document.getElementById('recipe-grid');
+  grid.innerHTML = RECIPES.map(r => `
+    <div class="recipe-card">
+      <div class="recipe-card-head" style="background:${r.color}">
+        <div class="recipe-card-no">FICHE 0${r.id} / 05</div>
+        <h3>${r.name}</h3>
+        <div class="sub">${r.sub}</div>
+      </div>
+      <div class="recipe-card-body">
+        <div class="params-mini">
+          <div class="param-mini"><span class="lbl">Marinade</span><span class="val">${r.marinade}</span></div>
+          <div class="param-mini"><span class="lbl">Four</span><span class="val">${r.four}</span></div>
+          <div class="param-mini"><span class="lbl">Cuisson</span><span class="val">${r.cuisson}</span></div>
+        </div>
+        <div class="macros-mini">
+          <span class="macro-chip">${r.kcal}<span>kcal</span></span>
+          <span class="macro-chip">${r.proteines}g<span>prot.</span></span>
+          <span class="macro-chip">${r.lipides}g<span>lip.</span></span>
+          <span class="macro-chip">${r.glucides}g<span>glu.</span></span>
+        </div>
+        <button class="add-plan-btn" onclick="event.stopPropagation(); openPickerForRecipe(${r.id})">+ Ajouter au planning</button>
+      </div>
+    </div>
+  `).join('');
+  // Click on card head → modal
+  grid.querySelectorAll('.recipe-card').forEach((card, i) => {
+    card.querySelector('.recipe-card-head').addEventListener('click', () => openModal(RECIPES[i]));
+  });
+}
+
+// ===== MODAL =====
+function openModal(r) {
+  const overlay = document.getElementById('modal-overlay');
+  document.getElementById('modal-content').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-head" style="background:${r.color}">
+      <div class="fno">FICHE 0${r.id} / 05</div>
+      <h2>${r.name}</h2>
+      <div class="sub">${r.sub}</div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-params">
+        <div class="modal-param"><span class="lbl">Marinade</span><span class="val">${r.marinade}</span></div>
+        <div class="modal-param"><span class="lbl">Four</span><span class="val">${r.four.replace(' (basse)', '')}<small>${r.four.includes('basse') ? ' basse' : ''}</small></span></div>
+        <div class="modal-param"><span class="lbl">Cuisson</span><span class="val">${r.cuisson}</span></div>
+        <div class="modal-param"><span class="lbl">À cœur</span><span class="val">${r.coeur}</span></div>
+      </div>
+      <div class="modal-cols">
+        <div>
+          <div class="block-title">Marinade (pour 4 blancs)</div>
+          <ul class="ingr">${r.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
+        </div>
+        <div>
+          <div class="block-title">Méthode</div>
+          <ol class="steps">${r.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+        </div>
+      </div>
+      <div class="modal-macros">
+        <div class="modal-macros-head"><b>Macros</b><span>~ par 100 g cuit</span></div>
+        <div class="modal-macros-grid">
+          <div class="modal-macro"><div class="mv">${r.kcal}</div><div class="ml">kcal</div></div>
+          <div class="modal-macro"><div class="mv">${r.proteines}g</div><div class="ml">protéines</div></div>
+          <div class="modal-macro"><div class="mv">${r.lipides}g</div><div class="ml">lipides</div></div>
+          <div class="modal-macro"><div class="mv">${r.glucides}g</div><div class="ml">glucides</div></div>
+        </div>
+      </div>
+      <div class="astuce-box"><b>L'astuce moelleux</b>${r.astuce}</div>
+    </div>
+  `;
+  overlay.classList.add('open');
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+// ===== PLANNER =====
+function renderPlanner() {
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = DAYS.map((day, di) => `
+    <div class="day-col">
+      <div class="day-header">
+        <div class="day-name">${day}</div>
+        <div class="day-num">${di + 1}</div>
+      </div>
+      <div class="day-slots">
+        ${SLOTS.map(slot => {
+          const key = `${day}-${slot}`;
+          const rid = plan[key];
+          const r = rid ? RECIPES.find(x => x.id === rid) : null;
+          return `
+            <div class="meal-slot" onclick="openPicker('${key}')">
+              <span class="slot-label">${slot}</span>
+              ${r ? `
+                <div class="meal-pill" style="background:${r.color}" onclick="event.stopPropagation()">
+                  ${r.name.split(' ')[0]}
+                  <div class="remove-meal" onclick="removeMeal('${key}')">✕</div>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+  updateSummary();
+}
+
+function updateSummary() {
+  const meals = Object.values(plan).filter(Boolean);
+  const count = meals.length;
+  // Count unique recipe batches (each recipe = 1 batch of 4 blancs)
+  const batchMap = {};
+  meals.forEach(id => { batchMap[id] = (batchMap[id] || 0) + 1; });
+  const batches = Object.values(batchMap).length;
+  const avgProt = count > 0
+    ? Math.round(meals.reduce((sum, id) => sum + RECIPES.find(r => r.id === id).proteines, 0) / count)
+    : null;
+
+  document.getElementById('s-count').textContent = count;
+  document.getElementById('s-poulet').innerHTML = `${batches} <span class="s-unit">batch${batches > 1 ? 's' : ''}</span>`;
+  document.getElementById('s-prot').textContent = avgProt ? `${avgProt}g` : '—';
+}
+
+function openPicker(slotKey) {
+  pendingSlot = slotKey;
+  const list = document.getElementById('picker-list');
+  list.innerHTML = RECIPES.map(r => `
+    <div class="picker-item" onclick="assignRecipe(${r.id})">
+      <div class="picker-dot" style="background:${r.color}"></div>
+      <div>
+        <div class="picker-item-name">${r.name}</div>
+        <div class="picker-item-kcal">${r.kcal} kcal · ${r.proteines}g prot.</div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('picker-overlay').classList.add('open');
+  document.getElementById('picker-panel').classList.add('open');
+}
+
+function openPickerForRecipe(recipeId) {
+  // Open planner view then show picker for first empty slot
+  showView('planner', document.querySelector('nav button:nth-child(3)'));
+  const firstEmpty = Object.keys(plan).find(k => !plan[k]);
+  if (firstEmpty) {
+    pendingSlot = firstEmpty;
+    assignRecipe(recipeId);
+  }
+}
+
+function closePicker() {
+  pendingSlot = null;
+  document.getElementById('picker-overlay').classList.remove('open');
+  document.getElementById('picker-panel').classList.remove('open');
+}
+
+function assignRecipe(recipeId) {
+  if (pendingSlot) {
+    plan[pendingSlot] = recipeId;
+    closePicker();
+    renderPlanner();
+    renderCourses();
+  }
+}
+
+function removeMeal(key) {
+  plan[key] = null;
+  renderPlanner();
+  renderCourses();
+}
+
+function clearAll() {
+  Object.keys(plan).forEach(k => { plan[k] = null; });
+  renderPlanner();
+  renderCourses();
+}
+
+// ===== COURSES =====
+function renderCourses() {
+  const container = document.getElementById('courses-content');
+  const usedIds = [...new Set(Object.values(plan).filter(Boolean))];
+
+  if (usedIds.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <span class="big">Aucun repas planifié</span>
+        Ajoutez des recettes à votre <a onclick="showView('planner', document.querySelector('nav button:nth-child(3)'))">planificateur</a> pour générer la liste.
+      </div>
+    `;
+    return;
+  }
+
+  // Aggregate ingredients by category
+  const categories = {};
+  usedIds.forEach(id => {
+    const r = RECIPES.find(x => x.id === id);
+    // Count how many times this recipe is used
+    const count = Object.values(plan).filter(x => x === id).length;
+    Object.entries(r.courses).forEach(([cat, items]) => {
+      if (!categories[cat]) categories[cat] = {};
+      items.forEach(item => {
+        // Try to detect poulet quantity
+        if (item.includes('poulet')) {
+          const qty = count * 4;
+          categories[cat][`Blancs de poulet`] = `${qty} blancs`;
+        } else {
+          categories[cat][item] = count > 1 ? `×${count}` : '';
+        }
+      });
+    });
+  });
+
+  const recipeNames = usedIds.map(id => RECIPES.find(r => r.id === id).name).join(', ');
+  container.innerHTML = `
+    <p class="courses-intro">Recettes sélectionnées : <b>${recipeNames}</b></p>
+    ${Object.entries(categories).map(([cat, items]) => `
+      <div class="course-section">
+        <h3>${cat}</h3>
+        <ul class="course-list">
+          ${Object.entries(items).map(([item, qty], i) => `
+            <li id="li-${cat}-${i}">
+              <input type="checkbox" id="cb-${cat}-${i}" onchange="toggleItem('li-${cat}-${i}', this)">
+              <label for="cb-${cat}-${i}">${item}</label>
+              ${qty ? `<span class="course-qty">${qty}</span>` : ''}
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    `).join('')}
+    <button class="btn" onclick="window.print()">Imprimer la liste</button>
+  `;
+}
+
+function toggleItem(liId, cb) {
+  document.getElementById(liId).classList.toggle('checked', cb.checked);
+}
+
+// ===== NAV =====
+function showView(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${id}`).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// ===== INIT =====
+renderRecipes();
+renderPlanner();
+renderCourses();
+</script>
+</body>
+</html>
