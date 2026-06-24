@@ -57,7 +57,7 @@ const FUND_USES = [
 ]
 
 const FAQS = [
-  { q: "Que se passe-t-il si l'objectif n'est pas atteint ?",   a: "Le livre sera imprimé quoi qu'il arrive : je m'y engage, et je compléterai de ma poche si nécessaire. Ton soutien ne sert donc pas à « décider » si le livre existera, mais à le rendre possible sans que j'aie à tout porter seul — et à imprimer un plus grand tirage pour le diffuser plus largement." },
+  { q: "Que se passe-t-il si l'objectif n'est pas atteint ?",   a: "Le livre sera imprimé quoi qu'il arrive : je m'y engage. Ton soutien ne décide pas si le livre existera ou pas — il décide jusqu'où il ira. Chaque participation transforme un projet personnel en élan collectif : elle amplifie, multiplie le tirage, et propulse le message bien au-delà de ce qu'aucun auteur ne pourrait faire seul." },
   { q: 'Quand vais-je recevoir mon livre ?',                     a: "L'ebook est déjà disponible : tu le reçois par email dès la validation de ton paiement. Les exemplaires papier dédicacés, eux, sont expédiés une fois le tirage imprimé (été 2026)." },
   { q: 'Le paiement est-il vraiment sécurisé ?',                 a: "Oui. Les paiements passent par Stripe. Carte bancaire, Apple Pay et Google Pay sont acceptés. Le Scribe ne voit jamais tes données bancaires." },
   { q: 'Puis-je contribuer sans prendre de contrepartie ?',      a: "Bien sûr. Le bouton « Faire un don libre » te permet de soutenir du montant que tu veux. Chaque euro va directement à l'impression." },
