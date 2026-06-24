@@ -11,15 +11,15 @@ const TIERS = [
     contents: ["Ma reconnaissance & ton nom sur la page des soutiens du site", "Le suivi de la campagne en avant-première"] },
   { id: 'ebook',    price: 9,   ship: 0,  shipKind: 'digital', physical: false, titre: "L'ebook",                    livraison: 'Immédiatement', tag: null,            featured: false, visual: 'ereader',
     contents: ["L'ebook au format EPUB (compatible toutes liseuses)", "Disponible dès la parution, par email"] },
-  { id: 'livre',    price: 16,  ship: 3,  shipKind: 'fee',     physical: true,  titre: 'Le livre — tarif lancement', livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'book',
+  { id: 'livre',    price: 16,  ship: 3,  shipKind: 'fee',     physical: true,  titre: 'Le livre — tarif lancement', livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'book', strikePrice: '18,99 €',
     contents: ["1 exemplaire papier de L'urgence des temps", "Au tarif de lancement (au lieu de 18,99 €)"] },
   { id: 'dedicace', price: 25,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre dédicacé',          livraison: 'Juillet 2026', tag: 'Recommandé',      featured: true,  visual: 'book-ereader',
     contents: ["1 exemplaire papier dédicacé par l'auteur", "L'ebook offert en bonus"] },
   { id: 'echange',  price: 40,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre + un échange',      livraison: 'Juillet 2026', tag: null,             featured: false, visual: 'laptop',
     contents: ["1 exemplaire papier dédicacé", "L'ebook offert", "Un échange visio ou téléphone après ta lecture"] },
-  { id: 'pack3',    price: 45,  ship: 5,  shipKind: 'fee',     physical: true,  titre: 'Pack de 3 — tarif lancement', livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'stack3',
+  { id: 'pack3',    price: 45,  ship: 5,  shipKind: 'fee',     physical: true,  titre: 'Pack de 3 — tarif lancement', livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'stack3', strikePrice: '57 €',
     contents: ["3 exemplaires papier dédicacés", "Parfait pour offrir autour de toi", "Tarif lancement — prix définitif après campagne : 57 €"] },
-  { id: 'eglise',   price: 140, ship: 10, shipKind: 'fee',     physical: true,  titre: "Le pack Église — tarif lancement (10 ex.)", livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'stack10',
+  { id: 'eglise',   price: 140, ship: 10, shipKind: 'fee',     physical: true,  titre: "Le pack Église — tarif lancement (10 ex.)", livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'stack10', strikePrice: '190 €',
     contents: ["10 exemplaires papier", "Pour ta communauté, ton groupe ou ton Église", "Tarif lancement — prix définitif après campagne : 190 €"] },
 ]
 
@@ -857,7 +857,10 @@ export default function CampagnePage() {
                           <span style={{ display: 'inline-block', fontSize: '10px', fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase', background: 'rgba(201,167,125,.15)', color: C.gold, padding: '3px 9px', borderRadius: '99px' }}>{tier.tag}</span>
                         </div>
                       )}
-                      <p style={{ textAlign: 'center', fontSize: '14px', color: C.gold, fontWeight: 600, margin: '0 0 2px' }}>Pour {tier.price} €</p>
+                      <div style={{ textAlign: 'center', marginBottom: '2px' }}>
+                        <span style={{ fontSize: '14px', color: C.gold, fontWeight: 600 }}>Pour {tier.price} €</span>
+                        {tier.strikePrice && <span style={{ fontSize: '12px', color: C.text3, textDecoration: 'line-through', marginLeft: '6px' }}>au lieu de {tier.strikePrice}</span>}
+                      </div>
                       <h3 style={{ textAlign: 'center', fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '19px', fontWeight: 700, color: C.text, margin: '0 0 16px' }}>{tier.titre}</h3>
 
                       <button
