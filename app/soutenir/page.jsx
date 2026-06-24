@@ -17,10 +17,10 @@ const TIERS = [
     contents: ["1 exemplaire papier dédicacé par l'auteur", "L'ebook offert en bonus"] },
   { id: 'echange',  price: 40,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre + un échange',      livraison: 'Juillet 2026', tag: null,             featured: false, visual: 'laptop',
     contents: ["1 exemplaire papier dédicacé", "L'ebook offert", "Un échange visio ou téléphone après ta lecture"] },
-  { id: 'pack3',    price: 45,  ship: 5,  shipKind: 'fee',     physical: true,  titre: 'Pack de 3 — à offrir',       livraison: 'Juillet 2026', tag: null,             featured: false, visual: 'stack3',
-    contents: ["3 exemplaires papier dédicacés", "Parfait pour offrir autour de toi"] },
-  { id: 'eglise',   price: 200, ship: 10, shipKind: 'fee',     physical: true,  titre: "Le pack Église (10 ex.)",    livraison: 'Juillet 2026', tag: null,             featured: false, visual: 'stack10',
-    contents: ["10 exemplaires papier", "Pour ta communauté, ton groupe ou ton Église"] },
+  { id: 'pack3',    price: 45,  ship: 5,  shipKind: 'fee',     physical: true,  titre: 'Pack de 3 — tarif lancement', livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'stack3',
+    contents: ["3 exemplaires papier dédicacés", "Parfait pour offrir autour de toi", "Tarif lancement — prix définitif après campagne : 57 €"] },
+  { id: 'eglise',   price: 140, ship: 10, shipKind: 'fee',     physical: true,  titre: "Le pack Église — tarif lancement (10 ex.)", livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'stack10',
+    contents: ["10 exemplaires papier", "Pour ta communauté, ton groupe ou ton Église", "Tarif lancement — prix définitif après campagne : 190 €"] },
 ]
 
 const GOAL = 1000
