@@ -242,7 +242,7 @@ function TierVisual({ visual, isLight }) {
         <div style={{ position: 'absolute', left: 0, top: '8px', width: '168px' }}>
           <div style={{ width: '156px', margin: '0 auto', background: '#0c0c0c', border: '2px solid #2a2a2a', borderBottom: 'none', borderRadius: '10px 10px 0 0', padding: '8px' }}>
             <div style={{ position: 'relative', borderRadius: '5px', overflow: 'hidden', aspectRatio: '16 / 10', background: '#1b262d' }}>
-              <img src="/photo_nico_profil.jpg" alt="Nicolas Salafranque" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src="/photo_nico_profil.jpg" alt="Nicolas Salafranque" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }} />
               <span style={{ position: 'absolute', top: '5px', left: '5px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '8px', fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,.55)', padding: '2px 6px', borderRadius: '99px' }}>
                 <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#4ade80' }} />En direct
               </span>
