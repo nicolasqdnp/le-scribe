@@ -494,11 +494,14 @@ export default function CampagnePage() {
         /* ── Mobile ── */
         .ls-header-logo { display: none; }
         @media (max-width: 600px) {
+          body, .ls-page-root { overflow-x: hidden; max-width: 100vw; }
           .ls-header-text { display: none !important; }
           .ls-header-logo { display: block !important; }
-          .ls-hero { grid-template-columns: 1fr !important; gap: 28px !important; padding-top: 32px !important; padding-bottom: 32px !important; }
+          .ls-hero { grid-template-columns: 1fr !important; gap: 28px !important; padding: 28px 16px 24px !important; }
           .ls-hero-cover { display: flex; justify-content: center; }
-          .ls-hero-cover img { width: min(240px, 68vw) !important; }
+          .ls-hero-cover img { width: min(220px, 60vw) !important; }
+          .ls-main-body { padding-left: 16px !important; padding-right: 16px !important; }
+          .ls-toc-item { margin-left: 0 !important; }
           .ls-sticky-bar { display: none !important; }
           .ls-sticky-bar.ls-scrolled { display: flex !important; padding: 12px 16px !important; }
           .ls-sticky-left { display: none !important; }
@@ -509,7 +512,7 @@ export default function CampagnePage() {
         * { box-sizing: border-box; }
       `}</style>
 
-      <div style={{ background: C.bg, color: C.text, minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div className="ls-page-root" style={{ background: C.bg, color: C.text, minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
 
         {/* ── Header ────────────────────────────────────────────────────────── */}
         <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(13,13,13,.92)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${C.border}`, padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px' }}>
@@ -604,7 +607,7 @@ export default function CampagnePage() {
         )}
 
         {/* ── Corps principal ────────────────────────────────────────────────── */}
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px 80px' }}>
+        <div className="ls-main-body" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px 80px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '48px', alignItems: 'start' }}
             className="campagne-grid">
 
@@ -647,7 +650,7 @@ export default function CampagnePage() {
                     <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '14px', background: 'linear-gradient(270deg,rgba(120,86,45,.22),transparent)' }} />
                     {TOC.map((ch, i) => (
                       ch.n ? (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '14px', margin: `0 0 13px ${TOC_INDENTS[i % TOC_INDENTS.length]}px` }}>
+                        <div key={i} className="ls-toc-item" style={{ display: 'flex', alignItems: 'center', gap: '14px', margin: `0 0 13px ${TOC_INDENTS[i % TOC_INDENTS.length]}px` }}>
                           <span style={{ flexShrink: 0, width: '30px', height: '30px', borderRadius: '50%', background: 'radial-gradient(circle at 38% 30%, #a83a26, #6f1f14 72%)', color: '#f3e3c8', fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 7px rgba(0,0,0,.3), inset 0 1px 2px rgba(255,255,255,.25)' }}>{ch.n}</span>
                           <span style={{ fontFamily: 'Georgia, serif', fontSize: '15.5px', color: '#3a2c19', lineHeight: 1.4 }}>{ch.titre}</span>
                         </div>
