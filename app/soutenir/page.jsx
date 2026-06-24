@@ -224,7 +224,13 @@ function TierVisual({ visual }) {
         <div style={{ position: 'absolute', left: '18px', top: '24px', width: '92px', height: '128px', background: '#0c0c0c', border: '1px solid #2a2a2a', borderRadius: '11px', padding: '6px', boxShadow: '0 10px 26px rgba(0,0,0,.55)', transform: 'rotate(-8deg)' }}>
           <img src={COVER} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px' }} />
         </div>
-        <img src={COVER} alt="" style={{ position: 'absolute', right: '6px', bottom: '8px', height: '144px', borderRadius: '5px', boxShadow: '0 16px 34px rgba(0,0,0,.62)', transform: 'rotate(7deg)' }} />
+        <div style={{ position: 'absolute', right: '6px', bottom: '8px', transform: 'rotate(7deg)', transformOrigin: 'bottom center', zIndex: 1 }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', right: '-9px', top: '4px', bottom: '4px', width: '11px', background: 'linear-gradient(90deg, #c8b99a, #f0e8d8 40%, #e4d8c0)', borderRadius: '0 2px 2px 0', zIndex: 0 }} />
+            <div style={{ position: 'absolute', right: '-6px', top: '4px', bottom: '4px', width: '7px', background: '#d4c9b0', zIndex: 0 }} />
+            <img src={COVER} alt="" style={{ height: '144px', borderRadius: '5px 2px 2px 5px', boxShadow: '0 16px 34px rgba(0,0,0,.62)', position: 'relative', zIndex: 1 }} />
+          </div>
+        </div>
       </div>
     )
   } else if (visual === 'laptop') {
@@ -243,7 +249,13 @@ function TierVisual({ visual }) {
           <div style={{ width: '168px', height: '8px', margin: '0 auto', background: 'linear-gradient(#3c3c3c,#202020)', borderRadius: '0 0 7px 7px' }} />
           <div style={{ width: '44px', height: '3px', margin: '0 auto', background: '#2a2a2a', borderRadius: '0 0 4px 4px' }} />
         </div>
-        <img src={COVER} alt="" style={{ position: 'absolute', right: '2px', bottom: '6px', height: '128px', borderRadius: '5px', boxShadow: '0 14px 30px rgba(0,0,0,.62)', transform: 'rotate(7deg)' }} />
+        <div style={{ position: 'absolute', right: '2px', bottom: '6px', transform: 'rotate(7deg)', transformOrigin: 'bottom center', zIndex: 1 }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', right: '-9px', top: '4px', bottom: '4px', width: '11px', background: 'linear-gradient(90deg, #c8b99a, #f0e8d8 40%, #e4d8c0)', borderRadius: '0 2px 2px 0', zIndex: 0 }} />
+            <div style={{ position: 'absolute', right: '-6px', top: '4px', bottom: '4px', width: '7px', background: '#d4c9b0', zIndex: 0 }} />
+            <img src={COVER} alt="" style={{ height: '128px', borderRadius: '5px 2px 2px 5px', boxShadow: '0 14px 30px rgba(0,0,0,.62)', position: 'relative', zIndex: 1 }} />
+          </div>
+        </div>
       </div>
     )
   } else if (visual === 'stack3') {
@@ -251,15 +263,30 @@ function TierVisual({ visual }) {
       <div style={{ position: 'relative', width: '188px', height: '176px' }}>
         <img src={COVER} alt="" style={{ position: 'absolute', left: '50%', top: '50%', height: '134px', borderRadius: '4px', boxShadow: '0 10px 26px rgba(0,0,0,.5)', transform: 'translate(-50%,-50%) translateX(-40px) rotate(-17deg)' }} />
         <img src={COVER} alt="" style={{ position: 'absolute', left: '50%', top: '50%', height: '134px', borderRadius: '4px', boxShadow: '0 10px 26px rgba(0,0,0,.5)', transform: 'translate(-50%,-50%) translateX(40px) rotate(17deg)' }} />
-        <img src={COVER} alt="" style={{ position: 'absolute', left: '50%', top: '50%', height: '142px', borderRadius: '4px', boxShadow: '0 14px 30px rgba(0,0,0,.6)', transform: 'translate(-50%,-50%) translateY(-5px)' }} />
+        {/* Livre du centre avec tranche */}
+        <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%) translateY(-5px)' }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', right: '-9px', top: '4px', bottom: '4px', width: '11px', background: 'linear-gradient(90deg, #c8b99a, #f0e8d8 40%, #e4d8c0)', borderRadius: '0 2px 2px 0', zIndex: 0 }} />
+            <div style={{ position: 'absolute', right: '-6px', top: '4px', bottom: '4px', width: '7px', background: '#d4c9b0', zIndex: 0 }} />
+            <img src={COVER} alt="" style={{ height: '142px', borderRadius: '4px 2px 2px 4px', boxShadow: '0 14px 30px rgba(0,0,0,.6)', position: 'relative', zIndex: 1 }} />
+          </div>
+        </div>
       </div>
     )
   } else if (visual === 'stack10') {
     scene = (
       <div style={{ position: 'relative', width: '158px', height: '178px' }}>
-        {[[28, 26], [21, 19], [14, 12], [7, 6], [0, 0]].map(([x, y], i, arr) => (
-          <img key={i} src={COVER} alt="" style={{ position: 'absolute', left: 0, top: 0, height: '142px', borderRadius: '4px', boxShadow: i === arr.length - 1 ? '0 14px 30px rgba(0,0,0,.6)' : '0 3px 8px rgba(0,0,0,.4)', transform: `translate(${x}px,${y}px)` }} />
+        {[[28, 26], [21, 19], [14, 12], [7, 6]].map(([x, y], i) => (
+          <img key={i} src={COVER} alt="" style={{ position: 'absolute', left: 0, top: 0, height: '142px', borderRadius: '4px', boxShadow: '0 3px 8px rgba(0,0,0,.4)', transform: `translate(${x}px,${y}px)` }} />
         ))}
+        {/* Livre du dessus avec tranche */}
+        <div style={{ position: 'absolute', left: 0, top: 0 }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', right: '-9px', top: '4px', bottom: '4px', width: '11px', background: 'linear-gradient(90deg, #c8b99a, #f0e8d8 40%, #e4d8c0)', borderRadius: '0 2px 2px 0', zIndex: 0 }} />
+            <div style={{ position: 'absolute', right: '-6px', top: '4px', bottom: '4px', width: '7px', background: '#d4c9b0', zIndex: 0 }} />
+            <img src={COVER} alt="" style={{ height: '142px', borderRadius: '4px 2px 2px 4px', boxShadow: '0 14px 30px rgba(0,0,0,.6)', position: 'relative', zIndex: 1 }} />
+          </div>
+        </div>
         <span style={{ position: 'absolute', right: '-2px', bottom: '2px', background: '#c9a77d', color: '#0d0d0d', fontWeight: 700, fontSize: '15px', padding: '5px 13px', borderRadius: '99px', boxShadow: '0 6px 16px rgba(0,0,0,.5)' }}>×10</span>
       </div>
     )
