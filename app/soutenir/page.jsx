@@ -329,6 +329,7 @@ export default function CampagnePage() {
   const [faqOpen, setFaqOpen]             = useState(0)
   const [excerptOpen, setExcerptOpen]     = useState(false)
   const [showFloat, setShowFloat]         = useState(false)
+  const [scrolled, setScrolled]           = useState(false)
   const [floatAmount, setFloatAmount]     = useState(0)
   const rafRef = useRef(null)
 
@@ -378,6 +379,12 @@ export default function CampagnePage() {
     rafRef.current = requestAnimationFrame(step)
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
   }, [raised])
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 120)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const handlePay = useCallback(async () => {
     const amt = parseInt(amount, 10) || 0
@@ -484,6 +491,20 @@ export default function CampagnePage() {
         .ls-faq-btn:hover { background: #161616 !important; }
         .ls-faq-btn:hover span { color: #fff !important; }
         @media (max-width: 600px) { .ls-temoignages-grid { grid-template-columns: 1fr !important; } }
+        /* ── Mobile ── */
+        .ls-header-logo { display: none; }
+        @media (max-width: 600px) {
+          .ls-header-text { display: none !important; }
+          .ls-header-logo { display: block !important; }
+          .ls-hero { grid-template-columns: 1fr !important; gap: 28px !important; padding-top: 32px !important; padding-bottom: 32px !important; }
+          .ls-hero-cover { display: flex; justify-content: center; }
+          .ls-hero-cover img { width: min(240px, 68vw) !important; }
+          .ls-sticky-bar { display: none !important; }
+          .ls-sticky-bar.ls-scrolled { display: flex !important; padding: 12px 16px !important; }
+          .ls-sticky-left { display: none !important; }
+          .ls-sticky-desktop-cta { display: none !important; }
+          .ls-sticky-mobile-cta { display: block !important; width: 100%; text-align: center; border-radius: 12px !important; padding: 13px !important; font-size: 15px !important; }
+        }
         .ls-nav-link:hover { color: #c9a77d !important; }
         * { box-sizing: border-box; }
       `}</style>
@@ -492,8 +513,9 @@ export default function CampagnePage() {
 
         {/* ── Header ────────────────────────────────────────────────────────── */}
         <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(13,13,13,.92)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${C.border}`, padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px' }}>
-          <a href="/" style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '20px', fontWeight: 700, color: C.gold, textDecoration: 'none' }}>
-            Le Scribe
+          <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+            <span className="ls-header-text" style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '20px', fontWeight: 700, color: C.gold }}>Le Scribe</span>
+            <img className="ls-header-logo" src={isLight ? '/lescribe-logo-fond-clair.png' : '/lescribe-logo-fond-sombre.png'} alt="Le Scribe" style={{ height: '30px' }} />
           </a>
           <nav style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <a href="#histoire" className="ls-nav-link" style={{ fontSize: '13px', color: C.text3, textDecoration: 'none', transition: 'color .2s' }}>Le livre</a>
@@ -509,10 +531,10 @@ export default function CampagnePage() {
 
         {/* ── Hero ──────────────────────────────────────────────────────────── */}
         <section style={{ maxWidth: '1100px', margin: '0 auto', padding: '64px 24px 48px', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1.6fr)', gap: '64px', alignItems: 'center' }}
-          className="ls-fade"
+          className="ls-fade ls-hero"
         >
           {/* Couverture flottante */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div className="ls-hero-cover" style={{ display: 'flex', justifyContent: 'center' }}>
             <div className="ls-float" style={{ position: 'relative' }}>
               <img
                 src="/lurgence-des-temps-couv-v2.png"
@@ -919,8 +941,8 @@ export default function CampagnePage() {
         </footer>
 
         {/* ── Barre sticky basse ────────────────────────────────────────────── */}
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40, background: 'rgba(13,13,13,.95)', backdropFilter: 'blur(12px)', borderTop: `1px solid ${C.border}`, padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-          <div style={{ flex: 1, maxWidth: '280px' }}>
+        <div className={`ls-sticky-bar${scrolled ? ' ls-scrolled' : ''}`} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40, background: 'rgba(13,13,13,.95)', backdropFilter: 'blur(12px)', borderTop: `1px solid ${C.border}`, padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+          <div className="ls-sticky-left" style={{ flex: 1, maxWidth: '280px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: C.text3, marginBottom: '4px' }}>
               <span>{Math.round(pct)}% financé</span>
               <span>{backers} contributeurs</span>
@@ -929,11 +951,13 @@ export default function CampagnePage() {
               <div style={{ background: `linear-gradient(90deg, ${C.gold}, #e8c99a)`, height: '100%', width: `${pct}%`, borderRadius: '99px' }} />
             </div>
           </div>
-          <a
-            href="#contreparties"
-            style={{ background: C.gold, color: C.bg, fontWeight: 700, fontSize: '14px', padding: '10px 20px', borderRadius: '10px', textDecoration: 'none', flexShrink: 0 }}
-            className="ls-btn-gold">
+          <a href="#contreparties" className="ls-btn-gold ls-sticky-desktop-cta"
+            style={{ background: C.gold, color: C.bg, fontWeight: 700, fontSize: '14px', padding: '10px 20px', borderRadius: '10px', textDecoration: 'none', flexShrink: 0 }}>
             Je participe
+          </a>
+          <a href="#contreparties" className="ls-btn-gold ls-sticky-mobile-cta"
+            style={{ display: 'none', background: C.gold, color: C.bg, fontWeight: 700, fontSize: '14px', padding: '10px 20px', borderRadius: '10px', textDecoration: 'none' }}>
+            Voir les contreparties
           </a>
         </div>
         {/* Espace pour la barre sticky */}
