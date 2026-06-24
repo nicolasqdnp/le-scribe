@@ -7,13 +7,20 @@ import { useTheme } from '../components/ThemeProvider'
 // ─── Données statiques ────────────────────────────────────────────────────────
 
 const TIERS = [
-  { id: 'merci',    price: 5,   ship: 0,  shipKind: 'none',    physical: false, titre: 'Un grand merci',             desc: "Ma profonde reconnaissance, ton nom sur la page des soutiens du site et le suivi de la campagne.",                                               livraison: '—',       backers: 0,  tag: null,           featured: false },
-  { id: 'ebook',    price: 9,   ship: 0,  shipKind: 'digital', physical: false, titre: "L'ebook",                    desc: "La version numérique (EPUB), compatible toutes liseuses, dès la parution.",                                                                livraison: 'Juin 2026', backers: 0,  tag: null,           featured: false },
-  { id: 'livre',    price: 16,  ship: 3,  shipKind: 'fee',     physical: true,  titre: 'Le livre — tarif lancement', desc: "Un exemplaire papier au prix de lancement, au lieu de 18,99 €.",                                                                           livraison: 'Été 2026', backers: 0,  tag: 'Lancement',    featured: false },
-  { id: 'dedicace', price: 25,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre dédicacé',          desc: "Un exemplaire papier signé de la main de l'auteur, + l'ebook offert.",                                                                    livraison: 'Été 2026', backers: 0,  tag: 'Recommandé', featured: true  },
-  { id: 'echange',  price: 40,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre + un échange',      desc: "Le livre dédicacé, puis après ta lecture un moment ensemble (visio ou tél.) pour répondre à tes questions.",                               livraison: 'Été 2026', backers: 0,  tag: null,           featured: false },
-  { id: 'pack3',    price: 45,  ship: 5,  shipKind: 'fee',     physical: true,  titre: 'Pack de 3 — à offrir',       desc: "Trois exemplaires dédicacés, pour partager autour de toi.",                                                                               livraison: 'Été 2026', backers: 0,  tag: null,           featured: false },
-  { id: 'eglise',   price: 200, ship: 10, shipKind: 'fee',     physical: true,  titre: "Le pack Église (10 ex.)",    desc: "Un lot de 10 exemplaires dédicacés pour ta communauté ou ton groupe.",                                                                      livraison: 'Été 2026', backers: 0,  tag: null,           featured: false },
+  { id: 'merci',    price: 5,   ship: 0,  shipKind: 'none',    physical: false, titre: 'Un grand merci',             livraison: '—',            tag: null,             featured: false, visual: 'seal',
+    contents: ["Ta reconnaissance & ton nom sur la page des soutiens du site", "Le suivi de la campagne en avant-première"] },
+  { id: 'ebook',    price: 9,   ship: 0,  shipKind: 'digital', physical: false, titre: "L'ebook",                    livraison: 'Dès la parution', tag: null,           featured: false, visual: 'ereader',
+    contents: ["L'ebook au format EPUB (compatible toutes liseuses)", "Disponible dès la parution, par email"] },
+  { id: 'livre',    price: 16,  ship: 3,  shipKind: 'fee',     physical: true,  titre: 'Le livre — tarif lancement', livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'book',
+    contents: ["1 exemplaire papier de L'urgence des temps", "Au tarif de lancement (au lieu de 18,99 €)"] },
+  { id: 'dedicace', price: 25,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre dédicacé',          livraison: 'Juillet 2026', tag: 'Recommandé',      featured: true,  visual: 'book-ereader',
+    contents: ["1 exemplaire papier dédicacé par l'auteur", "L'ebook offert en bonus"] },
+  { id: 'echange',  price: 40,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre + un échange',      livraison: 'Juillet 2026', tag: null,             featured: false, visual: 'laptop',
+    contents: ["1 exemplaire papier dédicacé", "L'ebook offert", "Un échange visio ou téléphone après ta lecture"] },
+  { id: 'pack3',    price: 45,  ship: 5,  shipKind: 'fee',     physical: true,  titre: 'Pack de 3 — à offrir',       livraison: 'Juillet 2026', tag: null,             featured: false, visual: 'stack3',
+    contents: ["3 exemplaires papier dédicacés", "Parfait pour offrir autour de toi"] },
+  { id: 'eglise',   price: 200, ship: 10, shipKind: 'fee',     physical: true,  titre: "Le pack Église (10 ex.)",    livraison: 'Juillet 2026', tag: null,             featured: false, visual: 'stack10',
+    contents: ["10 exemplaires papier", "Pour ta communauté, ton groupe ou ton Église"] },
 ]
 
 const GOAL = 1000
@@ -40,6 +47,8 @@ const TOC = [
   { n: '',   titre: 'Conclusion — Vivre l\'urgence des temps' },
   { n: '',   titre: 'Postface — Une invitation à continuer le chemin' },
 ]
+
+const TOC_INDENTS = [0, 30, 14, 38, 8, 26, 18, 34, 6, 28, 16, 36, 10, 24, 20, 32, 12, 22]
 
 const FUND_USES = [
   { icon: '📖', titre: 'Le premier tirage',  desc: 'Impression de 300 exemplaires papier, de qualité et à prix juste.' },
@@ -163,6 +172,80 @@ function shipLabel(tier) {
 
 // ─── Composant principal ──────────────────────────────────────────────────────
 
+const COVER = '/lurgence-des-temps-couv-v2.png'
+
+function TierVisual({ visual }) {
+  const stage = {
+    height: '206px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: 'radial-gradient(ellipse at 50% 0%, rgba(201,167,125,.13), #141414 72%)',
+    borderBottom: '1px solid #1e1e1e', position: 'relative', overflow: 'hidden',
+  }
+  let scene = null
+
+  if (visual === 'seal') {
+    scene = (
+      <div style={{ width: '108px', height: '108px', borderRadius: '50%', background: 'radial-gradient(circle at 38% 30%, #b9472f, #6f1f14 72%)', boxShadow: '0 12px 30px rgba(0,0,0,.55), inset 0 2px 7px rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(201,167,125,.55)' }}>
+        <span style={{ fontSize: '40px', color: 'rgba(255,236,212,.92)', lineHeight: 1 }}>✦</span>
+      </div>
+    )
+  } else if (visual === 'book') {
+    scene = <img src={COVER} alt="" style={{ height: '158px', borderRadius: '5px', boxShadow: '0 16px 36px rgba(0,0,0,.65)', transform: 'perspective(700px) rotateY(-9deg)' }} />
+  } else if (visual === 'ereader') {
+    scene = (
+      <div style={{ position: 'relative', width: '122px', height: '172px', background: '#0c0c0c', border: '1px solid #2a2a2a', borderRadius: '15px', padding: '9px 9px 16px', boxShadow: '0 16px 36px rgba(0,0,0,.6)' }}>
+        <img src={COVER} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px' }} />
+        <div style={{ position: 'absolute', bottom: '5px', left: '50%', transform: 'translateX(-50%)', width: '24px', height: '4px', borderRadius: '99px', background: '#2e2e2e' }} />
+      </div>
+    )
+  } else if (visual === 'book-ereader') {
+    scene = (
+      <div style={{ position: 'relative', width: '200px', height: '186px' }}>
+        <div style={{ position: 'absolute', left: '18px', top: '24px', width: '92px', height: '128px', background: '#0c0c0c', border: '1px solid #2a2a2a', borderRadius: '11px', padding: '6px', boxShadow: '0 10px 26px rgba(0,0,0,.55)', transform: 'rotate(-8deg)' }}>
+          <img src={COVER} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px' }} />
+        </div>
+        <img src={COVER} alt="" style={{ position: 'absolute', right: '6px', bottom: '8px', height: '144px', borderRadius: '5px', boxShadow: '0 16px 34px rgba(0,0,0,.62)', transform: 'rotate(7deg)' }} />
+      </div>
+    )
+  } else if (visual === 'laptop') {
+    scene = (
+      <div style={{ position: 'relative', width: '220px', height: '188px' }}>
+        <div style={{ position: 'absolute', left: 0, top: '8px', width: '168px' }}>
+          <div style={{ width: '156px', margin: '0 auto', background: '#0c0c0c', border: '2px solid #2a2a2a', borderBottom: 'none', borderRadius: '10px 10px 0 0', padding: '8px' }}>
+            <div style={{ position: 'relative', borderRadius: '5px', overflow: 'hidden', aspectRatio: '16 / 10', background: '#1b262d' }}>
+              <img src="/photo_nico_profil.jpg" alt="Nicolas Salafranque" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <span style={{ position: 'absolute', top: '5px', left: '5px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '8px', fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,.55)', padding: '2px 6px', borderRadius: '99px' }}>
+                <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#4ade80' }} />En direct
+              </span>
+              <div style={{ position: 'absolute', bottom: '5px', right: '5px', width: '32px', height: '23px', borderRadius: '3px', background: '#33454f', border: '1px solid rgba(255,255,255,.22)' }} />
+            </div>
+          </div>
+          <div style={{ width: '168px', height: '8px', margin: '0 auto', background: 'linear-gradient(#3c3c3c,#202020)', borderRadius: '0 0 7px 7px' }} />
+          <div style={{ width: '44px', height: '3px', margin: '0 auto', background: '#2a2a2a', borderRadius: '0 0 4px 4px' }} />
+        </div>
+        <img src={COVER} alt="" style={{ position: 'absolute', right: '2px', bottom: '6px', height: '128px', borderRadius: '5px', boxShadow: '0 14px 30px rgba(0,0,0,.62)', transform: 'rotate(7deg)' }} />
+      </div>
+    )
+  } else if (visual === 'stack3') {
+    scene = (
+      <div style={{ position: 'relative', width: '188px', height: '176px' }}>
+        <img src={COVER} alt="" style={{ position: 'absolute', left: '50%', top: '50%', height: '134px', borderRadius: '4px', boxShadow: '0 10px 26px rgba(0,0,0,.5)', transform: 'translate(-50%,-50%) translateX(-40px) rotate(-17deg)' }} />
+        <img src={COVER} alt="" style={{ position: 'absolute', left: '50%', top: '50%', height: '134px', borderRadius: '4px', boxShadow: '0 10px 26px rgba(0,0,0,.5)', transform: 'translate(-50%,-50%) translateX(40px) rotate(17deg)' }} />
+        <img src={COVER} alt="" style={{ position: 'absolute', left: '50%', top: '50%', height: '142px', borderRadius: '4px', boxShadow: '0 14px 30px rgba(0,0,0,.6)', transform: 'translate(-50%,-50%) translateY(-5px)' }} />
+      </div>
+    )
+  } else if (visual === 'stack10') {
+    scene = (
+      <div style={{ position: 'relative', width: '158px', height: '178px' }}>
+        {[[28, 26], [21, 19], [14, 12], [7, 6], [0, 0]].map(([x, y], i, arr) => (
+          <img key={i} src={COVER} alt="" style={{ position: 'absolute', left: 0, top: 0, height: '142px', borderRadius: '4px', boxShadow: i === arr.length - 1 ? '0 14px 30px rgba(0,0,0,.6)' : '0 3px 8px rgba(0,0,0,.4)', transform: `translate(${x}px,${y}px)` }} />
+        ))}
+        <span style={{ position: 'absolute', right: '-2px', bottom: '2px', background: '#c9a77d', color: '#0d0d0d', fontWeight: 700, fontSize: '15px', padding: '5px 13px', borderRadius: '99px', boxShadow: '0 6px 16px rgba(0,0,0,.5)' }}>×10</span>
+      </div>
+    )
+  }
+  return <div style={stage}>{scene}</div>
+}
+
 export default function CampagnePage() {
   const { theme } = useTheme()
   const [systemDark, setSystemDark]       = useState(true)
@@ -182,7 +265,6 @@ export default function CampagnePage() {
   const [displayPct, setDisplayPct]       = useState(0)
   const [backers, setBackers]             = useState(0)
   const [tierBackers, setTierBackers]     = useState({})
-  const [showAllToc, setShowAllToc]       = useState(false)
   const [modal, setModal]                 = useState(null)
   const [pickup, setPickup]               = useState(false)
   const [amount, setAmount]               = useState('')
@@ -470,35 +552,29 @@ export default function CampagnePage() {
 
               {/* Sommaire */}
               <section style={{ marginBottom: '48px' }}>
-                <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '22px', fontWeight: 700, color: C.text, marginBottom: '20px' }}>
+                <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '22px', fontWeight: 700, color: C.text, margin: '0 0 6px' }}>
                   Ce que contient le livre
                 </h2>
-                <p style={{ fontSize: '14px', color: C.text3, marginBottom: '16px' }}>
-                  211 pages · 15 chapitres + introduction, conclusion et postface
-                </p>
-                <div style={{ background: C.paper, borderRadius: '14px', padding: '24px', border: `1px solid ${C.border}` }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {(showAllToc ? TOC : TOC.slice(0, 4)).map((ch, i) => (
-                      <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                        {ch.n ? (
-                          <span style={{ minWidth: '24px', height: '24px', borderRadius: '50%', background: '#8a5c30', color: '#fff', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
-                            {ch.n}
-                          </span>
-                        ) : (
-                          <span style={{ minWidth: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
-                            <span style={{ color: C.gold, fontSize: '16px', lineHeight: 1 }}>–</span>
-                          </span>
-                        )}
-                        <span style={{ fontSize: '14px', color: C.text2, lineHeight: 1.5 }}>{ch.titre}</span>
-                      </div>
+                <p style={{ fontSize: '14px', color: C.text3, margin: '0 0 22px' }}>211 pages · 15 chapitres + introduction, conclusion et postface</p>
+
+                <div style={{ position: 'relative', padding: '8px 0' }}>
+                  <div style={{ height: '22px', margin: '0 -6px', borderRadius: '13px', background: 'linear-gradient(180deg,#9a7b4a,#caa86e 45%,#8a6a3c)', boxShadow: '0 6px 16px rgba(0,0,0,.45), inset 0 2px 3px rgba(255,255,255,.35)', position: 'relative', zIndex: 2 }} />
+                  <div style={{ position: 'relative', zIndex: 1, margin: '-6px 6px', padding: '34px 30px', background: 'linear-gradient(165deg,#f6efdd,#ece0c6 60%,#e3d3b2)', boxShadow: '0 18px 40px rgba(0,0,0,.45), inset 0 0 60px rgba(150,110,60,.14)', borderLeft: '1px solid #d8c39a', borderRight: '1px solid #d8c39a' }}>
+                    <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '14px', background: 'linear-gradient(90deg,rgba(120,86,45,.22),transparent)' }} />
+                    <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '14px', background: 'linear-gradient(270deg,rgba(120,86,45,.22),transparent)' }} />
+                    {TOC.map((ch, i) => (
+                      ch.n ? (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '14px', margin: `0 0 13px ${TOC_INDENTS[i % TOC_INDENTS.length]}px` }}>
+                          <span style={{ flexShrink: 0, width: '30px', height: '30px', borderRadius: '50%', background: 'radial-gradient(circle at 38% 30%, #a83a26, #6f1f14 72%)', color: '#f3e3c8', fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 7px rgba(0,0,0,.3), inset 0 1px 2px rgba(255,255,255,.25)' }}>{ch.n}</span>
+                          <span style={{ fontFamily: 'Georgia, serif', fontSize: '15.5px', color: '#3a2c19', lineHeight: 1.4 }}>{ch.titre}</span>
+                        </div>
+                      ) : (
+                        <div key={i} style={{ textAlign: 'center', fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontStyle: 'italic', fontSize: '15px', color: '#9a6f3a', margin: `${i === 0 ? '2px' : '20px'} 0 16px`, letterSpacing: '.02em' }}>✦ &nbsp;{ch.titre}&nbsp; ✦</div>
+                      )
                     ))}
                   </div>
+                  <div style={{ height: '22px', margin: '0 -6px', borderRadius: '13px', background: 'linear-gradient(180deg,#9a7b4a,#caa86e 45%,#8a6a3c)', boxShadow: '0 6px 16px rgba(0,0,0,.45), inset 0 2px 3px rgba(255,255,255,.35)', position: 'relative', zIndex: 2 }} />
                 </div>
-                <button
-                  onClick={() => setShowAllToc(v => !v)}
-                  style={{ marginTop: '12px', width: '100%', background: 'transparent', border: `1px solid ${C.border}`, color: C.text3, fontSize: '13px', padding: '10px', borderRadius: '10px', cursor: 'pointer' }}>
-                  {showAllToc ? `Replier ↑` : `Voir les 15 chapitres ↓`}
-                </button>
               </section>
 
               {/* Extrait */}
@@ -588,51 +664,29 @@ export default function CampagnePage() {
                 <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '22px', fontWeight: 700, color: C.text, marginBottom: '20px' }}>
                   Ce que disent les lecteurs
                 </h2>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="ls-temoignages-grid">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {[
-                    {
-                      quote: "Ce livre est facile à lire et affermira votre foi dans ce retour imminent de notre merveilleux sauveur. Merci pour ce travail fouillé, cette vision à 360° de la fin des temps.",
-                      name: "Patrick Salafranque",
-                      role: "Pasteur · Père de l'auteur",
-                    },
-                    {
-                      quote: "Prendre une position claire et didactisée sur la fin des temps, c'est faire preuve d'un grand courage. Merci d'avoir effacé la brume qui régnait dans mon esprit sur ce thème.",
-                      name: "François Bernot",
-                      role: "Docteur en physique appliquée",
-                    },
-                    {
-                      quote: "Il y a des livres que l'on lit pour apprendre. Et puis il y a des livres qui viennent réveiller une conscience. L'urgence des temps fait partie de ces ouvrages.",
-                      name: "Aymerick Sroka",
-                      role: "Prophète",
-                    },
-                    {
-                      quote: "C'est comme une étude biblique — tu pourrais te poser avec le livre et ta Bible à côté. J'apprends énormément, alors que je pensais déjà connaître le sujet. Il y a un travail monstre derrière ces pages : non seulement d'étude, mais aussi de pédagogie. C'est accessible, malgré la profondeur. En tant qu'ami et chrétien qui veut en savoir plus sur le retour de Jésus, c'est hyper enrichissant. Merci grandement.",
-                      name: "Un ami lecteur",
-                      role: "",
-                    },
-                  ].map(({ quote, name, role }, i) => {
-                    const initials = name.split(' ').slice(0, 2).map(w => w[0].toUpperCase()).join('')
-                    return (
-                      <blockquote key={i} style={{ margin: 0, padding: '22px 24px', background: C.surface, border: `1px solid ${C.border}`, borderRadius: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
-                        {/* Grand guillemet décoratif */}
-                        <span style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '64px', lineHeight: 1, color: C.gold, opacity: 0.35, position: 'absolute', top: '8px', left: '18px', pointerEvents: 'none', userSelect: 'none' }}>
-                          "
-                        </span>
-                        <p style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '14px', fontStyle: 'italic', color: C.text2, lineHeight: 1.8, margin: '32px 0 20px', position: 'relative' }}>
-                          {quote}
-                        </p>
-                        <footer style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.gold, color: C.bg, fontSize: '12px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {initials}
-                          </span>
-                          <div>
-                            <span style={{ fontSize: '13px', fontWeight: 600, color: C.text3, display: 'block' }}>{name}</span>
-                            {role && <span style={{ fontSize: '12px', color: C.text3, opacity: 0.7, display: 'block', marginTop: '1px' }}>{role}</span>}
-                          </div>
-                        </footer>
-                      </blockquote>
-                    )
-                  })}
+                    { initials: 'PS', name: "Patrick Salafranque", role: "Pasteur · Préface · Père de l'auteur",
+                      quote: "Comme quand on pénètre dans une pièce obscure, si on prend le temps d'y demeurer, l'œil s'adapte et les choses deviennent visibles : c'est bien le but de ce livre. Une approche originale, qui répond à des questions très concrètes — la grande tribulation, le temps de la colère de Dieu, l'enlèvement de l'Église, comment discerner les temps que nous vivons et comment s'y préparer. Merci à Nicolas pour ce travail fouillé, cette vision à 360° de la fin des temps. Ce livre est facile à lire et affermira votre foi dans ce retour imminent de notre merveilleux Sauveur." },
+                    { initials: 'FB', name: "François Bernot", role: "Docteur en physique appliquée · Préface",
+                      quote: "Se pencher sur la fin des temps en prenant une position claire, limpide et didactisée, c'est faire preuve d'un grand courage, car les contradicteurs sur ce thème sont légion. Alors merci Nicolas, mon ami, d'avoir mouillé ta chemise — et surtout d'avoir effacé la brume qui régnait dans mon esprit sur ce thème qui, autrefois, m'avait passionné." },
+                    { initials: 'AS', name: "Aymerick Sroka", role: "Prophète · Préface",
+                      quote: "Il y a des livres que l'on lit simplement pour apprendre. Et puis il y a des livres que l'on lit parce qu'ils viennent toucher une urgence, réveiller une conscience et remettre une génération devant une réalité qu'elle ne peut plus ignorer. L'urgence des temps fait partie de ces ouvrages. Il ne cherche pas à produire de la peur : il nous ramène à une vérité simple — Jésus n'a jamais parlé des temps de la fin pour effrayer ses disciples, mais pour les préparer. Ce n'est pas une urgence de panique : c'est une urgence d'alignement, de consécration, de réveil. Car au bout de l'histoire, le dernier mot appartient à l'Agneau. Viens, Seigneur Jésus." },
+                    { initials: '✦', name: "Un ami lecteur", role: "Premier lecteur du manuscrit",
+                      quote: "C'est comme une étude biblique — tu pourrais te poser avec le livre et ta Bible à côté. J'apprends énormément, alors que je pensais déjà connaître le sujet. Il y a un travail monstre derrière ces pages : non seulement d'étude, mais aussi de pédagogie. C'est accessible, malgré la profondeur. En tant qu'ami et chrétien qui veut en savoir plus sur le retour de Jésus, c'est hyper enrichissant. Merci grandement." },
+                  ].map((t, i) => (
+                    <blockquote key={i} style={{ margin: 0, padding: '28px 30px', background: C.surface, border: `1px solid ${C.border}`, borderLeft: `3px solid ${C.gold}`, borderRadius: '16px' }}>
+                      <span style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '46px', lineHeight: .4, color: C.gold, opacity: .4, display: 'block', height: '24px' }}>"</span>
+                      <p style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '16px', fontStyle: 'italic', color: C.text2, lineHeight: 1.85, margin: '0 0 20px' }}>{t.quote}</p>
+                      <footer style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                        <div style={{ flexShrink: 0, width: '46px', height: '46px', borderRadius: '50%', background: 'linear-gradient(135deg,#d4b896,#b8966c)', color: '#0d0d0d', fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{t.initials}</div>
+                        <div>
+                          <div style={{ fontSize: '14px', fontWeight: 600, color: C.text }}>{t.name}</div>
+                          <div style={{ fontSize: '12.5px', color: C.text3, marginTop: '2px' }}>{t.role}</div>
+                        </div>
+                      </footer>
+                    </blockquote>
+                  ))}
                 </div>
               </section>
 
@@ -672,89 +726,67 @@ export default function CampagnePage() {
 
               {TIERS.map(tier => {
                 const ship = shipLabel(tier)
-                const backerCount = tierBackers[tier.id] ?? tier.backers
-                // Parser la desc en bullet points : phrases séparées par ". "
-                const descItems = tier.desc.length > 80
-                  ? tier.desc.split('. ').filter(Boolean).map((s, idx, arr) => idx < arr.length - 1 ? s + '.' : s)
-                  : [tier.desc]
+                const backerCount = tierBackers[tier.id] ?? 0
                 return (
                   <div
                     key={tier.id}
+                    onClick={() => openModal(tier)}
                     className={tier.featured ? 'ls-tier ls-tier-featured' : 'ls-tier'}
                     style={{
-                      background: tier.featured ? 'rgba(201,167,125,.06)' : C.surface,
-                      border: `1px solid ${tier.featured ? 'rgba(201,167,125,.4)' : C.border}`,
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      transition: 'border-color .2s, background .2s',
-                      position: 'relative',
+                      background: C.surface,
+                      border: `1px solid ${tier.featured ? 'rgba(201,167,125,.55)' : C.border}`,
+                      borderRadius: '14px', overflow: 'hidden', cursor: 'pointer',
+                      position: 'relative', transition: 'border-color .2s',
+                      boxShadow: tier.featured ? '0 0 0 1px rgba(201,167,125,.25), 0 16px 40px rgba(0,0,0,.4)' : 'none',
                     }}
                   >
-                    {/* Image de couverture */}
-                    <div style={{ position: 'relative', height: '140px', overflow: 'hidden' }}>
-                      <img
-                        src="/lurgence-des-temps-couv-v2.png"
-                        alt="L'urgence des temps"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                      />
-                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,.1) 0%, rgba(0,0,0,.45) 100%)' }} />
+                    {tier.featured && (
+                      <div style={{ background: C.gold, color: '#0d0d0d', fontSize: '12px', fontWeight: 700, textAlign: 'center', padding: '6px' }}>
+                        ★ Contrepartie à la une
+                      </div>
+                    )}
+
+                    <TierVisual visual={tier.visual} />
+
+                    <div style={{ padding: '18px 20px 20px' }}>
                       {tier.tag && (
-                        <span style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '11px', fontWeight: 600, background: tier.featured ? C.gold : 'rgba(201,167,125,.85)', color: tier.featured ? '#0d0d0d' : '#fff', padding: '3px 10px', borderRadius: '99px', backdropFilter: 'blur(4px)' }}>
-                          {tier.tag}
-                        </span>
+                        <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+                          <span style={{ display: 'inline-block', fontSize: '10px', fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase', background: 'rgba(201,167,125,.15)', color: C.gold, padding: '3px 9px', borderRadius: '99px' }}>{tier.tag}</span>
+                        </div>
                       )}
-                    </div>
+                      <p style={{ textAlign: 'center', fontSize: '14px', color: C.gold, fontWeight: 600, margin: '0 0 2px' }}>Pour {tier.price} €</p>
+                      <h3 style={{ textAlign: 'center', fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '19px', fontWeight: 700, color: C.text, margin: '0 0 16px' }}>{tier.titre}</h3>
 
-                    {/* Contenu de la carte */}
-                    <div style={{ padding: '16px' }}>
-                      {/* Prix */}
-                      <p style={{ fontSize: '12px', fontWeight: 600, color: C.gold, marginBottom: '4px' }}>
-                        Pour {tier.price} €
-                      </p>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); openModal(tier) }}
+                        className="ls-btn-gold"
+                        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: C.gold, color: '#0d0d0d', fontWeight: 700, fontSize: '15px', padding: '12px', borderRadius: '99px', border: 'none', cursor: 'pointer', marginBottom: '18px' }}>
+                        <span style={{ fontSize: '18px', lineHeight: 1 }}>＋</span> Choisir
+                      </button>
 
-                      {/* Titre */}
-                      <p style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '20px', fontWeight: 700, color: C.text, margin: '0 0 12px' }}>
-                        {tier.titre}
-                      </p>
-
-                      {/* Description en bullet points */}
-                      <ul style={{ margin: '0 0 14px', padding: '0', listStyle: 'none' }}>
-                        {descItems.map((item, idx) => (
-                          <li key={idx} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', marginBottom: '6px' }}>
-                            <span style={{ color: C.gold, fontWeight: 700, flexShrink: 0, marginTop: '1px' }}>•</span>
-                            <span style={{ fontSize: '13px', color: C.text2, lineHeight: 1.55 }}>{item}</span>
+                      <ul style={{ listStyle: 'none', margin: '0 0 16px', padding: 0, display: 'flex', flexDirection: 'column', gap: '9px' }}>
+                        {tier.contents.map((c, i) => (
+                          <li key={i} style={{ position: 'relative', paddingLeft: '22px', fontSize: '13px', color: C.text2, lineHeight: 1.5 }}>
+                            <span style={{ position: 'absolute', left: '4px', top: 0, color: C.gold, fontWeight: 700 }}>•</span>{c}
                           </li>
                         ))}
                       </ul>
 
-                      {/* Livraison + frais de port */}
-                      {(tier.livraison !== '—' || ship) && (
-                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
-                          {tier.livraison !== '—' && (
-                            <span style={{ fontSize: '11px', color: C.text3, background: C.surface2, padding: '2px 8px', borderRadius: '99px' }}>{tier.livraison}</span>
-                          )}
-                          {ship && (
-                            <span style={{ fontSize: '11px', color: ship.color }}>{ship.text}</span>
-                          )}
-                        </div>
+                      {tier.physical && (
+                        <p style={{ fontSize: '12px', fontStyle: 'italic', color: C.text3, margin: '0 0 10px' }}>(Visuel du livre non contractuel)</p>
+                      )}
+                      {tier.livraison !== '—' && (
+                        <p style={{ fontSize: '13px', color: C.text2, margin: '0 0 6px' }}>Livraison estimée : <strong style={{ color: C.text }}>{tier.livraison}</strong></p>
+                      )}
+                      {tier.physical && (
+                        <p style={{ fontSize: '12px', fontStyle: 'italic', color: C.text3, margin: '0 0 14px', lineHeight: 1.5 }}>Frais de port en option, calculés au paiement — offerts en remise en main propre.</p>
                       )}
 
-                      {/* Bouton Choisir */}
-                      <button
-                        onClick={() => openModal(tier)}
-                        style={{ width: '100%', background: C.gold, color: C.bg, fontWeight: 700, fontSize: '14px', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer', marginBottom: '12px', transition: 'background .2s' }}
-                        className="ls-btn-gold">
-                        + Choisir
-                      </button>
-
-                      {/* Pied de carte : date livraison + contributions */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${C.border}`, paddingTop: '10px', gap: '8px' }}>
-                        <span style={{ fontSize: '11px', color: C.text3, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          📅 {tier.livraison !== '—' ? tier.livraison : 'Immédiat'}
-                        </span>
-                        <span style={{ fontSize: '11px', color: C.text3, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          🤍 {backerCount} soutien{backerCount !== 1 ? 's' : ''}
-                        </span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', paddingTop: '14px', borderTop: `1px solid ${C.border}` }}>
+                        {tier.livraison !== '—' && (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: C.text3, background: C.surface2, padding: '4px 10px', borderRadius: '8px' }}>📅 {tier.livraison}</span>
+                        )}
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: C.text3, background: C.surface2, padding: '4px 10px', borderRadius: '8px' }}>♥ {backerCount} contribution{backerCount !== 1 ? 's' : ''}</span>
                       </div>
                     </div>
                   </div>
@@ -843,8 +875,8 @@ export default function CampagnePage() {
                   <h3 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '20px', fontWeight: 700, color: C.text, marginBottom: '4px' }}>
                     {modal.free ? 'Don libre' : modal.titre}
                   </h3>
-                  {!modal.free && (
-                    <p style={{ fontSize: '13px', color: C.text3 }}>{modal.desc}</p>
+                  {!modal.free && modal.contents && (
+                    <p style={{ fontSize: '13px', color: C.text3 }}>{modal.contents.join(' · ')}</p>
                   )}
                   {modal.free && (
                     <p style={{ fontSize: '13px', color: C.text3 }}>Soutenir du montant de ton choix</p>
