@@ -9,7 +9,7 @@ import { useTheme } from '../components/ThemeProvider'
 const TIERS = [
   { id: 'merci',    price: 5,   ship: 0,  shipKind: 'none',    physical: false, titre: 'Un grand merci',             livraison: '—',            tag: null,             featured: false, visual: 'seal',
     contents: ["Ta reconnaissance & ton nom sur la page des soutiens du site", "Le suivi de la campagne en avant-première"] },
-  { id: 'ebook',    price: 9,   ship: 0,  shipKind: 'digital', physical: false, titre: "L'ebook",                    livraison: 'Dès la parution', tag: null,           featured: false, visual: 'ereader',
+  { id: 'ebook',    price: 9,   ship: 0,  shipKind: 'digital', physical: false, titre: "L'ebook",                    livraison: 'Immédiatement', tag: null,            featured: false, visual: 'ereader',
     contents: ["L'ebook au format EPUB (compatible toutes liseuses)", "Disponible dès la parution, par email"] },
   { id: 'livre',    price: 16,  ship: 3,  shipKind: 'fee',     physical: true,  titre: 'Le livre — tarif lancement', livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'book',
     contents: ["1 exemplaire papier de L'urgence des temps", "Au tarif de lancement (au lieu de 18,99 €)"] },
@@ -184,17 +184,38 @@ function TierVisual({ visual }) {
 
   if (visual === 'seal') {
     scene = (
-      <div style={{ width: '108px', height: '108px', borderRadius: '50%', background: 'radial-gradient(circle at 38% 30%, #b9472f, #6f1f14 72%)', boxShadow: '0 12px 30px rgba(0,0,0,.55), inset 0 2px 7px rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(201,167,125,.55)' }}>
-        <span style={{ fontSize: '40px', color: 'rgba(255,236,212,.92)', lineHeight: 1 }}>✦</span>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+        <span style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '58px', fontWeight: 700, color: '#c9a77d', letterSpacing: '0.04em', lineHeight: 1 }}>Merci</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ display: 'block', width: '36px', height: '1px', background: 'rgba(201,167,125,.35)' }} />
+          <span style={{ color: 'rgba(201,167,125,.55)', fontSize: '13px' }}>✦</span>
+          <span style={{ display: 'block', width: '36px', height: '1px', background: 'rgba(201,167,125,.35)' }} />
+        </div>
+        <span style={{ fontSize: '10px', color: 'rgba(201,167,125,.45)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>soutenir le projet</span>
       </div>
     )
   } else if (visual === 'book') {
-    scene = <img src={COVER} alt="" style={{ height: '158px', borderRadius: '5px', boxShadow: '0 16px 36px rgba(0,0,0,.65)', transform: 'perspective(700px) rotateY(-9deg)' }} />
+    scene = (
+      <div style={{ position: 'relative' }}>
+        {/* Tranche du livre (effet pages) */}
+        <div style={{ position: 'absolute', right: '-9px', top: '6px', bottom: '6px', width: '12px', background: 'linear-gradient(90deg, #c8b99a, #f0e8d8 40%, #e4d8c0)', borderRadius: '0 2px 2px 0', zIndex: 0 }} />
+        <div style={{ position: 'absolute', right: '-6px', top: '6px', bottom: '6px', width: '8px', background: '#d4c9b0', zIndex: 0 }} />
+        <img src={COVER} alt="" style={{ height: '158px', borderRadius: '5px 2px 2px 5px', boxShadow: '0 16px 36px rgba(0,0,0,.65)', transform: 'perspective(700px) rotateY(-9deg)', position: 'relative', zIndex: 1 }} />
+      </div>
+    )
   } else if (visual === 'ereader') {
     scene = (
-      <div style={{ position: 'relative', width: '122px', height: '172px', background: '#0c0c0c', border: '1px solid #2a2a2a', borderRadius: '15px', padding: '9px 9px 16px', boxShadow: '0 16px 36px rgba(0,0,0,.6)' }}>
-        <img src={COVER} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px' }} />
-        <div style={{ position: 'absolute', bottom: '5px', left: '50%', transform: 'translateX(-50%)', width: '24px', height: '4px', borderRadius: '99px', background: '#2e2e2e' }} />
+      <div style={{ position: 'relative', width: '132px', height: '182px', background: '#141414', border: '2px solid #303030', borderRadius: '18px', padding: '14px 14px 24px', boxShadow: '0 16px 36px rgba(0,0,0,.65)' }}>
+        {/* Écran avec léger reflet bleuté typique e-ink */}
+        <div style={{ width: '100%', height: '100%', borderRadius: '4px', overflow: 'hidden', position: 'relative', background: '#e8f0f0' }}>
+          <img src={COVER} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(180,220,220,.18) 0%, transparent 50%)', pointerEvents: 'none' }} />
+        </div>
+        {/* Bouton home */}
+        <div style={{ position: 'absolute', bottom: '7px', left: '50%', transform: 'translateX(-50%)', width: '28px', height: '5px', borderRadius: '99px', background: '#2a2a2a' }} />
+        {/* Boutons latéraux tournage de page */}
+        <div style={{ position: 'absolute', right: '-4px', top: '38%', width: '4px', height: '22px', borderRadius: '0 3px 3px 0', background: '#252525' }} />
+        <div style={{ position: 'absolute', right: '-4px', top: '55%', width: '4px', height: '14px', borderRadius: '0 3px 3px 0', background: '#252525' }} />
       </div>
     )
   } else if (visual === 'book-ereader') {
@@ -416,8 +437,8 @@ export default function CampagnePage() {
         .ls-pop  { animation: ls-pop  .3s ease both; }
         .ls-float { animation: ls-float 3s ease-in-out infinite; }
         .ls-rise  { animation: ls-rise 1.8s ease forwards; }
-        .ls-tier:hover { border-color: #3a3530 !important; background: #161616 !important; }
-        .ls-tier-featured:hover { border-color: #c9a77d !important; }
+        .ls-tier:hover { border-color: rgba(201,167,125,.35) !important; box-shadow: 0 4px 20px rgba(0,0,0,.1) !important; }
+        .ls-tier-featured:hover { border-color: rgba(201,167,125,.75) !important; }
         .ls-btn-gold:hover { background: #d4b896 !important; }
         .ls-btn-outline:hover { border-color: #c9a77d !important; color: #c9a77d !important; }
         .ls-faq-btn:hover { background: #161616 !important; }
