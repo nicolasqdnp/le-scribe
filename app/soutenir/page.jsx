@@ -166,7 +166,7 @@ function shipLabel(tier) {
   if (tier.shipKind === 'none')    return null
   if (tier.shipKind === 'digital') return { text: 'Livraison numérique', color: '#4ade80' }
   if (tier.shipKind === 'free')    return { text: 'Port offert', color: '#4ade80' }
-  if (tier.shipKind === 'fee')     return { text: `+${tier.ship}€ de port`, color: '#c9a77d' }
+  if (tier.shipKind === 'fee')     return { text: 'Frais de livraison calculés à l\'étape suivante', color: '#c9a77d' }
   return null
 }
 
@@ -963,7 +963,7 @@ export default function CampagnePage() {
                   {modal.livraison !== '—' && (
                     <span style={{ color: C.text3 }}>📦 Livraison : <strong style={{ color: C.text2 }}>{modal.livraison}</strong></span>
                   )}
-                  {(() => { const s = shipLabel(modal); return s ? <span style={{ color: s.color }}>{s.text}</span> : null })()}
+                  {!pickup && (() => { const s = shipLabel(modal); return s ? <span style={{ color: s.color }}>{s.text}</span> : null })()}
                 </div>
               )}
 
@@ -1041,7 +1041,7 @@ export default function CampagnePage() {
                 <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '14px', cursor: 'pointer', fontSize: '13px', color: C.text2 }}>
                   <input type="checkbox" checked={pickup} onChange={e => setPickup(e.target.checked)}
                     style={{ marginTop: '2px', accentColor: C.gold, flexShrink: 0 }} />
-                  <span>Remise en main propre (voisin, collègue, Église) — <strong style={{ color: C.gold }}>frais de port offerts</strong></span>
+                  <span>Remise en main propre{modal.shipKind === 'fee' ? <> — <strong style={{ color: C.gold }}>frais de port offerts</strong></> : ''}</span>
                 </label>
               )}
 
