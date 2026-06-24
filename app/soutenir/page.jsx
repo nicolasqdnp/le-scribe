@@ -514,8 +514,7 @@ export default function CampagnePage() {
         {/* ── Header ────────────────────────────────────────────────────────── */}
         <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(13,13,13,.92)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${C.border}`, padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px' }}>
           <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-            <span className="ls-header-text" style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '20px', fontWeight: 700, color: C.gold }}>Le Scribe</span>
-            <img className="ls-header-logo" src={isLight ? '/lescribe-logo-fond-clair.png' : '/lescribe-logo-fond-sombre.png'} alt="Le Scribe" style={{ height: '30px' }} />
+            <img src={isLight ? '/lescribe-logo-fond-clair.png' : '/lescribe-logo-fond-sombre.png'} alt="Le Scribe" style={{ height: '30px' }} />
           </a>
           <nav style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <a href="#histoire" className="ls-nav-link" style={{ fontSize: '13px', color: C.text3, textDecoration: 'none', transition: 'color .2s' }}>Le livre</a>
