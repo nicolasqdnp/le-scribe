@@ -174,11 +174,14 @@ function shipLabel(tier) {
 
 const COVER = '/lurgence-des-temps-couv-v2.png'
 
-function TierVisual({ visual }) {
+function TierVisual({ visual, isLight }) {
   const stage = {
     height: '206px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    background: 'radial-gradient(ellipse at 50% 0%, rgba(201,167,125,.13), #141414 72%)',
-    borderBottom: '1px solid #1e1e1e', position: 'relative', overflow: 'hidden',
+    background: isLight
+      ? 'radial-gradient(ellipse at 50% 0%, rgba(160,112,64,.12), #e8e2d8 72%)'
+      : 'radial-gradient(ellipse at 50% 0%, rgba(201,167,125,.13), #141414 72%)',
+    borderBottom: isLight ? '1px solid #d8d0c4' : '1px solid #1e1e1e',
+    position: 'relative', overflow: 'hidden',
   }
   let scene = null
 
@@ -815,7 +818,7 @@ export default function CampagnePage() {
                       </div>
                     )}
 
-                    <TierVisual visual={tier.visual} />
+                    <TierVisual visual={tier.visual} isLight={isLight} />
 
                     <div style={{ padding: '18px 20px 20px' }}>
                       {tier.tag && (
