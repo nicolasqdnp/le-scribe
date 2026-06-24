@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
+import ThemeToggle from '../components/ThemeToggle'
 
 // ─── Données statiques ────────────────────────────────────────────────────────
 
@@ -166,9 +167,9 @@ export default function CampagnePage() {
   const [displayPct, setDisplayPct]       = useState(0)
   const [backers, setBackers]             = useState(0)
   const [tierBackers, setTierBackers]     = useState({})
-  const [showAllTiers, setShowAllTiers]   = useState(false)
   const [showAllToc, setShowAllToc]       = useState(false)
   const [modal, setModal]                 = useState(null)
+  const [pickup, setPickup]               = useState(false)
   const [amount, setAmount]               = useState('')
   const [email, setEmail]                 = useState('')
   const [emailError, setEmailError]       = useState(false)
@@ -241,7 +242,7 @@ export default function CampagnePage() {
       const res = await fetch('/api/checkout-campagne', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier_id, email, amount: amt }),
+        body: JSON.stringify({ tier_id, email, amount: amt, pickup }),
       })
       const data = await res.json()
       if (data.url) {
@@ -258,6 +259,7 @@ export default function CampagnePage() {
 
   const openModal = useCallback((tier) => {
     setModal(tier)
+    setPickup(false)
     setAmount(tier?.free ? '' : String(tier?.price || ''))
     setEmail('')
     setEmailError(false)
@@ -319,7 +321,7 @@ export default function CampagnePage() {
           <a href="/" style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '20px', fontWeight: 700, color: C.gold, textDecoration: 'none' }}>
             Le Scribe
           </a>
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <nav style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <a href="#histoire" className="ls-nav-link" style={{ fontSize: '13px', color: C.text3, textDecoration: 'none', transition: 'color .2s' }}>Le livre</a>
             <a href="#contreparties" className="ls-nav-link" style={{ fontSize: '13px', color: C.text3, textDecoration: 'none', transition: 'color .2s' }}>Contreparties</a>
             <a
@@ -327,6 +329,7 @@ export default function CampagnePage() {
               style={{ background: C.gold, color: C.bg, fontWeight: 700, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none' }}>
               Je participe
             </a>
+            <ThemeToggle />
           </nav>
         </header>
 
@@ -467,14 +470,20 @@ export default function CampagnePage() {
                     Feuilleter le livre
                   </h2>
                   <button
-                    onClick={() => setExcerptOpen(o => !o)}
+                    onClick={() => setExcerptOpen(true)}
                     style={{ background: C.gold, color: C.bg, fontWeight: 700, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', border: 'none' }}>
-                    {excerptOpen ? 'Refermer ↑' : 'Lire un extrait ↓'}
+                    Lire un extrait →
                   </button>
                 </div>
+              </section>
 
-                {excerptOpen && (
-                  <div className="ls-fade" style={{ background: C.paper, borderRadius: '14px', padding: '32px', boxShadow: '0 4px 32px rgba(0,0,0,.4)' }}>
+              {/* Overlay extrait */}
+              {excerptOpen && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,.7)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '24px 16px', overflowY: 'auto' }}
+                  onClick={e => { if (e.target === e.currentTarget) setExcerptOpen(false) }}>
+                  <div className="ls-pop" style={{ background: C.paper, borderRadius: '16px', padding: '40px 36px', maxWidth: '680px', width: '100%', position: 'relative', boxShadow: '0 30px 80px rgba(0,0,0,.6)', marginTop: '20px', marginBottom: '20px' }}>
+                    <button onClick={() => setExcerptOpen(false)}
+                      style={{ position: 'absolute', top: '16px', right: '20px', background: 'transparent', border: 'none', fontSize: '22px', color: '#9a8060', cursor: 'pointer', lineHeight: 1 }}>×</button>
                     <p style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '11px', fontWeight: 600, color: '#9a8060', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '24px' }}>
                       Introduction
                     </p>
@@ -492,14 +501,14 @@ export default function CampagnePage() {
                     </p>
                     <div style={{ textAlign: 'center', marginTop: '24px' }}>
                       <button
-                        onClick={() => openModal(TIERS.find(t => t.id === 'ebook'))}
+                        onClick={() => { setExcerptOpen(false); openModal(TIERS.find(t => t.id === 'ebook')) }}
                         style={{ background: '#b08e63', color: '#fff', fontWeight: 700, fontSize: '14px', padding: '12px 24px', borderRadius: '10px', border: 'none', cursor: 'pointer' }}>
                         Soutenir et lire la suite →
                       </button>
                     </div>
                   </div>
-                )}
-              </section>
+                </div>
+              )}
 
               {/* Usages des fonds */}
               <section style={{ marginBottom: '48px' }}>
@@ -523,9 +532,7 @@ export default function CampagnePage() {
                   À propos de l'auteur
                 </h2>
                 <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: '14px', padding: '24px', display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: `linear-gradient(135deg, ${C.gold}, #8a6040)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '20px', fontWeight: 700, color: C.bg, fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif' }}>
-                    N
-                  </div>
+                  <img src="/photo_nico_profil.jpg" alt="Nicolas Salafranque" style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: `2px solid ${C.gold}` }} />
                   <div>
                     <p style={{ fontSize: '15px', fontWeight: 600, color: C.text, marginBottom: '6px' }}>Nicolas Salafranque</p>
                     <p style={{ fontSize: '13px', color: C.text3, marginBottom: '10px' }}>Pasteur · Fondateur des Éditions Le Scribe</p>
@@ -613,7 +620,7 @@ export default function CampagnePage() {
                 Choisir une contrepartie
               </h2>
 
-              {(showAllTiers ? TIERS : TIERS.slice(0, 3)).map(tier => {
+              {TIERS.map(tier => {
                 const ship = shipLabel(tier)
                 return (
                   <div
@@ -662,21 +669,6 @@ export default function CampagnePage() {
                 )
               })}
 
-              {/* Voir plus / moins */}
-              {!showAllTiers ? (
-                <button
-                  onClick={() => setShowAllTiers(true)}
-                  style={{ width: '100%', background: 'transparent', border: `1px solid ${C.border}`, color: C.gold, fontSize: '13px', padding: '12px', borderRadius: '12px', cursor: 'pointer', transition: 'border-color .2s' }}
-                  className="ls-btn-outline">
-                  Voir tous les paliers ({TIERS.length}) ↓
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowAllTiers(false)}
-                  style={{ width: '100%', background: 'transparent', border: `1px solid ${C.border}`, color: C.text3, fontSize: '13px', padding: '12px', borderRadius: '12px', cursor: 'pointer' }}>
-                  Replier ↑
-                </button>
-              )}
 
               {/* Don libre */}
               <button
@@ -686,8 +678,9 @@ export default function CampagnePage() {
                 Faire un don libre →
               </button>
 
-              <p style={{ fontSize: '11px', color: C.text3, textAlign: 'center', marginTop: '4px' }}>
-                Paiement sécurisé par Stripe · CB, Apple Pay, Google Pay
+              <p style={{ fontSize: '11px', color: C.text3, textAlign: 'center', marginTop: '4px', lineHeight: 1.6 }}>
+                Paiement sécurisé par <strong style={{ color: C.text2 }}>Stripe</strong> · CB, Apple Pay, Google Pay<br/>
+                <span style={{ opacity: 0.7 }}>La plateforme de paiement utilisée par Amazon, Google et des millions d'entreprises.</span>
               </p>
             </div>
           </div>
@@ -831,8 +824,17 @@ export default function CampagnePage() {
                 )}
               </div>
 
+              {/* Remise en main propre */}
+              {!modal.free && modal.physical && (
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '14px', cursor: 'pointer', fontSize: '13px', color: C.text2 }}>
+                  <input type="checkbox" checked={pickup} onChange={e => setPickup(e.target.checked)}
+                    style={{ marginTop: '2px', accentColor: C.gold, flexShrink: 0 }} />
+                  <span>Remise en main propre (voisin, collègue, Église) — <strong style={{ color: C.gold }}>frais de port offerts</strong></span>
+                </label>
+              )}
+
               {/* Récap frais de port */}
-              {!modal.free && modal.ship > 0 && (
+              {!modal.free && modal.ship > 0 && !pickup && (
                 <div style={{ background: C.surface2, borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', fontSize: '13px', color: C.text3 }}>
                   {amount ? parseInt(amount, 10) || modal.price : modal.price}€ + {modal.ship}€ de port = <strong style={{ color: C.text }}>{(parseInt(amount, 10) || modal.price) + modal.ship}€ au total</strong>
                 </div>
@@ -847,7 +849,7 @@ export default function CampagnePage() {
                 disabled={loadingPay || !amount}
                 style={{ width: '100%', background: loadingPay || !amount ? '#5a5040' : C.gold, color: C.bg, fontWeight: 700, fontSize: '15px', padding: '14px', borderRadius: '12px', border: 'none', cursor: loadingPay || !amount ? 'not-allowed' : 'pointer', transition: 'background .2s' }}
                 className={loadingPay || !amount ? '' : 'ls-btn-gold'}>
-                {loadingPay ? 'Redirection vers Stripe…' : `Payer ${amount ? (parseInt(amount, 10) || 0) + (modal.ship || 0) : ''}€ →`}
+                {loadingPay ? 'Redirection vers Stripe…' : `Payer ${amount ? (parseInt(amount, 10) || 0) + (pickup ? 0 : (modal.ship || 0)) : ''}€ →`}
               </button>
 
               <p style={{ fontSize: '11px', color: C.text3, textAlign: 'center', marginTop: '12px' }}>

@@ -15,7 +15,7 @@ const TIERS: Record<string, { ship: number; shipKind: string; physical: boolean;
 
 export async function POST(req: NextRequest) {
   try {
-    const { tier_id, email, amount } = await req.json()
+    const { tier_id, email, amount, pickup } = await req.json()
 
     if (!tier_id || !TIERS[tier_id]) {
       return NextResponse.json({ error: 'Palier invalide' }, { status: 400 })
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
     const tier = TIERS[tier_id]
     const amountCents = amtInt * 100
-    const shippingCents = tier.ship
+    const shippingCents = pickup ? 0 : tier.ship
     const totalCents = amountCents + shippingCents
 
     const supabase = createClient(
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       payment_method_types: ['card'],
     }
 
-    if (tier.physical) {
+    if (tier.physical && !pickup) {
       sessionParams.shipping_address_collection = {
         allowed_countries: ['FR', 'BE', 'CH', 'LU', 'CA'],
       }
