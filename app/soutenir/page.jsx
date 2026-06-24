@@ -751,7 +751,7 @@ export default function CampagnePage() {
                       quote: "Se pencher sur la fin des temps en prenant une position claire, limpide et didactisée, c'est faire preuve d'un grand courage, car les contradicteurs sur ce thème sont légion. Alors merci Nicolas, mon ami, d'avoir mouillé ta chemise — et surtout d'avoir effacé la brume qui régnait dans mon esprit sur ce thème qui, autrefois, m'avait passionné." },
                     { initials: 'AS', name: "Aymerick Sroka", role: "Prophète · Préface",
                       quote: "Il y a des livres que l'on lit simplement pour apprendre. Et puis il y a des livres que l'on lit parce qu'ils viennent toucher une urgence, réveiller une conscience et remettre une génération devant une réalité qu'elle ne peut plus ignorer. L'urgence des temps fait partie de ces ouvrages. Il ne cherche pas à produire de la peur : il nous ramène à une vérité simple — Jésus n'a jamais parlé des temps de la fin pour effrayer ses disciples, mais pour les préparer. Ce n'est pas une urgence de panique : c'est une urgence d'alignement, de consécration, de réveil. Car au bout de l'histoire, le dernier mot appartient à l'Agneau. Viens, Seigneur Jésus." },
-                    { initials: '✦', name: "Un ami lecteur", role: "Premier lecteur du manuscrit",
+                    { initials: '✦', name: "Un ami lecteur", role: "",
                       quote: "C'est comme une étude biblique — tu pourrais te poser avec le livre et ta Bible à côté. J'apprends énormément, alors que je pensais déjà connaître le sujet. Il y a un travail monstre derrière ces pages : non seulement d'étude, mais aussi de pédagogie. C'est accessible, malgré la profondeur. En tant qu'ami et chrétien qui veut en savoir plus sur le retour de Jésus, c'est hyper enrichissant. Merci grandement." },
                   ].map((t, i) => (
                     <blockquote key={i} style={{ margin: 0, padding: '28px 30px', background: C.surface, border: `1px solid ${C.border}`, borderLeft: `3px solid ${C.gold}`, borderRadius: '16px' }}>
@@ -761,7 +761,7 @@ export default function CampagnePage() {
                         <div style={{ flexShrink: 0, width: '46px', height: '46px', borderRadius: '50%', background: 'linear-gradient(135deg,#d4b896,#b8966c)', color: '#0d0d0d', fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{t.initials}</div>
                         <div>
                           <div style={{ fontSize: '14px', fontWeight: 600, color: C.text }}>{t.name}</div>
-                          <div style={{ fontSize: '12.5px', color: C.text3, marginTop: '2px' }}>{t.role}</div>
+                          {t.role && <div style={{ fontSize: '12.5px', color: C.text3, marginTop: '2px' }}>{t.role}</div>}
                         </div>
                       </footer>
                     </blockquote>
