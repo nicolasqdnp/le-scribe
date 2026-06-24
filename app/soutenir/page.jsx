@@ -8,7 +8,7 @@ import { useTheme } from '../components/ThemeProvider'
 
 const TIERS = [
   { id: 'merci',    price: 5,   ship: 0,  shipKind: 'none',    physical: false, titre: 'Un grand merci',             livraison: '—',            tag: null,             featured: false, visual: 'seal',
-    contents: ["Ta reconnaissance & ton nom sur la page des soutiens du site", "Le suivi de la campagne en avant-première"] },
+    contents: ["Ma reconnaissance & ton nom sur la page des soutiens du site", "Le suivi de la campagne en avant-première"] },
   { id: 'ebook',    price: 9,   ship: 0,  shipKind: 'digital', physical: false, titre: "L'ebook",                    livraison: 'Immédiatement', tag: null,            featured: false, visual: 'ereader',
     contents: ["L'ebook au format EPUB (compatible toutes liseuses)", "Disponible dès la parution, par email"] },
   { id: 'livre',    price: 16,  ship: 3,  shipKind: 'fee',     physical: true,  titre: 'Le livre — tarif lancement', livraison: 'Juillet 2026', tag: 'Tarif lancement', featured: false, visual: 'book',
