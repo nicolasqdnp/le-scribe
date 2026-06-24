@@ -482,6 +482,7 @@ export default function CampagnePage() {
         .ls-btn-gold:hover { background: #d4b896 !important; }
         .ls-btn-outline:hover { border-color: #c9a77d !important; color: #c9a77d !important; }
         .ls-faq-btn:hover { background: #161616 !important; }
+        .ls-faq-btn:hover span { color: #fff !important; }
         @media (max-width: 600px) { .ls-temoignages-grid { grid-template-columns: 1fr !important; } }
         .ls-nav-link:hover { color: #c9a77d !important; }
         * { box-sizing: border-box; }
