@@ -551,7 +551,7 @@ export default function CampagnePage() {
                     {
                       quote: "Ce livre est facile à lire et affermira votre foi dans ce retour imminent de notre merveilleux sauveur. Merci pour ce travail fouillé, cette vision à 360° de la fin des temps.",
                       name: "Patrick Salafranque",
-                      role: "Pasteur",
+                      role: "Pasteur · Père de l'auteur",
                     },
                     {
                       quote: "Prendre une position claire et didactisée sur la fin des temps, c'est faire preuve d'un grand courage. Merci d'avoir effacé la brume qui régnait dans mon esprit sur ce thème.",
