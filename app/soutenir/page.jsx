@@ -4,12 +4,12 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 // ─── Données statiques ────────────────────────────────────────────────────────
 
 const TIERS = [
-  { id: 'merci',    price: 5,   ship: 0,  shipKind: 'none',    physical: false, titre: 'Un grand merci',             desc: "Ma profonde reconnaissance, ton nom sur la page des soutiens du site et le suivi de la campagne.",                                               livraison: '—',       backers: 8,  tag: null,           featured: false },
-  { id: 'ebook',    price: 9,   ship: 0,  shipKind: 'digital', physical: false, titre: "L'ebook",                    desc: "La version numérique (EPUB), compatible toutes liseuses, dès la parution.",                                                                livraison: 'Juin 2026', backers: 9,  tag: null,           featured: false },
-  { id: 'livre',    price: 16,  ship: 3,  shipKind: 'fee',     physical: true,  titre: 'Le livre — tarif lancement', desc: "Un exemplaire papier au prix de lancement, au lieu de 18,99 €.",                                                                           livraison: 'Été 2026', backers: 7,  tag: 'Lancement',    featured: false },
-  { id: 'dedicace', price: 25,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre dédicacé',          desc: "Un exemplaire papier signé de la main de l'auteur, + l'ebook offert.",                                                                    livraison: 'Été 2026', backers: 5,  tag: 'Le plus choisi', featured: true  },
-  { id: 'echange',  price: 40,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre + un échange',      desc: "Le livre dédicacé, puis après ta lecture un moment ensemble (visio ou tél.) pour répondre à tes questions.",                               livraison: 'Été 2026', backers: 1,  tag: null,           featured: false },
-  { id: 'pack3',    price: 45,  ship: 5,  shipKind: 'fee',     physical: true,  titre: 'Pack de 3 — à offrir',       desc: "Trois exemplaires dédicacés, pour partager autour de toi.",                                                                               livraison: 'Été 2026', backers: 2,  tag: null,           featured: false },
+  { id: 'merci',    price: 5,   ship: 0,  shipKind: 'none',    physical: false, titre: 'Un grand merci',             desc: "Ma profonde reconnaissance, ton nom sur la page des soutiens du site et le suivi de la campagne.",                                               livraison: '—',       backers: 0,  tag: null,           featured: false },
+  { id: 'ebook',    price: 9,   ship: 0,  shipKind: 'digital', physical: false, titre: "L'ebook",                    desc: "La version numérique (EPUB), compatible toutes liseuses, dès la parution.",                                                                livraison: 'Juin 2026', backers: 0,  tag: null,           featured: false },
+  { id: 'livre',    price: 16,  ship: 3,  shipKind: 'fee',     physical: true,  titre: 'Le livre — tarif lancement', desc: "Un exemplaire papier au prix de lancement, au lieu de 18,99 €.",                                                                           livraison: 'Été 2026', backers: 0,  tag: 'Lancement',    featured: false },
+  { id: 'dedicace', price: 25,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre dédicacé',          desc: "Un exemplaire papier signé de la main de l'auteur, + l'ebook offert.",                                                                    livraison: 'Été 2026', backers: 0,  tag: 'Le plus choisi', featured: true  },
+  { id: 'echange',  price: 40,  ship: 0,  shipKind: 'free',    physical: true,  titre: 'Le livre + un échange',      desc: "Le livre dédicacé, puis après ta lecture un moment ensemble (visio ou tél.) pour répondre à tes questions.",                               livraison: 'Été 2026', backers: 0,  tag: null,           featured: false },
+  { id: 'pack3',    price: 45,  ship: 5,  shipKind: 'fee',     physical: true,  titre: 'Pack de 3 — à offrir',       desc: "Trois exemplaires dédicacés, pour partager autour de toi.",                                                                               livraison: 'Été 2026', backers: 0,  tag: null,           featured: false },
   { id: 'eglise',   price: 200, ship: 10, shipKind: 'fee',     physical: true,  titre: "Le pack Église (10 ex.)",    desc: "Un lot de 10 exemplaires dédicacés pour ta communauté ou ton groupe.",                                                                      livraison: 'Été 2026', backers: 0,  tag: null,           featured: false },
 ]
 
@@ -181,17 +181,13 @@ export default function CampagnePage() {
 
   // Fetch stats + animation jauge
   useEffect(() => {
-    // Init tierBackers
-    const tb = {}
-    TIERS.forEach(t => { tb[t.id] = t.backers })
-    setTierBackers(tb)
-
-    // Fetch stats réelles
+    // Fetch stats réelles (raised, backers globaux, tierBackers)
     fetch('/api/campagne/stats')
       .then(r => r.json())
       .then(data => {
         if (data.raised) setRaised(data.raised)
         if (data.backers) setBackers(data.backers)
+        if (data.tierBackers) setTierBackers(data.tierBackers)
       })
       .catch(() => {})
 

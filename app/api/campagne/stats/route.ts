@@ -10,19 +10,23 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from('crowdfunding_contributions')
-      .select('amount')
+      .select('amount, tier_id')
       .eq('status', 'paid')
 
     if (error) {
       console.error('[campagne/stats]', error.message)
-      return NextResponse.json({ raised: 0, backers: 0 })
+      return NextResponse.json({ raised: 0, backers: 0, tierBackers: {} })
     }
 
     const backers = data?.length ?? 0
     const raised = data?.reduce((sum, row) => sum + row.amount, 0) ?? 0
 
-    // amount est stocké en centimes, on retourne en euros
-    return NextResponse.json({ raised: Math.round(raised / 100), backers })
+    const tierBackers: Record<string, number> = {}
+    data?.forEach(row => {
+      tierBackers[row.tier_id] = (tierBackers[row.tier_id] ?? 0) + 1
+    })
+
+    return NextResponse.json({ raised: Math.round(raised / 100), backers, tierBackers })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     console.error('[campagne/stats]', message)
