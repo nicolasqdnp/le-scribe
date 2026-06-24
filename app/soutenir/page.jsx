@@ -615,7 +615,7 @@ export default function CampagnePage() {
             </div>
 
             {/* ── Colonne droite : contreparties (sticky) ─────────────────── */}
-            <div id="contreparties" style={{ position: 'sticky', top: '72px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div id="contreparties" style={{ position: 'sticky', top: '72px', display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: 'calc(100vh - 90px)', overflowY: 'auto', paddingRight: '4px' }}>
 
               <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '18px', fontWeight: 700, color: C.text, marginBottom: '4px' }}>
                 Choisir une contrepartie
