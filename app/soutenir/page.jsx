@@ -476,15 +476,23 @@ export default function CampagnePage() {
                 <p style={{ fontSize: '14px', color: C.text3, marginBottom: '16px' }}>
                   211 pages · 15 chapitres + introduction, conclusion et postface
                 </p>
-                <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: '14px', overflow: 'hidden' }}>
-                  {(showAllToc ? TOC : TOC.slice(0, 4)).map((ch, i) => (
-                    <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', padding: '12px 18px', borderBottom: `1px solid ${C.border}` }}>
-                      <span style={{ minWidth: '28px', fontSize: '12px', color: C.text3, fontWeight: 700, paddingTop: '1px', textAlign: 'right' }}>
-                        {ch.n || ''}
-                      </span>
-                      <span style={{ fontSize: '14px', color: C.text2 }}>{ch.titre}</span>
-                    </div>
-                  ))}
+                <div style={{ background: C.paper, borderRadius: '14px', padding: '24px', border: `1px solid ${C.border}` }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {(showAllToc ? TOC : TOC.slice(0, 4)).map((ch, i) => (
+                      <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                        {ch.n ? (
+                          <span style={{ minWidth: '24px', height: '24px', borderRadius: '50%', background: '#8a5c30', color: '#fff', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
+                            {ch.n}
+                          </span>
+                        ) : (
+                          <span style={{ minWidth: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
+                            <span style={{ color: C.gold, fontSize: '16px', lineHeight: 1 }}>–</span>
+                          </span>
+                        )}
+                        <span style={{ fontSize: '14px', color: C.text2, lineHeight: 1.5 }}>{ch.titre}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <button
                   onClick={() => setShowAllToc(v => !v)}
@@ -602,17 +610,29 @@ export default function CampagnePage() {
                       name: "Un ami lecteur",
                       role: "",
                     },
-                  ].map(({ quote, name, role }, i) => (
-                    <blockquote key={i} style={{ margin: 0, padding: '22px 24px', background: C.surface, border: `1px solid ${C.border}`, borderLeft: `3px solid ${C.gold}`, borderRadius: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                      <p style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '14px', fontStyle: 'italic', color: C.text2, lineHeight: 1.8, margin: '0 0 16px' }}>
-                        « {quote} »
-                      </p>
-                      <footer>
-                        <span style={{ fontSize: '13px', fontWeight: 600, color: C.text3 }}>— {name}</span>
-                        {role && <span style={{ fontSize: '12px', color: C.text3, opacity: 0.7, display: 'block', marginTop: '2px' }}>{role}</span>}
-                      </footer>
-                    </blockquote>
-                  ))}
+                  ].map(({ quote, name, role }, i) => {
+                    const initials = name.split(' ').slice(0, 2).map(w => w[0].toUpperCase()).join('')
+                    return (
+                      <blockquote key={i} style={{ margin: 0, padding: '22px 24px', background: C.surface, border: `1px solid ${C.border}`, borderRadius: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
+                        {/* Grand guillemet décoratif */}
+                        <span style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '64px', lineHeight: 1, color: C.gold, opacity: 0.35, position: 'absolute', top: '8px', left: '18px', pointerEvents: 'none', userSelect: 'none' }}>
+                          "
+                        </span>
+                        <p style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '14px', fontStyle: 'italic', color: C.text2, lineHeight: 1.8, margin: '32px 0 20px', position: 'relative' }}>
+                          {quote}
+                        </p>
+                        <footer style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span style={{ width: '32px', height: '32px', borderRadius: '50%', background: C.gold, color: C.bg, fontSize: '12px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            {initials}
+                          </span>
+                          <div>
+                            <span style={{ fontSize: '13px', fontWeight: 600, color: C.text3, display: 'block' }}>{name}</span>
+                            {role && <span style={{ fontSize: '12px', color: C.text3, opacity: 0.7, display: 'block', marginTop: '1px' }}>{role}</span>}
+                          </div>
+                        </footer>
+                      </blockquote>
+                    )
+                  })}
                 </div>
               </section>
 
@@ -652,6 +672,11 @@ export default function CampagnePage() {
 
               {TIERS.map(tier => {
                 const ship = shipLabel(tier)
+                const backerCount = tierBackers[tier.id] ?? tier.backers
+                // Parser la desc en bullet points : phrases séparées par ". "
+                const descItems = tier.desc.length > 80
+                  ? tier.desc.split('. ').filter(Boolean).map((s, idx, arr) => idx < arr.length - 1 ? s + '.' : s)
+                  : [tier.desc]
                 return (
                   <div
                     key={tier.id}
@@ -660,40 +685,77 @@ export default function CampagnePage() {
                       background: tier.featured ? 'rgba(201,167,125,.06)' : C.surface,
                       border: `1px solid ${tier.featured ? 'rgba(201,167,125,.4)' : C.border}`,
                       borderRadius: '12px',
-                      padding: '16px',
-                      cursor: 'pointer',
+                      overflow: 'hidden',
                       transition: 'border-color .2s, background .2s',
                       position: 'relative',
                     }}
-                    onClick={() => openModal(tier)}
                   >
-                    {tier.tag && (
-                      <div style={{ marginBottom: '6px', textAlign: 'right' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 600, background: tier.featured ? C.gold : 'rgba(201,167,125,.15)', color: tier.featured ? C.bg : C.gold, padding: '3px 8px', borderRadius: '99px' }}>
+                    {/* Image de couverture */}
+                    <div style={{ position: 'relative', height: '140px', overflow: 'hidden' }}>
+                      <img
+                        src="/lurgence-des-temps-couv-v2.png"
+                        alt="L'urgence des temps"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,.1) 0%, rgba(0,0,0,.45) 100%)' }} />
+                      {tier.tag && (
+                        <span style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '11px', fontWeight: 600, background: tier.featured ? C.gold : 'rgba(201,167,125,.85)', color: tier.featured ? '#0d0d0d' : '#fff', padding: '3px 10px', borderRadius: '99px', backdropFilter: 'blur(4px)' }}>
                           {tier.tag}
                         </span>
-                      </div>
-                    )}
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                      <p style={{ fontSize: '14px', fontWeight: 700, color: C.text, margin: 0 }}>{tier.titre}</p>
-                      <p style={{ fontSize: '18px', fontWeight: 700, color: C.gold, margin: '0 0 0 8px', flexShrink: 0 }}>{tier.price}€</p>
+                      )}
                     </div>
 
-                    <p style={{ fontSize: '13px', color: C.text3, lineHeight: 1.55, marginBottom: '10px' }}>{tier.desc}</p>
+                    {/* Contenu de la carte */}
+                    <div style={{ padding: '16px' }}>
+                      {/* Prix */}
+                      <p style={{ fontSize: '12px', fontWeight: 600, color: C.gold, marginBottom: '4px' }}>
+                        Pour {tier.price} €
+                      </p>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                        {tier.livraison !== '—' && (
-                          <span style={{ fontSize: '11px', color: C.text3, background: C.surface2, padding: '2px 8px', borderRadius: '99px' }}>{tier.livraison}</span>
-                        )}
-                        {ship && (
-                          <span style={{ fontSize: '11px', color: ship.color, background: 'transparent', padding: '2px 0' }}>{ship.text}</span>
-                        )}
+                      {/* Titre */}
+                      <p style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '20px', fontWeight: 700, color: C.text, margin: '0 0 12px' }}>
+                        {tier.titre}
+                      </p>
+
+                      {/* Description en bullet points */}
+                      <ul style={{ margin: '0 0 14px', padding: '0', listStyle: 'none' }}>
+                        {descItems.map((item, idx) => (
+                          <li key={idx} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', marginBottom: '6px' }}>
+                            <span style={{ color: C.gold, fontWeight: 700, flexShrink: 0, marginTop: '1px' }}>•</span>
+                            <span style={{ fontSize: '13px', color: C.text2, lineHeight: 1.55 }}>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* Livraison + frais de port */}
+                      {(tier.livraison !== '—' || ship) && (
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                          {tier.livraison !== '—' && (
+                            <span style={{ fontSize: '11px', color: C.text3, background: C.surface2, padding: '2px 8px', borderRadius: '99px' }}>{tier.livraison}</span>
+                          )}
+                          {ship && (
+                            <span style={{ fontSize: '11px', color: ship.color }}>{ship.text}</span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Bouton Choisir */}
+                      <button
+                        onClick={() => openModal(tier)}
+                        style={{ width: '100%', background: C.gold, color: C.bg, fontWeight: 700, fontSize: '14px', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer', marginBottom: '12px', transition: 'background .2s' }}
+                        className="ls-btn-gold">
+                        + Choisir
+                      </button>
+
+                      {/* Pied de carte : date livraison + contributions */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${C.border}`, paddingTop: '10px', gap: '8px' }}>
+                        <span style={{ fontSize: '11px', color: C.text3, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          📅 {tier.livraison !== '—' ? tier.livraison : 'Immédiat'}
+                        </span>
+                        <span style={{ fontSize: '11px', color: C.text3, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          🤍 {backerCount} soutien{backerCount !== 1 ? 's' : ''}
+                        </span>
                       </div>
-                      <span style={{ fontSize: '11px', color: C.text3 }}>
-                        {(tierBackers[tier.id] ?? tier.backers)} soutien{(tierBackers[tier.id] ?? tier.backers) !== 1 ? 's' : ''}
-                      </span>
                     </div>
                   </div>
                 )
