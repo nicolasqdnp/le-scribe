@@ -310,6 +310,7 @@ export default function CampagnePage() {
         .ls-btn-gold:hover { background: #d4b896 !important; }
         .ls-btn-outline:hover { border-color: #c9a77d !important; color: #c9a77d !important; }
         .ls-faq-btn:hover { background: #161616 !important; }
+        @media (max-width: 600px) { .ls-temoignages-grid { grid-template-columns: 1fr !important; } }
         .ls-nav-link:hover { color: #c9a77d !important; }
         * { box-sizing: border-box; }
       `}</style>
@@ -540,16 +541,45 @@ export default function CampagnePage() {
                 </div>
               </section>
 
-              {/* Témoignage */}
+              {/* Témoignages */}
               <section style={{ marginBottom: '48px' }}>
-                <blockquote style={{ margin: 0, padding: '28px 32px', background: C.surface, border: `1px solid ${C.border}`, borderLeft: `3px solid ${C.gold}`, borderRadius: '14px' }}>
-                  <p style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '16px', fontStyle: 'italic', color: C.text2, lineHeight: 1.8, margin: '0 0 18px' }}>
-                    « C'est comme une étude biblique — tu pourrais te poser avec le livre et ta Bible à côté. J'apprends énormément, alors que je pensais déjà connaître le sujet. Il y a un travail monstre derrière ces pages : non seulement d'étude, mais aussi de pédagogie. C'est accessible, malgré la profondeur. En tant qu'ami et chrétien qui veut en savoir plus sur le retour de Jésus, c'est hyper enrichissant. Merci grandement. »
-                  </p>
-                  <footer style={{ fontSize: '13px', color: C.text3 }}>
-                    — Un ami lecteur
-                  </footer>
-                </blockquote>
+                <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '22px', fontWeight: 700, color: C.text, marginBottom: '20px' }}>
+                  Ce que disent les lecteurs
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="ls-temoignages-grid">
+                  {[
+                    {
+                      quote: "Ce livre est facile à lire et affermira votre foi dans ce retour imminent de notre merveilleux sauveur. Merci pour ce travail fouillé, cette vision à 360° de la fin des temps.",
+                      name: "Patrick Salafranque",
+                      role: "Pasteur",
+                    },
+                    {
+                      quote: "Prendre une position claire et didactisée sur la fin des temps, c'est faire preuve d'un grand courage. Merci d'avoir effacé la brume qui régnait dans mon esprit sur ce thème.",
+                      name: "François Bernot",
+                      role: "Docteur en physique appliquée",
+                    },
+                    {
+                      quote: "Il y a des livres que l'on lit pour apprendre. Et puis il y a des livres qui viennent réveiller une conscience. L'urgence des temps fait partie de ces ouvrages.",
+                      name: "Aymerick Sroka",
+                      role: "Prophète",
+                    },
+                    {
+                      quote: "C'est comme une étude biblique — tu pourrais te poser avec le livre et ta Bible à côté. Super riche, et malgré la profondeur, ça reste très pédagogique et très compréhensible.",
+                      name: "Un ami lecteur",
+                      role: "",
+                    },
+                  ].map(({ quote, name, role }, i) => (
+                    <blockquote key={i} style={{ margin: 0, padding: '22px 24px', background: C.surface, border: `1px solid ${C.border}`, borderLeft: `3px solid ${C.gold}`, borderRadius: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                      <p style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '14px', fontStyle: 'italic', color: C.text2, lineHeight: 1.8, margin: '0 0 16px' }}>
+                        « {quote} »
+                      </p>
+                      <footer>
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: C.text3 }}>— {name}</span>
+                        {role && <span style={{ fontSize: '12px', color: C.text3, opacity: 0.7, display: 'block', marginTop: '2px' }}>{role}</span>}
+                      </footer>
+                    </blockquote>
+                  ))}
+                </div>
               </section>
 
               {/* FAQ */}
