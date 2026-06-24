@@ -540,6 +540,18 @@ export default function CampagnePage() {
                 </div>
               </section>
 
+              {/* Témoignage */}
+              <section style={{ marginBottom: '48px' }}>
+                <blockquote style={{ margin: 0, padding: '28px 32px', background: C.surface, border: `1px solid ${C.border}`, borderLeft: `3px solid ${C.gold}`, borderRadius: '14px' }}>
+                  <p style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '16px', fontStyle: 'italic', color: C.text2, lineHeight: 1.8, margin: '0 0 18px' }}>
+                    « C'est comme une étude biblique — tu pourrais te poser avec le livre et ta Bible à côté. J'apprends énormément, alors que je pensais déjà connaître le sujet. Il y a un travail monstre derrière ces pages : non seulement d'étude, mais aussi de pédagogie. C'est accessible, malgré la profondeur. En tant qu'ami et chrétien qui veut en savoir plus sur le retour de Jésus, c'est hyper enrichissant. Merci grandement. »
+                  </p>
+                  <footer style={{ fontSize: '13px', color: C.text3 }}>
+                    — Un ami lecteur
+                  </footer>
+                </blockquote>
+              </section>
+
               {/* FAQ */}
               <section style={{ marginBottom: '48px' }}>
                 <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '22px', fontWeight: 700, color: C.text, marginBottom: '20px' }}>
