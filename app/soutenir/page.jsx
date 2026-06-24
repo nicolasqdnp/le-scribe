@@ -323,6 +323,7 @@ export default function CampagnePage() {
   const [publicName, setPublicName]       = useState('')
   const [email, setEmail]                 = useState('')
   const [emailError, setEmailError]       = useState(false)
+  const [nameError, setNameError]         = useState(false)
   const [loadingPay, setLoadingPay]       = useState(false)
   const [payError, setPayError]           = useState('')
   const [faqOpen, setFaqOpen]             = useState(0)
@@ -381,6 +382,11 @@ export default function CampagnePage() {
   const handlePay = useCallback(async () => {
     const amt = parseInt(amount, 10) || 0
     if (amt <= 0) return
+    if (modal?.physical && !publicName.trim()) {
+      setNameError(true)
+      return
+    }
+    setNameError(false)
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError(true)
       return
@@ -406,7 +412,7 @@ export default function CampagnePage() {
       setPayError('Erreur réseau. Réessaie dans un instant.')
       setLoadingPay(false)
     }
-  }, [amount, email, modal])
+  }, [amount, email, modal, publicName])
 
   const openModal = useCallback((tier) => {
     setModal(tier)
@@ -1003,20 +1009,21 @@ export default function CampagnePage() {
                 )}
               </div>
 
-              {/* Prénom / pseudo public */}
+              {/* Prénom dédicace / pseudo public */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.text3, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '8px' }}>
-                  Ton prénom ou pseudo <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optionnel)</span>
+                <label style={{ fontSize: '12px', fontWeight: 600, color: nameError ? C.err : C.text3, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '8px' }}>
+                  {modal.physical ? 'Prénom pour la dédicace' : <>Ton prénom ou pseudo <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optionnel)</span></>}
                 </label>
                 <input
                   type="text"
                   maxLength={60}
-                  placeholder="Marie, Pierre, Église Bethel…"
+                  placeholder={modal.physical ? 'Nicolas, Marie, Pierre…' : 'Marie, Pierre, Église Bethel…'}
                   value={publicName}
-                  onChange={e => setPublicName(e.target.value)}
-                  style={{ width: '100%', background: C.surface3, border: `1px solid ${C.border2}`, borderRadius: '10px', padding: '12px 14px', fontSize: '15px', color: C.text, outline: 'none' }}
+                  onChange={e => { setPublicName(e.target.value); setNameError(false) }}
+                  style={{ width: '100%', background: C.surface3, border: `1px solid ${nameError ? C.err : C.border2}`, borderRadius: '10px', padding: '12px 14px', fontSize: '15px', color: C.text, outline: 'none' }}
                 />
-                <p style={{ fontSize: '11px', color: C.text3, marginTop: '5px' }}>Sera affiché publiquement sur la page de campagne.</p>
+                {nameError && <p style={{ fontSize: '12px', color: C.err, marginTop: '6px' }}>Entre un prénom pour personnaliser la dédicace.</p>}
+                {!modal.physical && <p style={{ fontSize: '11px', color: C.text3, marginTop: '5px' }}>Sera affiché publiquement sur la page de campagne.</p>}
               </div>
 
               {/* Email */}
