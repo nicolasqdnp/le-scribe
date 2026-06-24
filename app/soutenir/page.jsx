@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
 import ThemeToggle from '../components/ThemeToggle'
 
 // ─── Données statiques ────────────────────────────────────────────────────────
@@ -532,7 +533,7 @@ export default function CampagnePage() {
                   À propos de l'auteur
                 </h2>
                 <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: '14px', padding: '24px', display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-                  <img src="/photo_nico_profil.jpg" alt="Nicolas Salafranque" style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: `2px solid ${C.gold}` }} />
+                  <Image src="/photo_nico_profil.jpg" alt="Nicolas Salafranque" width={64} height={64} style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: `2px solid ${C.gold}` }} />
                   <div>
                     <p style={{ fontSize: '15px', fontWeight: 600, color: C.text, marginBottom: '6px' }}>Nicolas Salafranque</p>
                     <p style={{ fontSize: '13px', color: C.text3, marginBottom: '10px' }}>Pasteur · Fondateur des Éditions Le Scribe</p>
