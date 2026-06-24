@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import ThemeToggle from '../components/ThemeToggle'
+import { useTheme } from '../components/ThemeProvider'
 
 // ─── Données statiques ────────────────────────────────────────────────────────
 
@@ -163,6 +164,19 @@ function shipLabel(tier) {
 // ─── Composant principal ──────────────────────────────────────────────────────
 
 export default function CampagnePage() {
+  const { theme } = useTheme()
+  const [systemDark, setSystemDark]       = useState(true)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    setSystemDark(mq.matches)
+    const h = e => setSystemDark(e.matches)
+    mq.addEventListener('change', h)
+    return () => mq.removeEventListener('change', h)
+  }, [])
+
+  const isLight = theme === 'light' || (theme === 'system' && !systemDark)
+
   const [raised, setRaised]               = useState(0)
   const [displayRaised, setDisplayRaised] = useState(0)
   const [displayPct, setDisplayPct]       = useState(0)
@@ -277,7 +291,22 @@ export default function CampagnePage() {
   const funded = raised >= GOAL
 
   // ── Styles communs ─────────────────────────────────────────────────────────
-  const C = {
+  const C = isLight ? {
+    bg:        '#f7f4ef',
+    surface:   '#eeebe5',
+    surface2:  '#e5e0d8',
+    surface3:  '#dbd5cc',
+    border:    '#cfc9bf',
+    border2:   '#c0bab0',
+    text:      '#1c1917',
+    text2:     '#44403c',
+    text3:     '#78716c',
+    gold:      '#a07040',
+    goldHov:   '#b08050',
+    ok:        '#3d7a3d',
+    err:       '#c0392b',
+    paper:     '#ffffff',
+  } : {
     bg:        '#0d0d0d',
     surface:   '#111',
     surface2:  '#161616',
