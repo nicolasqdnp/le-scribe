@@ -14,7 +14,8 @@ const TIERS = [
 ]
 
 const GOAL = 1000
-const DAYS_LEFT = 24
+const CAMPAIGN_END = new Date('2026-07-17T23:59:59Z')
+const DAYS_LEFT = Math.max(0, Math.ceil((CAMPAIGN_END - new Date()) / (1000 * 60 * 60 * 24)))
 
 const TOC = [
   { n: '',   titre: 'Introduction' },
