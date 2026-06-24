@@ -564,7 +564,7 @@ export default function CampagnePage() {
                       role: "Prophète",
                     },
                     {
-                      quote: "C'est comme une étude biblique — tu pourrais te poser avec le livre et ta Bible à côté. Super riche, et malgré la profondeur, ça reste très pédagogique et très compréhensible.",
+                      quote: "C'est comme une étude biblique — tu pourrais te poser avec le livre et ta Bible à côté. J'apprends énormément, alors que je pensais déjà connaître le sujet. Il y a un travail monstre derrière ces pages : non seulement d'étude, mais aussi de pédagogie. C'est accessible, malgré la profondeur. En tant qu'ami et chrétien qui veut en savoir plus sur le retour de Jésus, c'est hyper enrichissant. Merci grandement.",
                       name: "Un ami lecteur",
                       role: "",
                     },
