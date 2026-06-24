@@ -313,9 +313,11 @@ export default function CampagnePage() {
   const [displayPct, setDisplayPct]       = useState(0)
   const [backers, setBackers]             = useState(0)
   const [tierBackers, setTierBackers]     = useState({})
+  const [supporters, setSupporters]       = useState([])
   const [modal, setModal]                 = useState(null)
   const [pickup, setPickup]               = useState(false)
   const [amount, setAmount]               = useState('')
+  const [publicName, setPublicName]       = useState('')
   const [email, setEmail]                 = useState('')
   const [emailError, setEmailError]       = useState(false)
   const [loadingPay, setLoadingPay]       = useState(false)
@@ -335,6 +337,7 @@ export default function CampagnePage() {
         if (data.raised) setRaised(data.raised)
         if (data.backers) setBackers(data.backers)
         if (data.tierBackers) setTierBackers(data.tierBackers)
+        if (data.supporters) setSupporters(data.supporters)
       })
       .catch(() => {})
 
@@ -387,7 +390,7 @@ export default function CampagnePage() {
       const res = await fetch('/api/checkout-campagne', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier_id, email, amount: amt, pickup }),
+        body: JSON.stringify({ tier_id, email, amount: amt, pickup, public_name: publicName }),
       })
       const data = await res.json()
       if (data.url) {
@@ -407,6 +410,7 @@ export default function CampagnePage() {
     setPickup(false)
     setAmount(tier?.free ? '' : String(tier?.price || ''))
     setEmail('')
+    setPublicName('')
     setEmailError(false)
     setPayError('')
     setLoadingPay(false)
@@ -707,6 +711,23 @@ export default function CampagnePage() {
                 </div>
               </section>
 
+              {/* Soutiens publics */}
+              {supporters.length > 0 && (
+                <section style={{ marginBottom: '48px' }}>
+                  <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '22px', fontWeight: 700, color: C.text, marginBottom: '16px' }}>
+                    Ils ont soutenu ce projet
+                  </h2>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                    {supporters.map((name, i) => (
+                      <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.surface, border: `1px solid ${C.border}`, borderRadius: '99px', padding: '6px 14px', fontSize: '14px', color: C.text2 }}>
+                        <span style={{ color: C.gold, fontSize: '12px' }}>✦</span>
+                        {name}
+                      </span>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               {/* Témoignages */}
               <section style={{ marginBottom: '48px' }}>
                 <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '22px', fontWeight: 700, color: C.text, marginBottom: '20px' }}>
@@ -977,6 +998,22 @@ export default function CampagnePage() {
                     />
                   </div>
                 )}
+              </div>
+
+              {/* Prénom / pseudo public */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 600, color: C.text3, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '8px' }}>
+                  Ton prénom ou pseudo <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optionnel)</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={60}
+                  placeholder="Marie, Pierre, Église Bethel…"
+                  value={publicName}
+                  onChange={e => setPublicName(e.target.value)}
+                  style={{ width: '100%', background: C.surface3, border: `1px solid ${C.border2}`, borderRadius: '10px', padding: '12px 14px', fontSize: '15px', color: C.text, outline: 'none' }}
+                />
+                <p style={{ fontSize: '11px', color: C.text3, marginTop: '5px' }}>Sera affiché publiquement sur la page de campagne.</p>
               </div>
 
               {/* Email */}

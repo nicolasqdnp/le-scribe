@@ -10,7 +10,7 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from('crowdfunding_contributions')
-      .select('amount, tier_id')
+      .select('amount, tier_id, public_name')
       .eq('status', 'paid')
 
     if (error) {
@@ -26,7 +26,11 @@ export async function GET() {
       tierBackers[row.tier_id] = (tierBackers[row.tier_id] ?? 0) + 1
     })
 
-    return NextResponse.json({ raised: Math.round(raised / 100), backers, tierBackers })
+    const supporters = (data ?? [])
+      .map(row => row.public_name)
+      .filter((n): n is string => !!n)
+
+    return NextResponse.json({ raised: Math.round(raised / 100), backers, tierBackers, supporters })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     console.error('[campagne/stats]', message)

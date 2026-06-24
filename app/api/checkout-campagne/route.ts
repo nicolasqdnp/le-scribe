@@ -15,7 +15,7 @@ const TIERS: Record<string, { ship: number; shipKind: string; physical: boolean;
 
 export async function POST(req: NextRequest) {
   try {
-    const { tier_id, email, amount, pickup } = await req.json()
+    const { tier_id, email, amount, pickup, public_name } = await req.json()
 
     if (!tier_id || !TIERS[tier_id]) {
       return NextResponse.json({ error: 'Palier invalide' }, { status: 400 })
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
         shipping_amount: shippingCents,
         total_amount: totalCents,
         status: 'pending',
+        public_name: public_name?.trim()?.slice(0, 60) || null,
       })
       .select('id')
       .single()
