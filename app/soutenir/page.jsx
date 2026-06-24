@@ -894,7 +894,7 @@ export default function CampagnePage() {
             {DAYS_LEFT} jours restants
           </p>
           <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 700, color: C.text, marginBottom: '16px', lineHeight: 1.3 }}>
-            Ce livre mérite d'exister en papier.
+            Ensemble, mettons ce livre entre toutes les mains.
           </h2>
           <p style={{ fontSize: '16px', color: C.text2, marginBottom: '32px', maxWidth: '480px', margin: '0 auto 32px', lineHeight: 1.7 }}>
             Chaque contribution — quelle que soit sa taille — rend ce tirage possible.
