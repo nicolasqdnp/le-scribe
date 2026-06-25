@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       const email = session.customer_email || ''
 
       // Marquer la commande comme payée + stocker adresse si physique
-      const shipping = (session as any).shipping_details
+      const shipping = (session as any).shipping_details || (session as any).shipping
       const shippingAddress = shipping?.address || null
       const shippingName = shipping?.name || null
 
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     if (session.metadata?.contribution_id) {
       const { contribution_id, tier_id } = session.metadata
       const email = session.customer_email || ''
-      const shipping = (session as any).shipping_details
+      const shipping = (session as any).shipping_details || (session as any).shipping
 
       await supabaseAdmin
         .from('crowdfunding_contributions')

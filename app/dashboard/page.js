@@ -179,6 +179,7 @@ function Dashboard() {
           <Link href="/#comment" className="text-sm text-muted hover:text-cream px-4 py-2 rounded-lg hover:bg-surface transition">Comment ça marche</Link>
           <Link href="/#tarifs" className="text-sm text-muted hover:text-cream px-4 py-2 rounded-lg hover:bg-surface transition">Tarifs</Link>
           <Link href="/boutique" className="text-sm text-gold hover:text-gold2 px-4 py-2 rounded-lg hover:bg-surface transition">Boutique</Link>
+          <Link href="/soutenir" className="text-sm text-gold hover:text-gold2 px-4 py-2 rounded-lg hover:bg-surface transition">Soutenir le projet</Link>
           <span className="text-sm text-muted2 px-4 py-2 flex items-center gap-1.5">
             Tutos
             <span className="text-[10px] bg-surface2 text-muted2 border border-border px-1.5 py-0.5 rounded-full">Bientôt</span>
@@ -186,6 +187,11 @@ function Dashboard() {
         </nav>
         <div className="flex items-center gap-3">
           <ThemeToggle />
+          {user?.email === 'nicolas.salafranque@gmail.com' && (
+            <Link href="/admin/commandes" className="text-xs text-gold border border-gold/30 rounded-lg px-3 py-1.5 hover:bg-gold/10 transition">
+              Commandes
+            </Link>
+          )}
           <span className="text-sm text-muted hidden md:inline">{user?.user_metadata?.nom || user?.email}</span>
           <button onClick={handleLogout} className="text-xs text-muted hover:text-cream border border-border rounded-lg px-3 py-1.5 transition">
             Déconnexion
