@@ -1,37 +1,11 @@
 import WordCycler from './components/WordCycler'
-import ThemeToggle from './components/ThemeToggle'
+import HeaderNav from './components/HeaderNav'
 
 export default function Home() {
   return (
     <main className="min-h-screen page-glow text-cream">
 
-      {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-bg/90 backdrop-blur-sm">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2.5">
-            <img src="/lescribe-logo-fond-sombre.png" alt="Le Scribe" className="logo-nav-dark h-8 w-auto" />
-            <img src="/lescribe-logo-fond-clair.png" alt="Le Scribe" className="logo-nav-light h-8 w-auto" />
-          </a>
-          {/* Liens navigation centre */}
-          <nav className="hidden md:flex items-center gap-1">
-            <a href="#comment" className="text-sm text-muted hover:text-cream px-4 py-2 rounded-lg hover:bg-surface transition">Comment ça marche</a>
-            <a href="#tarifs" className="text-sm text-muted hover:text-cream px-4 py-2 rounded-lg hover:bg-surface transition">Tarifs</a>
-            <a href="/boutique" className="text-sm text-gold hover:text-gold2 px-4 py-2 rounded-lg hover:bg-surface transition">Boutique</a>
-            <a href="/soutenir" className="text-sm text-gold hover:text-gold2 px-4 py-2 rounded-lg hover:bg-surface transition">Soutenir le projet</a>
-            <a href="#tutos" className="text-sm text-muted2 hover:text-muted px-4 py-2 rounded-lg transition flex items-center gap-1.5">
-              Tutos
-              <span className="text-[10px] bg-surface2 text-muted2 border border-border px-1.5 py-0.5 rounded-full">Bientôt</span>
-            </a>
-          </nav>
-          <div className="flex gap-2 items-center">
-            <a href="/login" className="text-sm text-muted hover:text-cream px-4 py-2 transition">Connexion</a>
-            <a href="/inscription" className="text-sm bg-gold text-bg font-medium px-5 py-2 rounded-lg hover:bg-gold2 transition">
-              Commencer
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <HeaderNav />
 
       {/* Hero */}
       <section className="pt-40 pb-32 px-6">
