@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import ThemeToggle from '../components/ThemeToggle'
 import { useTheme } from '../components/ThemeProvider'
+import { track } from '@vercel/analytics'
 
 // ─── Données statiques ────────────────────────────────────────────────────────
 
@@ -410,6 +411,7 @@ export default function CampagnePage() {
       })
       const data = await res.json()
       if (data.url) {
+        track('checkout_initie', { tier: modal?.id ?? 'don_libre', amount: amt })
         window.location.href = data.url
       } else {
         setPayError(data.error || 'Une erreur est survenue.')
@@ -422,6 +424,7 @@ export default function CampagnePage() {
   }, [amount, email, modal, publicName])
 
   const openModal = useCallback((tier) => {
+    track('modal_ouvert', { tier: tier?.id ?? 'don_libre' })
     setModal(tier)
     setPickup(false)
     setAmount(tier?.free ? '' : String(tier?.price || ''))
