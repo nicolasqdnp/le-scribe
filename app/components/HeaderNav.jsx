@@ -50,11 +50,11 @@ export default function HeaderNav() {
         {/* Actions desktop + hamburger mobile */}
         <div className="flex gap-2 items-center">
           <a href="/login" className="hidden md:block text-sm text-muted hover:text-cream px-4 py-2 transition">Connexion</a>
-          <a href="/inscription" className="text-sm bg-gold text-bg font-medium px-5 py-2 rounded-lg hover:bg-gold2 transition">
+          <a href="/inscription" className="hidden md:block text-sm bg-gold text-bg font-medium px-5 py-2 rounded-lg hover:bg-gold2 transition">
             Commencer
           </a>
           <ThemeToggle />
-          {/* Hamburger */}
+          {/* Hamburger mobile */}
           <button
             onClick={() => setOpen(o => !o)}
             aria-label="Menu"
@@ -93,6 +93,9 @@ export default function HeaderNav() {
           <div className="h-px bg-border my-1" />
           <a href="/login" onClick={() => setOpen(false)} className="text-sm text-muted hover:text-cream px-4 py-3 rounded-lg hover:bg-surface transition">
             Connexion
+          </a>
+          <a href="/inscription" onClick={() => setOpen(false)} className="text-sm bg-gold text-bg font-medium px-4 py-3 rounded-lg text-center mt-1">
+            Commencer
           </a>
         </div>
       )}
