@@ -119,14 +119,21 @@ export async function POST(req: NextRequest) {
 
       const TIERS_WITH_EBOOK = ['ebook', 'dedicace', 'echange']
       if (TIERS_WITH_EBOOK.includes(tier_id) && email) {
-        const { data: signedUrl } = await supabaseAdmin.storage
-          .from('boutique')
-          .createSignedUrl('lurgence-des-temps.epub', 60 * 60 * 48)
-        if (signedUrl?.signedUrl) {
-          await sendEpubEmail(email, signedUrl.signedUrl)
-          await supabaseAdmin.from('crowdfunding_contributions')
-            .update({ epub_sent_at: new Date().toISOString() })
-            .eq('id', contribution_id)
+        const { data: existing } = await supabaseAdmin
+          .from('crowdfunding_contributions')
+          .select('epub_sent_at')
+          .eq('id', contribution_id)
+          .single()
+        if (!existing?.epub_sent_at) {
+          const { data: signedUrl } = await supabaseAdmin.storage
+            .from('boutique')
+            .createSignedUrl('lurgence-des-temps.epub', 60 * 60 * 48)
+          if (signedUrl?.signedUrl) {
+            await sendEpubEmail(email, signedUrl.signedUrl)
+            await supabaseAdmin.from('crowdfunding_contributions')
+              .update({ epub_sent_at: new Date().toISOString() })
+              .eq('id', contribution_id)
+          }
         }
       }
       if (tier_id !== 'ebook' && email) {
