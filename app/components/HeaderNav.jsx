@@ -17,11 +17,15 @@ export default function HeaderNav() {
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-bg/90 backdrop-blur-sm">
       <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo — icône seule sur mobile, logo complet sur desktop */}
-        <a href="/" className="flex items-center gap-2.5">
-          <img src="/lescribe-logo-fond-sombre.png" alt="Le Scribe" className="logo-nav-dark hidden md:block h-8 w-auto" />
-          <img src="/lescribe-logo-fond-clair.png" alt="Le Scribe" className="logo-nav-light hidden md:block h-8 w-auto" />
-          <img src="/lescribe-icon-sombre.png" alt="Le Scribe" className="logo-nav-dark md:hidden h-8 w-auto" />
-          <img src="/lescribe-icon.png" alt="Le Scribe" className="logo-nav-light md:hidden h-8 w-auto" />
+        <a href="/" className="flex items-center">
+          <span className="md:hidden">
+            <img src="/lescribe-icon-sombre.png" alt="Le Scribe" className="logo-nav-dark h-8 w-auto" />
+            <img src="/lescribe-icon.png" alt="Le Scribe" className="logo-nav-light h-8 w-auto" />
+          </span>
+          <span className="hidden md:flex">
+            <img src="/lescribe-logo-fond-sombre.png" alt="Le Scribe" className="logo-nav-dark h-8 w-auto" />
+            <img src="/lescribe-logo-fond-clair.png" alt="Le Scribe" className="logo-nav-light h-8 w-auto" />
+          </span>
         </a>
 
         {/* Nav desktop */}
