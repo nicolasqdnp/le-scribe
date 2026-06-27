@@ -117,7 +117,8 @@ export async function POST(req: NextRequest) {
         })
         .eq('id', contribution_id)
 
-      if (tier_id === 'ebook' && email) {
+      const TIERS_WITH_EBOOK = ['ebook', 'dedicace', 'echange']
+      if (TIERS_WITH_EBOOK.includes(tier_id) && email) {
         const { data: signedUrl } = await supabaseAdmin.storage
           .from('boutique')
           .createSignedUrl('lurgence-des-temps.epub', 60 * 60 * 48)
@@ -127,7 +128,8 @@ export async function POST(req: NextRequest) {
             .update({ epub_sent_at: new Date().toISOString() })
             .eq('id', contribution_id)
         }
-      } else if (email) {
+      }
+      if (tier_id !== 'ebook' && email) {
         await sendCampaignConfirmationEmail(email, tier_id)
       }
       console.log(`[webhook/stripe] Contribution ${tier_id} confirmée → ${email}`)
