@@ -60,9 +60,9 @@ export default function HeaderNav() {
             aria-label="Menu"
             className="md:hidden flex flex-col justify-center items-center w-9 h-9 rounded-lg hover:bg-surface transition gap-[5px]"
           >
-            <span className={`block w-5 h-0.5 bg-cream transition-all duration-200 ${open ? 'rotate-45 translate-y-[7px]' : ''}`} />
-            <span className={`block w-5 h-0.5 bg-cream transition-all duration-200 ${open ? 'opacity-0' : ''}`} />
-            <span className={`block w-5 h-0.5 bg-cream transition-all duration-200 ${open ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+            <span className={`block w-5 h-0.5 transition-all duration-200 ${open ? 'rotate-45 translate-y-[7px]' : ''}`} style={{ background: 'var(--cream)' }} />
+            <span className={`block w-5 h-0.5 transition-all duration-200 ${open ? 'opacity-0' : ''}`} style={{ background: 'var(--cream)' }} />
+            <span className={`block w-5 h-0.5 transition-all duration-200 ${open ? '-rotate-45 -translate-y-[7px]' : ''}`} style={{ background: 'var(--cream)' }} />
           </button>
         </div>
       </div>
