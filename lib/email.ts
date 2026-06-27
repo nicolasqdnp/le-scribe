@@ -95,7 +95,10 @@ export async function sendEpubEmail(to: string, downloadUrl: string) {
         <p>Votre exemplaire numérique de <strong style="color:#c9a77d;">L'urgence des temps</strong>
         par Nicolas Salafranque est prêt à être téléchargé.</p>
         <a href="${downloadUrl}" class="btn">Télécharger mon EPUB →</a>
-        <p style="font-size:13px;color:#7a6a50;">Ce lien est valable 48 heures. Si vous ne parvenez pas à télécharger le fichier, répondez à cet email.</p>
+        <p style="font-size:13px;color:#7a6a50;">Ce lien est valable 48 heures.</p>
+        <p style="font-size:13px;color:#7a6a50;background:#1f1c16;border:1px solid #3a2f20;border-radius:8px;padding:12px 16px;">
+          📬 <strong style="color:#e8e0d0;">Vous ne trouvez pas cet email ?</strong> Vérifiez vos <strong style="color:#e8e0d0;">spams ou courriers indésirables</strong>. Si vous n'avez rien reçu, répondez à cet email.
+        </p>
 
         <div style="margin:28px 0 0;padding:20px;background:#13120f;border-radius:12px;border:1px solid #2a2520;">
           <p style="margin:0 0 6px;font-size:13px;font-weight:bold;color:#c9a77d;">📱 Lire sur une liseuse Kindle ?</p>
