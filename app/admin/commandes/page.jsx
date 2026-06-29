@@ -42,6 +42,7 @@ export default function CommandesAdmin() {
   const [rows, setRows] = useState(null)
   const [loading, setLoading] = useState(true)
   const [toggling, setToggling] = useState(null)
+  const [resending, setResending] = useState(null)
   const [auth, setAuth] = useState(null)
   const [search, setSearch] = useState('')
   const [sortP, setSortP] = useState({ col: 'created_at', dir: 'asc' })
@@ -65,6 +66,17 @@ export default function CommandesAdmin() {
     const data = await res.json()
     setRows(data)
     setLoading(false)
+  }
+
+  async function resendEpub(row) {
+    setResending(row.id)
+    await fetch('/api/admin/resend-epub', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contribution_id: row.id }),
+    })
+    setResending(null)
+    alert(`Email renvoyé à ${row.email}`)
   }
 
   async function toggleShipped(row) {
@@ -210,11 +222,12 @@ export default function CommandesAdmin() {
                     <ThHead label="Palier" col="tier_id" sort={sortN} onSort={col => handleSort(setSortN, col)} />
                     <ThHead label="Montant" col="amount" sort={sortN} onSort={col => handleSort(setSortN, col)} />
                     <ThHead label="Date" col="created_at" sort={sortN} onSort={col => handleSort(setSortN, col)} />
+                    <th style={th}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {nonPhysical.length === 0 && (
-                    <tr><td colSpan={5} style={{ ...td, color: '#4a4a4a', textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
+                    <tr><td colSpan={6} style={{ ...td, color: '#4a4a4a', textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
                   )}
                   {nonPhysical.map(row => (
                     <tr key={row.id} style={{ borderBottom: '1px solid #1a1a1a' }}>
@@ -223,6 +236,18 @@ export default function CommandesAdmin() {
                       <td style={td}>{TIER_LABELS[row.tier_id] || row.tier_id}</td>
                       <td style={{ ...td, color: '#c9a77d', fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
                       <td style={{ ...td, color: '#5a5a5a' }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
+                      <td style={td}>
+                        {['ebook', 'dedicace', 'echange'].includes(row.tier_id) ? (
+                          <button onClick={() => resendEpub(row)} disabled={resending === row.id} style={{
+                            padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
+                            border: '1px solid #3a2a1a', background: '#1a1814', color: '#c9a77d',
+                            fontWeight: 600, whiteSpace: 'nowrap',
+                            opacity: resending === row.id ? 0.5 : 1,
+                          }}>
+                            {resending === row.id ? '…' : '📨 Renvoyer ebook'}
+                          </button>
+                        ) : <span style={{ color: '#3a3a3a' }}>—</span>}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
