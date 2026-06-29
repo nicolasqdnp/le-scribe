@@ -462,7 +462,7 @@ export default function CampagnePage() {
   } : {
     bg:        '#0d0d0d',
     surface:   '#111',
-    surface2:  '#161616',
+    surface2:  '#2a2520',
     surface3:  '#191919',
     border:    '#252525',
     border2:   '#2c2c2c',
