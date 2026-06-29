@@ -356,7 +356,7 @@ export default function CampagnePage() {
       const k = Math.min(1, (now - t0) / dur)
       const e = ease(k)
       setDisplayRaised(Math.round(target * e))
-      setDisplayPct(Math.min(100, (target / GOAL) * 100) * e)
+      setDisplayPct((target / GOAL) * 100 * e)
       if (k < 1) { rafRef.current = requestAnimationFrame(step) }
     }
     rafRef.current = requestAnimationFrame(step)
@@ -373,7 +373,7 @@ export default function CampagnePage() {
       const k = Math.min(1, (now - t0) / dur)
       const e = ease(k)
       setDisplayRaised(Math.round(target * e))
-      setDisplayPct(Math.min(100, (target / GOAL) * 100) * e)
+      setDisplayPct((target / GOAL) * 100 * e)
       if (k < 1) { rafRef.current = requestAnimationFrame(step) }
     }
     if (rafRef.current) cancelAnimationFrame(rafRef.current)
@@ -440,7 +440,7 @@ export default function CampagnePage() {
     setLoadingPay(false)
   }, [])
 
-  const pct = Math.min(100, (raised / GOAL) * 100)
+  const pct = (raised / GOAL) * 100
   const funded = raised >= GOAL
 
   // ── Styles communs ─────────────────────────────────────────────────────────
@@ -566,7 +566,7 @@ export default function CampagnePage() {
             {/* Jauge */}
             <div style={{ marginBottom: '20px' }}>
               <div style={{ background: C.surface2, borderRadius: '99px', height: '8px', overflow: 'hidden', marginBottom: '10px' }}>
-                <div style={{ background: `linear-gradient(90deg, ${C.gold}, #e8c99a)`, height: '100%', width: `${displayPct}%`, borderRadius: '99px', transition: 'width .1s linear' }} />
+                <div style={{ background: `linear-gradient(90deg, ${C.gold}, #e8c99a)`, height: '100%', width: `${Math.min(100, displayPct)}%`, borderRadius: '99px', transition: 'width .1s linear' }} />
               </div>
               <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
                 <div>
