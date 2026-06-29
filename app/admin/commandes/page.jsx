@@ -194,7 +194,7 @@ export default function CommandesAdmin() {
                       <td style={{ ...td, color: '#c9a77d', fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
                       <td style={{ ...td, color: '#a09070', maxWidth: 200 }}>{formatAddr(row.shipping_address)}</td>
                       <td style={{ ...td, color: '#5a5a5a', whiteSpace: 'nowrap' }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
-                      <td style={td}>
+                      <td style={{ ...td, display: 'flex', flexDirection: 'column', gap: 6 }}>
                         <button onClick={() => toggleShipped(row)} disabled={toggling === row.id} style={{
                           padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
                           border: '1px solid #3a2a1a',
@@ -205,6 +205,16 @@ export default function CommandesAdmin() {
                         }}>
                           {row.shipped_at ? '↩ Annuler' : '✓ Marquer envoyé'}
                         </button>
+                        {['dedicace', 'echange'].includes(row.tier_id) && (
+                          <button onClick={() => resendEpub(row)} disabled={resending === row.id} style={{
+                            padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
+                            border: '1px solid #3a2a1a', background: '#1a1814', color: '#c9a77d',
+                            fontWeight: 600, whiteSpace: 'nowrap',
+                            opacity: resending === row.id ? 0.5 : 1,
+                          }}>
+                            {resending === row.id ? '…' : '📨 Renvoyer ebook'}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
