@@ -572,6 +572,7 @@ export default function CampagnePage() {
                 <div>
                   <span style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '28px', fontWeight: 700, color: C.text }}>{displayRaised}€</span>
                   <span style={{ fontSize: '12px', color: C.text3, marginLeft: '6px' }}>sur {GOAL}€</span>
+                  <span style={{ display: 'block', fontSize: '12px', color: C.gold, marginTop: '2px', fontWeight: 600 }}>{Math.round(displayPct)}% financé</span>
                 </div>
                 <div style={{ borderLeft: `1px solid ${C.border}`, paddingLeft: '24px' }}>
                   <span style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '28px', fontWeight: 700, color: C.text }}>{backers}</span>
