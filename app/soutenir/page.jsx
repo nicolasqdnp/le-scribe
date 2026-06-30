@@ -605,7 +605,7 @@ export default function CampagnePage() {
         {funded && (
           <div style={{ background: 'rgba(74,222,128,.08)', border: `1px solid rgba(74,222,128,.2)`, padding: '16px 24px', textAlign: 'center', marginBottom: '8px' }}>
             <span style={{ fontSize: '14px', color: C.ok, fontWeight: 600 }}>
-              ✓ Objectif atteint ! Le financement continue pour un tirage plus large.
+              🎉 Objectif atteint ! La campagne continue — dernière chance de recevoir le livre au prix de lancement.
             </span>
           </div>
         )}
