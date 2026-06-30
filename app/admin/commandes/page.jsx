@@ -19,21 +19,34 @@ const TIER_LABELS = {
 
 const PHYSICAL = ['livre', 'pack3', 'eglise', 'dedicace', 'echange']
 
+const DARK = {
+  bg: '#0e0e0e', surface: '#1a1a1a', surface2: '#222', border: '#2a2a2a',
+  text: '#e8dcc8', text2: '#b0a090', text3: '#6a5a4a', muted: '#4a4a4a',
+  gold: '#c9a77d', shipped: '#0a120a', shippedBorder: '#1a2a1a', shippedText: '#4caf50',
+  pendingBg: '#2a1a0a', pendingText: '#c9a77d',
+}
+const LIGHT = {
+  bg: '#f7f4ef', surface: '#eeeae3', surface2: '#e5e0d8', border: '#d8d0c4',
+  text: '#1a1510', text2: '#4a3f30', text3: '#7a6a50', muted: '#a09070',
+  gold: '#9a6f3a', shipped: '#f0f7f0', shippedBorder: '#c0d8c0', shippedText: '#2e7d32',
+  pendingBg: '#fff8ee', pendingText: '#8a5a20',
+}
+
 function formatAddr(addr) {
   if (!addr) return '—'
   const { line1, line2, postal_code, city, country } = addr
   return [line1, line2, `${postal_code} ${city}`, country].filter(Boolean).join(', ')
 }
 
-function SortIcon({ col, sort }) {
-  if (sort.col !== col) return <span style={{ color: '#3a3a3a', marginLeft: 4 }}>↕</span>
-  return <span style={{ color: '#c9a77d', marginLeft: 4 }}>{sort.dir === 'asc' ? '↑' : '↓'}</span>
+function SortIcon({ col, sort, C }) {
+  if (sort.col !== col) return <span style={{ color: C.muted, marginLeft: 4 }}>↕</span>
+  return <span style={{ color: C.gold, marginLeft: 4 }}>{sort.dir === 'asc' ? '↑' : '↓'}</span>
 }
 
-function ThHead({ label, col, sort, onSort }) {
+function ThHead({ label, col, sort, onSort, C }) {
   return (
-    <th style={{ ...th, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }} onClick={() => onSort(col)}>
-      {label}<SortIcon col={col} sort={sort} />
+    <th style={{ textAlign: 'left', padding: '8px 12px', fontWeight: 500, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', color: C.text3 }} onClick={() => onSort(col)}>
+      {label}<SortIcon col={col} sort={sort} C={C} />
     </th>
   )
 }
@@ -47,7 +60,10 @@ export default function CommandesAdmin() {
   const [search, setSearch] = useState('')
   const [sortP, setSortP] = useState({ col: 'created_at', dir: 'asc' })
   const [sortN, setSortN] = useState({ col: 'created_at', dir: 'asc' })
+  const [dark, setDark] = useState(true)
   const router = useRouter()
+
+  const C = dark ? DARK : LIGHT
 
   useEffect(() => {
     const supabase = createClient()
@@ -68,17 +84,6 @@ export default function CommandesAdmin() {
     setLoading(false)
   }
 
-  async function resendEpub(row) {
-    setResending(row.id)
-    await fetch('/api/admin/resend-epub', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contribution_id: row.id }),
-    })
-    setResending(null)
-    alert(`Email renvoyé à ${row.email}`)
-  }
-
   async function toggleShipped(row) {
     setToggling(row.id)
     await fetch('/api/admin/contributions', {
@@ -88,6 +93,17 @@ export default function CommandesAdmin() {
     })
     await load()
     setToggling(null)
+  }
+
+  async function resendEpub(row) {
+    setResending(row.id)
+    await fetch('/api/admin/resend-epub', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contribution_id: row.id }),
+    })
+    setResending(null)
+    alert(`Email renvoyé à ${row.email}`)
   }
 
   function handleSort(setSort, col) {
@@ -126,16 +142,40 @@ export default function CommandesAdmin() {
   const nonPhysical = useMemo(() => sortRows(filterRows(allNonPhysical), sortN), [allNonPhysical, search, sortN])
   const nbEnvoye = allPhysical.filter(r => r.shipped_at).length
 
-  if (auth === null) return <div style={center}>Vérification…</div>
-  if (auth === false) return <div style={{ ...center, color: '#c9a77d' }}>Accès refusé — connecte-toi avec le bon compte.</div>
+  const centerStyle = { minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.text3, fontFamily: 'system-ui' }
+
+  if (auth === null) return <div style={centerStyle}>Vérification…</div>
+  if (auth === false) return <div style={{ ...centerStyle, color: C.gold }}>Accès refusé — connecte-toi avec le bon compte.</div>
+
+  const th = { textAlign: 'left', padding: '8px 12px', fontWeight: 500, color: C.text3 }
+  const td = { padding: '10px 12px', verticalAlign: 'top', color: C.text }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0e0e0e', color: '#e8dcc8', fontFamily: 'system-ui, sans-serif', padding: '40px 24px' }}>
+    <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: 'system-ui, sans-serif', padding: '40px 24px', transition: 'background .2s, color .2s' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4, color: '#c9a77d' }}>Commandes campagne</h1>
-        <p style={{ color: '#7a6a50', fontSize: 13, marginBottom: 24 }}>
-          {loading ? '…' : `${allPhysical.length} envois physiques — ${nbEnvoye} envoyés, ${allPhysical.length - nbEnvoye} restants`}
-        </p>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4, color: C.text }}>Commandes campagne</h1>
+            <p style={{ color: C.text3, fontSize: 13, margin: 0 }}>
+              {loading ? '…' : `${allPhysical.length} envois physiques — ${nbEnvoye} envoyés, ${allPhysical.length - nbEnvoye} restants`}
+            </p>
+          </div>
+          {/* Toggle thème */}
+          <button
+            onClick={() => setDark(d => !d)}
+            title={dark ? 'Passer en thème clair' : 'Passer en thème sombre'}
+            style={{
+              background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8,
+              padding: '7px 12px', cursor: 'pointer', fontSize: 18, lineHeight: 1,
+              color: C.text2, display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            {dark ? '☀️' : '🌙'}
+            <span style={{ fontSize: 12, color: C.text3 }}>{dark ? 'Clair' : 'Sombre'}</span>
+          </button>
+        </div>
 
         {/* Barre de recherche */}
         <input
@@ -145,61 +185,63 @@ export default function CommandesAdmin() {
           onChange={e => setSearch(e.target.value)}
           style={{
             width: '100%', maxWidth: 440, padding: '9px 14px', borderRadius: 8,
-            background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#e8dcc8',
+            background: C.surface, border: `1px solid ${C.border}`, color: C.text,
             fontSize: 13, outline: 'none', marginBottom: 28, boxSizing: 'border-box',
           }}
         />
 
-        {loading && <p style={{ color: '#7a6a50' }}>Chargement…</p>}
+        {loading && <p style={{ color: C.text3 }}>Chargement…</p>}
 
         {!loading && (
           <>
-            <h2 style={sectionTitle}>Envois physiques ({physical.length})</h2>
+            <h2 style={{ fontSize: 11, fontWeight: 600, color: C.text3, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              Envois physiques ({physical.length})
+            </h2>
             <div style={{ overflowX: 'auto', marginBottom: 48 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #2a2a2a', color: '#7a6a50' }}>
+                  <tr style={{ borderBottom: `1px solid ${C.border}` }}>
                     <th style={th}>Statut</th>
-                    <ThHead label="Prénom dédicace" col="public_name" sort={sortP} onSort={col => handleSort(setSortP, col)} />
+                    <ThHead label="Prénom dédicace" col="public_name" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
                     <th style={th}>Destinataire</th>
-                    <ThHead label="Email" col="email" sort={sortP} onSort={col => handleSort(setSortP, col)} />
-                    <ThHead label="Palier" col="tier_id" sort={sortP} onSort={col => handleSort(setSortP, col)} />
-                    <ThHead label="Montant" col="amount" sort={sortP} onSort={col => handleSort(setSortP, col)} />
+                    <ThHead label="Email" col="email" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
+                    <ThHead label="Palier" col="tier_id" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
+                    <ThHead label="Montant" col="amount" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
                     <th style={th}>Adresse</th>
-                    <ThHead label="Date" col="created_at" sort={sortP} onSort={col => handleSort(setSortP, col)} />
+                    <ThHead label="Date" col="created_at" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
                     <th style={th}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {physical.length === 0 && (
-                    <tr><td colSpan={9} style={{ ...td, color: '#4a4a4a', textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
+                    <tr><td colSpan={9} style={{ ...td, color: C.muted, textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
                   )}
                   {physical.map(row => (
-                    <tr key={row.id} style={{ borderBottom: '1px solid #1a1a1a', background: row.shipped_at ? '#0a120a' : 'transparent' }}>
+                    <tr key={row.id} style={{ borderBottom: `1px solid ${C.border}`, background: row.shipped_at ? C.shipped : 'transparent' }}>
                       <td style={td}>
                         <span style={{
                           display: 'inline-block', padding: '2px 10px', borderRadius: 99,
                           fontSize: 11, fontWeight: 600,
-                          background: row.shipped_at ? '#1a3a1a' : '#2a1a0a',
-                          color: row.shipped_at ? '#4caf50' : '#c9a77d',
-                          border: `1px solid ${row.shipped_at ? '#2a5a2a' : '#3a2a1a'}`,
+                          background: row.shipped_at ? C.shippedBorder : C.pendingBg,
+                          color: row.shipped_at ? C.shippedText : C.pendingText,
+                          border: `1px solid ${row.shipped_at ? C.shippedText + '44' : C.gold + '44'}`,
                         }}>
                           {row.shipped_at ? 'Envoyé' : 'À envoyer'}
                         </span>
                       </td>
-                      <td style={td}>{row.public_name || <span style={{ color: '#4a4a4a' }}>—</span>}</td>
-                      <td style={td}>{row.shipping_name || <span style={{ color: '#4a4a4a' }}>—</span>}</td>
-                      <td style={{ ...td, color: '#7a6a50' }}>{row.email}</td>
+                      <td style={td}>{row.public_name || <span style={{ color: C.muted }}>—</span>}</td>
+                      <td style={td}>{row.shipping_name || <span style={{ color: C.muted }}>—</span>}</td>
+                      <td style={{ ...td, color: C.text3 }}>{row.email}</td>
                       <td style={td}>{TIER_LABELS[row.tier_id] || row.tier_id}</td>
-                      <td style={{ ...td, color: '#c9a77d', fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
-                      <td style={{ ...td, color: '#a09070', maxWidth: 200 }}>{formatAddr(row.shipping_address)}</td>
-                      <td style={{ ...td, color: '#5a5a5a', whiteSpace: 'nowrap' }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
+                      <td style={{ ...td, color: C.gold, fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
+                      <td style={{ ...td, color: C.text2, maxWidth: 200 }}>{formatAddr(row.shipping_address)}</td>
+                      <td style={{ ...td, color: C.text3, whiteSpace: 'nowrap' }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
                       <td style={{ ...td, display: 'flex', flexDirection: 'column', gap: 6 }}>
                         <button onClick={() => toggleShipped(row)} disabled={toggling === row.id} style={{
                           padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
-                          border: '1px solid #3a2a1a',
-                          background: row.shipped_at ? '#1a1a1a' : '#c9a77d',
-                          color: row.shipped_at ? '#7a6a50' : '#0e0e0e',
+                          border: `1px solid ${C.border}`,
+                          background: row.shipped_at ? C.surface : C.gold,
+                          color: row.shipped_at ? C.text3 : dark ? '#0e0e0e' : '#fff',
                           fontWeight: 600, transition: 'all .15s', whiteSpace: 'nowrap',
                           opacity: toggling === row.id ? 0.5 : 1,
                         }}>
@@ -208,7 +250,7 @@ export default function CommandesAdmin() {
                         {['dedicace', 'echange'].includes(row.tier_id) && (
                           <button onClick={() => resendEpub(row)} disabled={resending === row.id} style={{
                             padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
-                            border: '1px solid #3a2a1a', background: '#1a1814', color: '#c9a77d',
+                            border: `1px solid ${C.border}`, background: C.surface, color: C.gold,
                             fontWeight: 600, whiteSpace: 'nowrap',
                             opacity: resending === row.id ? 0.5 : 1,
                           }}>
@@ -222,41 +264,43 @@ export default function CommandesAdmin() {
               </table>
             </div>
 
-            <h2 style={sectionTitle}>Dons & ebooks ({nonPhysical.length})</h2>
+            <h2 style={{ fontSize: 11, fontWeight: 600, color: C.text3, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              Dons & ebooks ({nonPhysical.length})
+            </h2>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #2a2a2a', color: '#7a6a50' }}>
-                    <ThHead label="Prénom" col="public_name" sort={sortN} onSort={col => handleSort(setSortN, col)} />
-                    <ThHead label="Email" col="email" sort={sortN} onSort={col => handleSort(setSortN, col)} />
-                    <ThHead label="Palier" col="tier_id" sort={sortN} onSort={col => handleSort(setSortN, col)} />
-                    <ThHead label="Montant" col="amount" sort={sortN} onSort={col => handleSort(setSortN, col)} />
-                    <ThHead label="Date" col="created_at" sort={sortN} onSort={col => handleSort(setSortN, col)} />
+                  <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                    <ThHead label="Prénom" col="public_name" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
+                    <ThHead label="Email" col="email" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
+                    <ThHead label="Palier" col="tier_id" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
+                    <ThHead label="Montant" col="amount" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
+                    <ThHead label="Date" col="created_at" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
                     <th style={th}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {nonPhysical.length === 0 && (
-                    <tr><td colSpan={6} style={{ ...td, color: '#4a4a4a', textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
+                    <tr><td colSpan={6} style={{ ...td, color: C.muted, textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
                   )}
                   {nonPhysical.map(row => (
-                    <tr key={row.id} style={{ borderBottom: '1px solid #1a1a1a' }}>
-                      <td style={td}>{row.public_name || <span style={{ color: '#4a4a4a' }}>—</span>}</td>
-                      <td style={{ ...td, color: '#7a6a50' }}>{row.email}</td>
+                    <tr key={row.id} style={{ borderBottom: `1px solid ${C.border}` }}>
+                      <td style={td}>{row.public_name || <span style={{ color: C.muted }}>—</span>}</td>
+                      <td style={{ ...td, color: C.text3 }}>{row.email}</td>
                       <td style={td}>{TIER_LABELS[row.tier_id] || row.tier_id}</td>
-                      <td style={{ ...td, color: '#c9a77d', fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
-                      <td style={{ ...td, color: '#5a5a5a' }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
+                      <td style={{ ...td, color: C.gold, fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
+                      <td style={{ ...td, color: C.text2 }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
                       <td style={td}>
                         {['ebook', 'dedicace', 'echange'].includes(row.tier_id) ? (
                           <button onClick={() => resendEpub(row)} disabled={resending === row.id} style={{
                             padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
-                            border: '1px solid #3a2a1a', background: '#1a1814', color: '#c9a77d',
+                            border: `1px solid ${C.border}`, background: C.surface, color: C.gold,
                             fontWeight: 600, whiteSpace: 'nowrap',
                             opacity: resending === row.id ? 0.5 : 1,
                           }}>
                             {resending === row.id ? '…' : '📨 Renvoyer ebook'}
                           </button>
-                        ) : <span style={{ color: '#3a3a3a' }}>—</span>}
+                        ) : <span style={{ color: C.muted }}>—</span>}
                       </td>
                     </tr>
                   ))}
@@ -269,8 +313,3 @@ export default function CommandesAdmin() {
     </div>
   )
 }
-
-const th = { textAlign: 'left', padding: '8px 12px', fontWeight: 500 }
-const td = { padding: '10px 12px', verticalAlign: 'top' }
-const center = { minHeight: '100vh', background: '#0e0e0e', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7a6a50', fontFamily: 'system-ui' }
-const sectionTitle = { fontSize: 11, fontWeight: 600, color: '#a09070', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.1em' }
