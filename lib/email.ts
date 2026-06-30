@@ -1,5 +1,5 @@
 const BREVO_API = 'https://api.brevo.com/v3/smtp/email'
-const FROM = { name: 'Le Scribe', email: 'noreply@lescribe.app' }
+const FROM = { name: 'Le Scribe', email: 'nicolas.salafranque@gmail.com' }
 
 // ─── Envoi générique ───────────────────────────────────────────────────────────
 
