@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { createClient } from '../../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
@@ -21,14 +21,16 @@ const PHYSICAL = ['livre', 'pack3', 'eglise', 'dedicace', 'echange']
 
 const DARK = {
   bg: '#0e0e0e', surface: '#1a1a1a', surface2: '#222', border: '#2a2a2a',
-  text: '#e8dcc8', text2: '#b0a090', text3: '#6a5a4a', muted: '#4a4a4a',
-  gold: '#c9a77d', shipped: '#0a120a', shippedBorder: '#1a2a1a', shippedText: '#4caf50',
-  pendingBg: '#2a1a0a', pendingText: '#c9a77d',
+  text: '#e8dcc8', text2: '#c8b898', text3: '#a09070',
+  muted: '#555', gold: '#e8c87a',
+  shipped: '#0a120a', shippedBorder: '#1a3a1a', shippedText: '#5cba60',
+  pendingBg: '#2a1a0a', pendingText: '#e8c87a',
 }
 const LIGHT = {
   bg: '#f7f4ef', surface: '#eeeae3', surface2: '#e5e0d8', border: '#d8d0c4',
-  text: '#1a1510', text2: '#4a3f30', text3: '#7a6a50', muted: '#a09070',
-  gold: '#9a6f3a', shipped: '#f0f7f0', shippedBorder: '#c0d8c0', shippedText: '#2e7d32',
+  text: '#1a1510', text2: '#4a3f30', text3: '#7a6a50',
+  muted: '#a09070', gold: '#8a5a20',
+  shipped: '#f0f7f0', shippedBorder: '#c0d8c0', shippedText: '#2e7d32',
   pendingBg: '#fff8ee', pendingText: '#8a5a20',
 }
 
@@ -51,6 +53,59 @@ function ThHead({ label, col, sort, onSort, C }) {
   )
 }
 
+function ThemeMenu({ theme, setTheme, C }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    function handleClick(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const options = [
+    { value: 'system', label: 'Identique au système', icon: '💻' },
+    { value: 'light',  label: 'Thème clair',          icon: '☀️' },
+    { value: 'dark',   label: 'Thème sombre',          icon: '🌙' },
+  ]
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        title="Changer le thème"
+        style={{
+          background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8,
+          padding: '7px 12px', cursor: 'pointer', fontSize: 18, lineHeight: 1,
+          color: C.text2, display: 'flex', alignItems: 'center', gap: 6,
+        }}
+      >
+        ⚙️ <span style={{ fontSize: 12, color: C.text3 }}>Thème</span>
+      </button>
+      {open && (
+        <div style={{
+          position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 100,
+          background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10,
+          padding: '4px', minWidth: 200, boxShadow: '0 4px 20px rgba(0,0,0,.3)',
+        }}>
+          {options.map(o => (
+            <button key={o.value} onClick={() => { setTheme(o.value); setOpen(false) }} style={{
+              display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+              padding: '9px 12px', background: theme === o.value ? C.surface2 : 'transparent',
+              border: 'none', borderRadius: 7, cursor: 'pointer', fontSize: 13,
+              color: theme === o.value ? C.text : C.text3, fontWeight: theme === o.value ? 600 : 400,
+              textAlign: 'left',
+            }}>
+              <span>{o.icon}</span> {o.label}
+              {theme === o.value && <span style={{ marginLeft: 'auto', color: C.gold }}>✓</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function CommandesAdmin() {
   const [rows, setRows] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -60,9 +115,19 @@ export default function CommandesAdmin() {
   const [search, setSearch] = useState('')
   const [sortP, setSortP] = useState({ col: 'created_at', dir: 'asc' })
   const [sortN, setSortN] = useState({ col: 'created_at', dir: 'asc' })
-  const [dark, setDark] = useState(true)
+  const [theme, setTheme] = useState('dark')
+  const [systemDark, setSystemDark] = useState(false)
   const router = useRouter()
 
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    setSystemDark(mq.matches)
+    const handler = e => setSystemDark(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  const dark = theme === 'dark' || (theme === 'system' && systemDark)
   const C = dark ? DARK : LIGHT
 
   useEffect(() => {
@@ -147,8 +212,8 @@ export default function CommandesAdmin() {
   if (auth === null) return <div style={centerStyle}>Vérification…</div>
   if (auth === false) return <div style={{ ...centerStyle, color: C.gold }}>Accès refusé — connecte-toi avec le bon compte.</div>
 
-  const th = { textAlign: 'left', padding: '8px 12px', fontWeight: 500, color: C.text3 }
-  const td = { padding: '10px 12px', verticalAlign: 'top', color: C.text }
+  const thStyle = { textAlign: 'left', padding: '8px 12px', fontWeight: 500, color: C.text3 }
+  const tdStyle = { padding: '10px 12px', verticalAlign: 'top', color: C.text }
 
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: 'system-ui, sans-serif', padding: '40px 24px', transition: 'background .2s, color .2s' }}>
@@ -162,19 +227,7 @@ export default function CommandesAdmin() {
               {loading ? '…' : `${allPhysical.length} envois physiques — ${nbEnvoye} envoyés, ${allPhysical.length - nbEnvoye} restants`}
             </p>
           </div>
-          {/* Toggle thème */}
-          <button
-            onClick={() => setDark(d => !d)}
-            title={dark ? 'Passer en thème clair' : 'Passer en thème sombre'}
-            style={{
-              background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8,
-              padding: '7px 12px', cursor: 'pointer', fontSize: 18, lineHeight: 1,
-              color: C.text2, display: 'flex', alignItems: 'center', gap: 6,
-            }}
-          >
-            {dark ? '☀️' : '🌙'}
-            <span style={{ fontSize: 12, color: C.text3 }}>{dark ? 'Clair' : 'Sombre'}</span>
-          </button>
+          <ThemeMenu theme={theme} setTheme={setTheme} C={C} />
         </div>
 
         {/* Barre de recherche */}
@@ -194,31 +247,31 @@ export default function CommandesAdmin() {
 
         {!loading && (
           <>
-            <h2 style={{ fontSize: 11, fontWeight: 600, color: C.text3, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            <h2 style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Envois physiques ({physical.length})
             </h2>
             <div style={{ overflowX: 'auto', marginBottom: 48 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                    <th style={th}>Statut</th>
+                    <th style={thStyle}>Statut</th>
                     <ThHead label="Prénom dédicace" col="public_name" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
-                    <th style={th}>Destinataire</th>
+                    <th style={thStyle}>Destinataire</th>
                     <ThHead label="Email" col="email" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
                     <ThHead label="Palier" col="tier_id" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
                     <ThHead label="Montant" col="amount" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
-                    <th style={th}>Adresse</th>
+                    <th style={thStyle}>Adresse</th>
                     <ThHead label="Date" col="created_at" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
-                    <th style={th}>Action</th>
+                    <th style={thStyle}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {physical.length === 0 && (
-                    <tr><td colSpan={9} style={{ ...td, color: C.muted, textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
+                    <tr><td colSpan={9} style={{ ...tdStyle, color: C.muted, textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
                   )}
                   {physical.map(row => (
                     <tr key={row.id} style={{ borderBottom: `1px solid ${C.border}`, background: row.shipped_at ? C.shipped : 'transparent' }}>
-                      <td style={td}>
+                      <td style={tdStyle}>
                         <span style={{
                           display: 'inline-block', padding: '2px 10px', borderRadius: 99,
                           fontSize: 11, fontWeight: 600,
@@ -229,14 +282,14 @@ export default function CommandesAdmin() {
                           {row.shipped_at ? 'Envoyé' : 'À envoyer'}
                         </span>
                       </td>
-                      <td style={td}>{row.public_name || <span style={{ color: C.muted }}>—</span>}</td>
-                      <td style={td}>{row.shipping_name || <span style={{ color: C.muted }}>—</span>}</td>
-                      <td style={{ ...td, color: C.text3 }}>{row.email}</td>
-                      <td style={td}>{TIER_LABELS[row.tier_id] || row.tier_id}</td>
-                      <td style={{ ...td, color: C.gold, fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
-                      <td style={{ ...td, color: C.text2, maxWidth: 200 }}>{formatAddr(row.shipping_address)}</td>
-                      <td style={{ ...td, color: C.text3, whiteSpace: 'nowrap' }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
-                      <td style={{ ...td, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <td style={tdStyle}>{row.public_name || <span style={{ color: C.muted }}>—</span>}</td>
+                      <td style={tdStyle}>{row.shipping_name || <span style={{ color: C.muted }}>—</span>}</td>
+                      <td style={{ ...tdStyle, color: C.text2 }}>{row.email}</td>
+                      <td style={tdStyle}>{TIER_LABELS[row.tier_id] || row.tier_id}</td>
+                      <td style={{ ...tdStyle, color: C.gold, fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
+                      <td style={{ ...tdStyle, color: C.text2, maxWidth: 200 }}>{formatAddr(row.shipping_address)}</td>
+                      <td style={{ ...tdStyle, color: C.text2, whiteSpace: 'nowrap' }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
+                      <td style={{ ...tdStyle, display: 'flex', flexDirection: 'column', gap: 6 }}>
                         <button onClick={() => toggleShipped(row)} disabled={toggling === row.id} style={{
                           padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
                           border: `1px solid ${C.border}`,
@@ -264,7 +317,7 @@ export default function CommandesAdmin() {
               </table>
             </div>
 
-            <h2 style={{ fontSize: 11, fontWeight: 600, color: C.text3, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            <h2 style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Dons & ebooks ({nonPhysical.length})
             </h2>
             <div style={{ overflowX: 'auto' }}>
@@ -276,21 +329,21 @@ export default function CommandesAdmin() {
                     <ThHead label="Palier" col="tier_id" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
                     <ThHead label="Montant" col="amount" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
                     <ThHead label="Date" col="created_at" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
-                    <th style={th}>Action</th>
+                    <th style={thStyle}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {nonPhysical.length === 0 && (
-                    <tr><td colSpan={6} style={{ ...td, color: C.muted, textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
+                    <tr><td colSpan={6} style={{ ...tdStyle, color: C.muted, textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
                   )}
                   {nonPhysical.map(row => (
                     <tr key={row.id} style={{ borderBottom: `1px solid ${C.border}` }}>
-                      <td style={td}>{row.public_name || <span style={{ color: C.muted }}>—</span>}</td>
-                      <td style={{ ...td, color: C.text3 }}>{row.email}</td>
-                      <td style={td}>{TIER_LABELS[row.tier_id] || row.tier_id}</td>
-                      <td style={{ ...td, color: C.gold, fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
-                      <td style={{ ...td, color: C.text2 }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
-                      <td style={td}>
+                      <td style={tdStyle}>{row.public_name || <span style={{ color: C.muted }}>—</span>}</td>
+                      <td style={{ ...tdStyle, color: C.text2 }}>{row.email}</td>
+                      <td style={tdStyle}>{TIER_LABELS[row.tier_id] || row.tier_id}</td>
+                      <td style={{ ...tdStyle, color: C.gold, fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
+                      <td style={{ ...tdStyle, color: C.text2 }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
+                      <td style={tdStyle}>
                         {['ebook', 'dedicace', 'echange'].includes(row.tier_id) ? (
                           <button onClick={() => resendEpub(row)} disabled={resending === row.id} style={{
                             padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
