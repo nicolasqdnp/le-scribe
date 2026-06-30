@@ -52,7 +52,7 @@ const TOC = [
 const TOC_INDENTS = [0, 30, 14, 38, 8, 26, 18, 34, 6, 28, 16, 36, 10, 24, 20, 32, 12, 22]
 
 const FUND_USES = [
-  { icon: '📖', titre: 'Le premier tirage',  desc: 'Impression de 300 exemplaires papier, de qualité et à prix juste.' },
+  { icon: '📖', titre: 'Le premier tirage',  desc: 'Impression de 300 exemplaires papier chez un imprimeur professionnel.' },
   { icon: '✉️', titre: 'Les contreparties',  desc: 'Préparation et envoi des livres dédicacés aux contributeurs.' },
   { icon: '🕊️', titre: 'La diffusion',       desc: 'Offrir le livre en Église et lors d\'événements, là où un lien ne suffit pas.' },
 ]
@@ -62,7 +62,7 @@ const FAQS = [
   { q: 'Quand vais-je recevoir mon livre ?',                     a: "L'ebook est déjà disponible : tu le reçois par email dès la validation de ton paiement. Les exemplaires papier dédicacés, eux, sont expédiés une fois le tirage imprimé (été 2026)." },
   { q: 'Le paiement est-il vraiment sécurisé ?',                 a: "Oui. Les paiements passent par Stripe. Carte bancaire, Apple Pay et Google Pay sont acceptés. Le Scribe ne voit jamais tes données bancaires." },
   { q: 'Puis-je contribuer sans prendre de contrepartie ?',      a: "Bien sûr. Le bouton « Faire un don libre » te permet de soutenir du montant que tu veux. Chaque euro va directement à l'impression." },
-  { q: "Le livre n'est-il pas déjà disponible en ligne ?",       a: "Si, en ebook et en impression à la demande. Cette campagne finance un vrai tirage local, de qualité, à prix juste — pour le diffuser en main propre, en Église et lors d'événements." },
+  { q: "Le livre n'est-il pas déjà disponible en ligne ?",       a: "Si, en ebook et en impression à la demande. Cette campagne finance un vrai tirage chez un imprimeur professionnel, de qualité — pour le diffuser en main propre, en Église et lors d'événements." },
 ]
 
 const INTRO_RAW = [
@@ -633,7 +633,7 @@ export default function CampagnePage() {
                   Un livre, ça se prête, ça s'offre, ça s'ouvre sur une table de nuit ou dans un car de transport. Il y a des endroits — des Églises, des groupes de maison, des rencontres — où un lien ne suffit pas. Il faut un objet. Un vrai livre, qu'on peut tenir dans les mains.
                 </p>
                 <p style={{ fontSize: '15px', color: C.text2, lineHeight: 1.8, marginBottom: '16px' }}>
-                  Cette campagne finance <strong style={{ color: C.text }}>un premier tirage de 300 exemplaires</strong> — imprimés localement, à prix juste, pour être diffusés en main propre.
+                  Cette campagne finance <strong style={{ color: C.text }}>un premier tirage de 300 exemplaires</strong> — imprimés chez un imprimeur professionnel, pour être diffusés en main propre.
                 </p>
                 <p style={{ fontSize: '15px', color: C.text2, lineHeight: 1.8 }}>
                   Si tu crois que ce message mérite d'exister en papier, c'est le moment de le rendre possible.
