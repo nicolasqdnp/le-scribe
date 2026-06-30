@@ -47,7 +47,7 @@ function SortIcon({ col, sort, C }) {
 
 function ThHead({ label, col, sort, onSort, C }) {
   return (
-    <th style={{ textAlign: 'left', padding: '8px 12px', fontWeight: 500, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', color: C.text3 }} onClick={() => onSort(col)}>
+    <th style={{ textAlign: 'left', padding: '8px 12px', fontWeight: 700, fontSize: 13, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', color: C.text }} onClick={() => onSort(col)}>
       {label}<SortIcon col={col} sort={sort} C={C} />
     </th>
   )
@@ -212,7 +212,7 @@ export default function CommandesAdmin() {
   if (auth === null) return <div style={centerStyle}>Vérification…</div>
   if (auth === false) return <div style={{ ...centerStyle, color: C.gold }}>Accès refusé — connecte-toi avec le bon compte.</div>
 
-  const thStyle = { textAlign: 'left', padding: '8px 12px', fontWeight: 500, color: C.text3 }
+  const thStyle = { textAlign: 'left', padding: '8px 12px', fontWeight: 700, fontSize: 13, color: C.text }
   const tdStyle = { padding: '10px 12px', verticalAlign: 'top', color: C.text }
 
   return (
