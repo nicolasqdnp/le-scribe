@@ -262,7 +262,7 @@ export default function CommandesAdmin() {
                     <ThHead label="Montant" col="amount" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
                     <th style={thStyle}>Adresse</th>
                     <ThHead label="Date" col="created_at" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
-                    <th style={thStyle}>Action</th>
+                    <th style={{ ...thStyle, minWidth: 160 }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -329,7 +329,7 @@ export default function CommandesAdmin() {
                     <ThHead label="Palier" col="tier_id" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
                     <ThHead label="Montant" col="amount" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
                     <ThHead label="Date" col="created_at" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
-                    <th style={thStyle}>Action</th>
+                    <th style={{ ...thStyle, minWidth: 160 }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
