@@ -251,7 +251,7 @@ export default function CommandesAdmin() {
               Envois physiques ({physical.length})
             </h2>
             <div style={{ overflowX: 'auto', marginBottom: 48 }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <table style={{ minWidth: 900, borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${C.border}` }}>
                     <th style={thStyle}>Statut</th>
@@ -289,7 +289,7 @@ export default function CommandesAdmin() {
                       <td style={{ ...tdStyle, color: C.gold, fontWeight: 600 }}>{((row.total_amount || row.amount) / 100).toFixed(0)} €</td>
                       <td style={{ ...tdStyle, color: C.text2, maxWidth: 200 }}>{formatAddr(row.shipping_address)}</td>
                       <td style={{ ...tdStyle, color: C.text2, whiteSpace: 'nowrap' }}>{new Date(row.created_at).toLocaleDateString('fr-FR')}</td>
-                      <td style={{ ...tdStyle, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <td style={{ ...tdStyle, minWidth: 160 }}>
                         <button onClick={() => toggleShipped(row)} disabled={toggling === row.id} style={{
                           padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
                           border: `1px solid ${C.border}`,
@@ -302,6 +302,7 @@ export default function CommandesAdmin() {
                         </button>
                         {['dedicace', 'echange'].includes(row.tier_id) && (
                           <button onClick={() => resendEpub(row)} disabled={resending === row.id} style={{
+                            display: 'block', marginTop: 6,
                             padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
                             border: `1px solid ${C.border}`, background: C.surface, color: C.gold,
                             fontWeight: 600, whiteSpace: 'nowrap',
@@ -321,7 +322,7 @@ export default function CommandesAdmin() {
               Dons & ebooks ({nonPhysical.length})
             </h2>
             <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <table style={{ minWidth: 700, borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${C.border}` }}>
                     <ThHead label="Prénom" col="public_name" sort={sortN} onSort={col => handleSort(setSortN, col)} C={C} />
