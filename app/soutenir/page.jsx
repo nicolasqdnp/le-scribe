@@ -52,7 +52,7 @@ const TOC = [
 const TOC_INDENTS = [0, 30, 14, 38, 8, 26, 18, 34, 6, 28, 16, 36, 10, 24, 20, 32, 12, 22]
 
 const FUND_USES = [
-  { icon: '📖', titre: 'Le premier tirage',  desc: 'Impression de 300 exemplaires papier chez un imprimeur professionnel.' },
+  { icon: '📖', titre: 'Le premier tirage',  desc: 'Impression de 500 exemplaires papier chez un imprimeur professionnel — grâce au succès de la campagne.' },
   { icon: '✉️', titre: 'Les contreparties',  desc: 'Préparation et envoi des livres dédicacés aux contributeurs.' },
   { icon: '🕊️', titre: 'La diffusion',       desc: 'Offrir le livre en Église et lors d\'événements, là où un lien ne suffit pas.' },
 ]
@@ -633,7 +633,7 @@ export default function CampagnePage() {
                   Un livre, ça se prête, ça s'offre, ça s'ouvre sur une table de nuit ou dans un car de transport. Il y a des endroits — des Églises, des groupes de maison, des rencontres — où un lien ne suffit pas. Il faut un objet. Un vrai livre, qu'on peut tenir dans les mains.
                 </p>
                 <p style={{ fontSize: '15px', color: C.text2, lineHeight: 1.8, marginBottom: '16px' }}>
-                  Cette campagne finance <strong style={{ color: C.text }}>un premier tirage de 300 exemplaires</strong> — imprimés chez un imprimeur professionnel, pour être diffusés en main propre.
+                  Cette campagne finance <strong style={{ color: C.text }}>un premier tirage de 500 exemplaires</strong> — imprimés chez un imprimeur professionnel, pour être diffusés en main propre. Grâce à votre soutien, l'objectif initial de 300 exemplaires a été dépassé !
                 </p>
                 <p style={{ fontSize: '15px', color: C.text2, lineHeight: 1.8 }}>
                   Si tu crois que ce message mérite d'exister en papier, c'est le moment de le rendre possible.
