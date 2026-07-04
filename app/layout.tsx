@@ -38,6 +38,9 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
         </ThemeProvider>
+        <footer style={{ textAlign: 'center', padding: '1rem', fontSize: '0.75rem', opacity: 0.5 }}>
+          © Nicolas Salafranque — Le Scribe
+        </footer>
         <Analytics />
         <SpeedInsights />
       </body>
