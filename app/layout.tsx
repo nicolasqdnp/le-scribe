@@ -30,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning className={`${playfair.variable} ${inter.variable}`}>
       <head>
+        <meta name="facebook-domain-verification" content="ezfvu2pqymaepysq2gblcbcd8xsk3t" />
         <style>{`button,a,[role="button"]{cursor:pointer!important}`}</style>
         {/* Anti-flash : applique le bon thème avant le premier rendu */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme')||'system';var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='light'||(t==='system'&&!d)){document.documentElement.classList.add('light');}}catch(e){}})();` }} />
