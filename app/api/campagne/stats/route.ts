@@ -30,7 +30,7 @@ export async function GET() {
     const supporters = (data ?? [])
       .map(row => row.public_name)
       .filter((n): n is string => {
-        if (!n) return false
+        if (!n || n.trim().length < 3) return false
         const lower = n.toLowerCase()
         return !BLACKLIST.some(b => lower.includes(b))
       })
