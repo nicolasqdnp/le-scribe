@@ -26,9 +26,14 @@ export async function GET() {
       tierBackers[row.tier_id] = (tierBackers[row.tier_id] ?? 0) + 1
     })
 
+    const BLACKLIST = ['pas besoin', 'pas de dédicace', 'sans dédicace', 'livre 1', 'livre 2', 'livre 3']
     const supporters = (data ?? [])
       .map(row => row.public_name)
-      .filter((n): n is string => !!n)
+      .filter((n): n is string => {
+        if (!n) return false
+        const lower = n.toLowerCase()
+        return !BLACKLIST.some(b => lower.includes(b))
+      })
 
     return NextResponse.json({ raised: Math.round(raised / 100), backers, tierBackers, supporters })
   } catch (err) {
