@@ -1,11 +1,57 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ThemeToggle from '../components/ThemeToggle'
+
+const TESTIMONIALS = [
+  { initials: 'PS', name: 'Patrick Salafranque', role: "Pasteur · Préface · Père de l'auteur",
+    quote: "Comme quand on pénètre dans une pièce obscure, si on prend le temps d'y demeurer, l'œil s'adapte et les choses deviennent visibles : c'est bien le but de ce livre. Une approche originale, qui répond à des questions très concrètes — la grande tribulation, le temps de la colère de Dieu, l'enlèvement de l'Église, comment discerner les temps que nous vivons et comment s'y préparer. Merci à Nicolas pour ce travail fouillé, cette vision à 360° de la fin des temps. Ce livre est facile à lire et affermira votre foi dans ce retour imminent de notre merveilleux Sauveur." },
+  { initials: 'FB', name: 'François Bernot', role: 'Docteur en physique appliquée · Préface',
+    quote: "Se pencher sur la fin des temps en prenant une position claire, limpide et didactisée, c'est faire preuve d'un grand courage, car les contradicteurs sur ce thème sont légion. Alors merci Nicolas, mon ami, d'avoir mouillé ta chemise — et surtout d'avoir effacé la brume qui régnait dans mon esprit sur ce thème qui, autrefois, m'avait passionné." },
+  { initials: 'AS', name: 'Aymerick Sroka', role: 'Prophète · Préface',
+    quote: "Il y a des livres que l'on lit simplement pour apprendre. Et puis il y a des livres que l'on lit parce qu'ils viennent toucher une urgence, réveiller une conscience et remettre une génération devant une réalité qu'elle ne peut plus ignorer. L'urgence des temps fait partie de ces ouvrages. Il ne cherche pas à produire de la peur : il nous ramène à une vérité simple — Jésus n'a jamais parlé des temps de la fin pour effrayer ses disciples, mais pour les préparer. Ce n'est pas une urgence de panique : c'est une urgence d'alignement, de consécration, de réveil. Car au bout de l'histoire, le dernier mot appartient à l'Agneau. Viens, Seigneur Jésus." },
+  { initials: '✦', name: 'Un ami lecteur', role: '',
+    quote: "C'est comme une étude biblique — tu pourrais te poser avec le livre et ta Bible à côté. J'apprends énormément, alors que je pensais déjà connaître le sujet. Il y a un travail monstre derrière ces pages : non seulement d'étude, mais aussi de pédagogie. C'est accessible, malgré la profondeur. En tant qu'ami et chrétien qui veut en savoir plus sur le retour de Jésus, c'est hyper enrichissant. Merci grandement." },
+]
+
+function Stars({ value, max = 5, size = 'text-xl', interactive = false, onHover, onClick, hover = 0 }) {
+  return (
+    <div className="flex gap-0.5">
+      {Array.from({ length: max }, (_, i) => {
+        const filled = interactive ? (hover || value) > i : value > i
+        return (
+          <button
+            key={i}
+            type={interactive ? 'button' : undefined}
+            disabled={!interactive}
+            onMouseEnter={() => onHover?.(i + 1)}
+            onMouseLeave={() => onHover?.(0)}
+            onClick={() => onClick?.(i + 1)}
+            className={`${size} leading-none ${filled ? 'text-gold' : 'text-muted2'} ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'} bg-transparent border-0 p-0`}
+            aria-label={interactive ? `${i + 1} étoile${i > 0 ? 's' : ''}` : undefined}
+          >
+            ★
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function BoutiquePage() {
   const [emailEpub, setEmailEpub] = useState('')
   const [loadingEpub, setLoadingEpub] = useState(false)
   const [error, setError] = useState('')
+
+  const [reviews, setReviews] = useState([])
+  const [reviewName, setReviewName] = useState('')
+  const [reviewRating, setReviewRating] = useState(0)
+  const [reviewHover, setReviewHover] = useState(0)
+  const [reviewComment, setReviewComment] = useState('')
+  const [reviewState, setReviewState] = useState('idle')
+
+  useEffect(() => {
+    fetch('/api/reviews').then(r => r.json()).then(setReviews).catch(() => {})
+  }, [])
 
   async function handleBuy(product, email, setLoading) {
     if (!email || !email.includes('@')) {
@@ -32,6 +78,32 @@ export default function BoutiquePage() {
       setLoading(false)
     }
   }
+
+  async function handleReviewSubmit(e) {
+    e.preventDefault()
+    if (!reviewRating) return
+    setReviewState('loading')
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: reviewName, rating: reviewRating, comment: reviewComment }),
+      })
+      if (res.ok) {
+        setReviewState('done')
+        setReviewName(''); setReviewRating(0); setReviewComment('')
+        fetch('/api/reviews').then(r => r.json()).then(setReviews).catch(() => {})
+      } else {
+        setReviewState('error')
+      }
+    } catch {
+      setReviewState('error')
+    }
+  }
+
+  const avgRating = reviews.length
+    ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+    : 0
 
   return (
     <main className="min-h-screen page-glow">
@@ -179,6 +251,140 @@ export default function BoutiquePage() {
         <p className="text-center text-xs text-muted2 mt-8">
           EPUB : paiement sécurisé par Stripe · Carte bancaire, Apple Pay, Google Pay
         </p>
+
+        {/* ── Témoignages ──────────────────────────────────────────── */}
+        <div className="mt-20 pt-10 border-t border-border">
+          <h3 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-cream mb-8">
+            Ce que disent les lecteurs
+          </h3>
+          <div className="flex flex-col gap-4">
+            {TESTIMONIALS.map((t, i) => (
+              <blockquote key={i} className="m-0 p-7 bg-surface border border-border border-l-[3px] border-l-gold/60 rounded-2xl">
+                <span className="font-[family-name:var(--font-playfair)] text-5xl leading-none text-gold/30 block h-6 mb-1">"</span>
+                <p className="font-[family-name:var(--font-playfair)] text-sm italic text-muted2 leading-relaxed mb-5">{t.quote}</p>
+                <footer className="flex items-center gap-3">
+                  <div className="flex-shrink-0 w-11 h-11 rounded-full bg-gradient-to-br from-[#d4b896] to-[#b8966c] text-[#0d0d0d] font-[family-name:var(--font-playfair)] font-bold text-sm flex items-center justify-center">
+                    {t.initials}
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-cream">{t.name}</div>
+                    {t.role && <div className="text-xs text-muted mt-0.5">{t.role}</div>}
+                  </div>
+                </footer>
+              </blockquote>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Avis lecteurs ─────────────────────────────────────────── */}
+        <div className="mt-16 pt-10 border-t border-border">
+          <div className="flex items-end gap-4 mb-8">
+            <h3 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-cream">
+              Avis des lecteurs
+            </h3>
+            {reviews.length > 0 && (
+              <div className="flex items-center gap-2 mb-0.5">
+                <Stars value={Math.round(avgRating)} size="text-base" />
+                <span className="text-sm text-muted">
+                  {avgRating.toFixed(1)} · {reviews.length} avis
+                </span>
+              </div>
+            )}
+          </div>
+
+          {reviews.length === 0 ? (
+            <p className="text-sm text-muted mb-8">Aucun avis pour le moment. Soyez le premier !</p>
+          ) : (
+            <div className="flex flex-col gap-4 mb-10">
+              {reviews.map(r => (
+                <div key={r.id} className="bg-surface border border-border rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Stars value={r.rating} size="text-sm" />
+                      <span className="text-sm font-semibold text-cream">{r.name}</span>
+                    </div>
+                    <span className="text-xs text-muted2">
+                      {new Date(r.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted2 leading-relaxed">{r.comment}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Formulaire d'avis */}
+          <div className="bg-surface border border-border rounded-2xl p-6">
+            <h4 className="font-[family-name:var(--font-playfair)] text-lg font-bold text-cream mb-5">
+              Laisser un avis
+            </h4>
+
+            {reviewState === 'done' ? (
+              <div className="text-center py-4">
+                <p className="text-ok text-sm mb-1">✓ Merci pour votre avis !</p>
+                <p className="text-xs text-muted">Votre avis a bien été enregistré.</p>
+                <button
+                  onClick={() => setReviewState('idle')}
+                  className="mt-4 text-xs text-gold hover:text-gold2 transition"
+                >
+                  Laisser un autre avis
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleReviewSubmit} className="flex flex-col gap-4">
+                <div>
+                  <label className="text-xs text-muted block mb-1.5">Votre note *</label>
+                  <Stars
+                    value={reviewRating}
+                    hover={reviewHover}
+                    size="text-3xl"
+                    interactive
+                    onHover={setReviewHover}
+                    onClick={setReviewRating}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs text-muted block mb-1.5">Votre prénom *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Jean-Pierre"
+                    value={reviewName}
+                    onChange={e => setReviewName(e.target.value)}
+                    maxLength={100}
+                    className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs text-muted block mb-1.5">Votre commentaire *</label>
+                  <textarea
+                    required
+                    placeholder="Partagez votre ressenti sur ce livre…"
+                    value={reviewComment}
+                    onChange={e => setReviewComment(e.target.value)}
+                    maxLength={1000}
+                    rows={4}
+                    className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition resize-none"
+                  />
+                </div>
+
+                {reviewState === 'error' && (
+                  <p className="text-xs text-err">Une erreur est survenue. Réessayez.</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={reviewState === 'loading' || !reviewRating}
+                  className="self-start bg-gold text-bg font-semibold text-sm px-6 py-2.5 rounded-xl hover:bg-gold2 transition disabled:opacity-50"
+                >
+                  {reviewState === 'loading' ? 'Envoi…' : 'Publier mon avis'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
 
         {/* À propos de l'auteur */}
         <div className="mt-16 pt-10 border-t border-border">
