@@ -261,7 +261,7 @@ export default function BoutiquePage() {
             {TESTIMONIALS.map((t, i) => (
               <blockquote key={i} className="m-0 p-7 bg-surface border border-border border-l-[3px] border-l-gold/60 rounded-2xl">
                 <span className="font-[family-name:var(--font-playfair)] text-5xl leading-none text-gold/30 block h-6 mb-1">"</span>
-                <p className="font-[family-name:var(--font-playfair)] text-sm italic text-muted2 leading-relaxed mb-5">{t.quote}</p>
+                <p className="font-[family-name:var(--font-playfair)] text-sm italic text-cream2 leading-relaxed mb-5">{t.quote}</p>
                 <footer className="flex items-center gap-3">
                   <div className="flex-shrink-0 w-11 h-11 rounded-full bg-gradient-to-br from-[#d4b896] to-[#b8966c] text-[#0d0d0d] font-[family-name:var(--font-playfair)] font-bold text-sm flex items-center justify-center">
                     {t.initials}
