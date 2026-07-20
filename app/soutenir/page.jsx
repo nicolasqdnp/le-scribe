@@ -524,11 +524,10 @@ export default function CampagnePage() {
           </a>
           <nav style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <a href="#histoire" className="ls-nav-link" style={{ fontSize: '13px', color: C.text3, textDecoration: 'none', transition: 'color .2s' }}>Le livre</a>
-            <a href="#contreparties" className="ls-nav-link" style={{ fontSize: '13px', color: C.text3, textDecoration: 'none', transition: 'color .2s' }}>Contreparties</a>
             <a
-              href="#contreparties"
+              href="/boutique"
               style={{ background: C.gold, color: C.bg, fontWeight: 700, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none' }}>
-              Je participe
+              Acheter le livre
             </a>
             <ThemeToggle />
           </nav>
@@ -587,28 +586,20 @@ export default function CampagnePage() {
 
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <a
-                href="#contreparties"
+                href="/boutique"
                 style={{ background: C.gold, color: C.bg, fontWeight: 700, fontSize: '15px', padding: '14px 28px', borderRadius: '12px', textDecoration: 'none', display: 'inline-block' }}>
-                Soutenir le projet →
+                Acheter le livre →
               </a>
-              <button
-                onClick={() => openModal({ free: true })}
-                style={{ background: 'transparent', border: `1px solid ${C.border2}`, color: C.text2, fontSize: '14px', padding: '14px 20px', borderRadius: '12px', cursor: 'pointer' }}
-                className="ls-btn-outline">
-                Don libre
-              </button>
             </div>
           </div>
         </section>
 
-        {/* ── Bandeau objectif atteint ──────────────────────────────────────── */}
-        {funded && (
-          <div style={{ background: 'rgba(74,222,128,.08)', border: `1px solid rgba(74,222,128,.2)`, padding: '16px 24px', textAlign: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '14px', color: C.ok, fontWeight: 600 }}>
-              🎉 Objectif atteint ! La campagne continue — dernière chance de recevoir le livre au prix de lancement.
-            </span>
-          </div>
-        )}
+        {/* ── Bandeau campagne terminée ─────────────────────────────────────── */}
+        <div style={{ background: 'rgba(201,167,125,.08)', border: `1px solid rgba(201,167,125,.2)`, padding: '16px 24px', textAlign: 'center', marginBottom: '8px' }}>
+          <span style={{ fontSize: '14px', color: C.gold, fontWeight: 600 }}>
+            🎉 Campagne terminée — merci à tous ! Le livre reste disponible sur la <a href="/boutique" style={{ color: C.gold, textDecoration: 'underline' }}>boutique</a>.
+          </span>
+        </div>
 
         {/* ── Corps principal ────────────────────────────────────────────────── */}
         <div className="ls-main-body" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px 80px' }}>
@@ -827,95 +818,26 @@ export default function CampagnePage() {
             {/* ── Colonne droite : contreparties (sticky) ─────────────────── */}
             <div id="contreparties" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-              <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '18px', fontWeight: 700, color: C.text, marginBottom: '4px' }}>
-                Choisir une contrepartie
-              </h2>
+              {/* ── Campagne terminée ─────────────────────────────────────── */}
+              <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: '16px', padding: '32px 24px', textAlign: 'center' }}>
+                <div style={{ fontSize: '36px', marginBottom: '12px' }}>🎉</div>
+                <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '20px', fontWeight: 700, color: C.text, marginBottom: '12px' }}>
+                  Campagne terminée
+                </h2>
+                <p style={{ fontSize: '14px', color: C.text2, lineHeight: 1.7, marginBottom: '8px' }}>
+                  <strong style={{ color: C.gold }}>1 734 € récoltés</strong> — merci à tous les contributeurs pour votre confiance et votre soutien !
+                </p>
+                <p style={{ fontSize: '14px', color: C.text2, lineHeight: 1.7, marginBottom: '28px' }}>
+                  Le livre est toujours disponible sur la boutique.
+                </p>
+                <a
+                  href="/boutique"
+                  style={{ display: 'inline-block', background: C.gold, color: '#0d0d0d', fontWeight: 700, fontSize: '15px', padding: '13px 28px', borderRadius: '99px', textDecoration: 'none' }}
+                  className="ls-btn-gold">
+                  Acheter le livre →
+                </a>
+              </div>
 
-              {TIERS.map(tier => {
-                const ship = shipLabel(tier)
-                const backerCount = tierBackers[tier.id] ?? 0
-                return (
-                  <div
-                    key={tier.id}
-                    onClick={() => openModal(tier)}
-                    className={tier.featured ? 'ls-tier ls-tier-featured' : 'ls-tier'}
-                    style={{
-                      background: C.surface,
-                      border: `1px solid ${tier.featured ? 'rgba(201,167,125,.55)' : C.border}`,
-                      borderRadius: '14px', overflow: 'hidden', cursor: 'pointer',
-                      position: 'relative', transition: 'border-color .2s',
-                      boxShadow: tier.featured ? '0 0 0 1px rgba(201,167,125,.25), 0 16px 40px rgba(0,0,0,.4)' : 'none',
-                    }}
-                  >
-                    {tier.featured && (
-                      <div style={{ background: C.gold, color: '#0d0d0d', fontSize: '12px', fontWeight: 700, textAlign: 'center', padding: '6px' }}>
-                        ★ Contrepartie à la une
-                      </div>
-                    )}
-
-                    <TierVisual visual={tier.visual} isLight={isLight} />
-
-                    <div style={{ padding: '18px 20px 20px' }}>
-                      {tier.tag && (
-                        <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-                          <span style={{ display: 'inline-block', fontSize: '10px', fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase', background: 'rgba(201,167,125,.15)', color: C.gold, padding: '3px 9px', borderRadius: '99px' }}>{tier.tag}</span>
-                        </div>
-                      )}
-                      <div style={{ textAlign: 'center', marginBottom: '2px' }}>
-                        <span style={{ fontSize: '14px', color: C.gold, fontWeight: 600 }}>Pour {tier.price} €</span>
-                        {tier.strikePrice && <span style={{ fontSize: '12px', color: C.text3, textDecoration: 'line-through', marginLeft: '6px' }}>au lieu de {tier.strikePrice}</span>}
-                      </div>
-                      <h3 style={{ textAlign: 'center', fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: '19px', fontWeight: 700, color: C.text, margin: '0 0 16px' }}>{tier.titre}</h3>
-
-                      <button
-                        onClick={(e) => { e.stopPropagation(); openModal(tier) }}
-                        className="ls-btn-gold"
-                        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: C.gold, color: '#0d0d0d', fontWeight: 700, fontSize: '15px', padding: '12px', borderRadius: '99px', border: 'none', cursor: 'pointer', marginBottom: '18px' }}>
-                        <span style={{ fontSize: '18px', lineHeight: 1 }}>＋</span> Choisir
-                      </button>
-
-                      <ul style={{ listStyle: 'none', margin: '0 0 16px', padding: 0, display: 'flex', flexDirection: 'column', gap: '9px' }}>
-                        {tier.contents.map((c, i) => (
-                          <li key={i} style={{ position: 'relative', paddingLeft: '22px', fontSize: '13px', color: C.text2, lineHeight: 1.5 }}>
-                            <span style={{ position: 'absolute', left: '4px', top: 0, color: C.gold, fontWeight: 700 }}>•</span>{c}
-                          </li>
-                        ))}
-                      </ul>
-
-                      {tier.physical && (
-                        <p style={{ fontSize: '12px', fontStyle: 'italic', color: C.text3, margin: '0 0 10px' }}>(Visuel du livre non contractuel)</p>
-                      )}
-                      {tier.livraison !== '—' && (
-                        <p style={{ fontSize: '13px', color: C.text2, margin: '0 0 6px' }}>Livraison estimée : <strong style={{ color: C.text }}>{tier.livraison}</strong></p>
-                      )}
-                      {tier.physical && (
-                        <p style={{ fontSize: '12px', fontStyle: 'italic', color: C.text3, margin: '0 0 14px', lineHeight: 1.5 }}>Frais de port en option, calculés au paiement — offerts en remise en main propre.</p>
-                      )}
-
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', paddingTop: '14px', borderTop: `1px solid ${C.border}` }}>
-                        {tier.livraison !== '—' && (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: C.text3, background: C.surface2, padding: '4px 10px', borderRadius: '8px' }}>📅 {tier.livraison}</span>
-                        )}
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: C.text3, background: C.surface2, padding: '4px 10px', borderRadius: '8px' }}>♥ {backerCount} contribution{backerCount !== 1 ? 's' : ''}</span>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-
-
-              {/* Don libre */}
-              <button
-                onClick={() => openModal({ free: true })}
-                style={{ width: '100%', background: 'transparent', border: `1px dashed ${C.border2}`, color: C.text3, fontSize: '14px', padding: '14px', borderRadius: '12px', cursor: 'pointer', transition: 'border-color .2s, color .2s' }}
-                className="ls-btn-outline">
-                Faire un don libre →
-              </button>
-
-              <p style={{ fontSize: '11px', color: C.text3, textAlign: 'center', marginTop: '4px', lineHeight: 1.6 }}>
-                Paiement sécurisé par <strong style={{ color: C.text2 }}>Stripe</strong> · CB, Apple Pay, Google Pay<br/>
-                <span style={{ opacity: 0.7 }}>La plateforme de paiement utilisée par Amazon, Google et des millions d'entreprises.</span>
-              </p>
             </div>
           </div>
         </div>
@@ -923,19 +845,19 @@ export default function CampagnePage() {
         {/* ── CTA final ─────────────────────────────────────────────────────── */}
         <section style={{ background: C.surface, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '64px 24px', textAlign: 'center' }}>
           <p style={{ fontSize: '12px', fontWeight: 600, color: C.gold, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '16px' }}>
-            {DAYS_LEFT} jours restants
+            Campagne terminée · 1 734 € récoltés
           </p>
           <h2 style={{ fontFamily: 'var(--font-playfair, "Playfair Display"), Georgia, serif', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 700, color: C.text, marginBottom: '16px', lineHeight: 1.3 }}>
-            Ensemble, mettons ce livre entre toutes les mains.
+            Merci à tous les contributeurs 🙏
           </h2>
           <p style={{ fontSize: '16px', color: C.text2, marginBottom: '32px', maxWidth: '480px', margin: '0 auto 32px', lineHeight: 1.7 }}>
-            Chaque contribution — quelle que soit sa taille — rend ce tirage possible.
+            Le livre est toujours disponible — en ebook ou en version papier sur Amazon.
           </p>
           <a
-            href="#contreparties"
+            href="/boutique"
             style={{ display: 'inline-block', background: C.gold, color: C.bg, fontWeight: 700, fontSize: '16px', padding: '16px 36px', borderRadius: '12px', textDecoration: 'none' }}
             className="ls-btn-gold">
-            Soutenir L'urgence des temps →
+            Acheter le livre →
           </a>
         </section>
 
@@ -960,13 +882,13 @@ export default function CampagnePage() {
               <div style={{ background: `linear-gradient(90deg, ${C.gold}, #e8c99a)`, height: '100%', width: `${pct}%`, borderRadius: '99px' }} />
             </div>
           </div>
-          <a href="#contreparties" className="ls-btn-gold ls-sticky-desktop-cta"
+          <a href="/boutique" className="ls-btn-gold ls-sticky-desktop-cta"
             style={{ background: C.gold, color: C.bg, fontWeight: 700, fontSize: '14px', padding: '10px 20px', borderRadius: '10px', textDecoration: 'none', flexShrink: 0 }}>
-            Je participe
+            Acheter le livre →
           </a>
-          <a href="#contreparties" className="ls-btn-gold ls-sticky-mobile-cta"
+          <a href="/boutique" className="ls-btn-gold ls-sticky-mobile-cta"
             style={{ display: 'none', background: C.gold, color: C.bg, fontWeight: 700, fontSize: '14px', padding: '10px 20px', borderRadius: '10px', textDecoration: 'none' }}>
-            Voir les contreparties
+            Acheter le livre →
           </a>
         </div>
         {/* Espace pour la barre sticky */}
