@@ -40,6 +40,8 @@ function Stars({ value, max = 5, size = 'text-xl', interactive = false, onHover,
 export default function BoutiquePage() {
   const [emailEpub, setEmailEpub] = useState('')
   const [loadingEpub, setLoadingEpub] = useState(false)
+  const [emailLivre, setEmailLivre] = useState('')
+  const [loadingLivre, setLoadingLivre] = useState(false)
   const [error, setError] = useState('')
 
   const [reviews, setReviews] = useState([])
@@ -223,7 +225,7 @@ export default function BoutiquePage() {
                 <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream mt-1">
                   Livre physique
                 </h2>
-                <p className="text-muted text-xs mt-1">Expédié par Amazon · livraison rapide</p>
+                <p className="text-muted text-xs mt-1">Expédié sous 3–5 jours ouvrés · France & Europe</p>
               </div>
               <div className="text-right flex-shrink-0 mt-5">
                 <span className="text-2xl font-bold text-cream">18,99€</span>
@@ -232,18 +234,24 @@ export default function BoutiquePage() {
             </div>
 
             <ul className="text-sm text-muted space-y-1.5 mb-6 flex-1">
-              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Impression et expédition par Amazon</li>
-              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France et international</li>
-              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Suivi de commande Amazon</li>
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Éditions Le Scribe · 211 pages</li>
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Adresse de livraison saisie au paiement</li>
             </ul>
 
-            <a
-              href="https://www.amazon.fr/dp/B0H4NN4FXF"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full border border-gold/40 text-gold font-semibold text-sm py-3 rounded-xl hover:bg-gold/5 hover:border-gold/60 transition text-center">
-              Commander sur Amazon — 18,99€
-            </a>
+            <input
+              type="email"
+              placeholder="ton@email.com"
+              value={emailLivre}
+              onChange={e => setEmailLivre(e.target.value)}
+              className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition mb-3"
+            />
+            <button
+              onClick={() => handleBuy('livre', emailLivre, setLoadingLivre)}
+              disabled={loadingLivre}
+              className="w-full bg-gold text-bg font-semibold text-sm py-3 rounded-xl hover:bg-gold2 transition disabled:opacity-60">
+              {loadingLivre ? 'Redirection…' : 'Commander le livre — 18,99€'}
+            </button>
           </div>
         </div>
 

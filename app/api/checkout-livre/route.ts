@@ -6,15 +6,22 @@ const PRODUCTS = {
   epub: {
     name: 'L\'urgence des temps — EPUB',
     description: 'Livre numérique · Téléchargement immédiat après paiement',
-    amount: 900,           // 9,00 €
+    amount: 900,
     shipping: false,
+  },
+  livre: {
+    name: 'L\'urgence des temps — Livre physique',
+    description: 'Éditions Le Scribe · 211 pages · Expédié sous 3–5 jours ouvrés',
+    amount: 1899,
+    shipping: true,
+    shippingAmount: 300,
   },
   physique: {
     name: 'L\'urgence des temps — Livre physique (précommande)',
     description: 'Éditions Le Scribe · Expédition dès impression disponible',
-    amount: 1600,          // 16,00 €
+    amount: 1600,
     shipping: true,
-    shippingAmount: 600,   // 6,00 € frais de port
+    shippingAmount: 600,
   },
 }
 
