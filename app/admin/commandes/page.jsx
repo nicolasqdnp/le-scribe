@@ -108,13 +108,16 @@ function ThemeMenu({ theme, setTheme, C }) {
 
 export default function CommandesAdmin() {
   const [rows, setRows] = useState(null)
+  const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [toggling, setToggling] = useState(null)
   const [resending, setResending] = useState(null)
+  const [resendingOrder, setResendingOrder] = useState(null)
   const [auth, setAuth] = useState(null)
   const [search, setSearch] = useState('')
   const [sortP, setSortP] = useState({ col: 'created_at', dir: 'asc' })
   const [sortN, setSortN] = useState({ col: 'created_at', dir: 'asc' })
+  const [sortO, setSortO] = useState({ col: 'created_at', dir: 'desc' })
   const [theme, setTheme] = useState('dark')
   const [systemDark, setSystemDark] = useState(false)
   const router = useRouter()
@@ -143,9 +146,14 @@ export default function CommandesAdmin() {
   }, [])
 
   async function load() {
-    const res = await fetch('/api/admin/contributions')
-    const data = await res.json()
-    setRows(data)
+    const [contribRes, ordersRes] = await Promise.all([
+      fetch('/api/admin/contributions'),
+      fetch('/api/admin/orders'),
+    ])
+    const contribData = await contribRes.json()
+    const ordersData = await ordersRes.json()
+    setRows(contribData)
+    setOrders(Array.isArray(ordersData) ? ordersData : [])
     setLoading(false)
   }
 
@@ -169,6 +177,18 @@ export default function CommandesAdmin() {
     })
     setResending(null)
     alert(`Email renvoyé à ${row.email}`)
+  }
+
+  async function resendEpubOrder(order) {
+    setResendingOrder(order.id)
+    await fetch('/api/admin/resend-epub-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order_id: order.id }),
+    })
+    await load()
+    setResendingOrder(null)
+    alert(`Email renvoyé à ${order.email}`)
   }
 
   function handleSort(setSort, col) {
@@ -201,10 +221,22 @@ export default function CommandesAdmin() {
     )
   }
 
+  function filterOrders(arr) {
+    if (!search.trim()) return arr
+    const q = search.toLowerCase()
+    return arr.filter(r =>
+      r.email?.toLowerCase().includes(q) ||
+      r.product?.toLowerCase().includes(q) ||
+      r.shipping_name?.toLowerCase().includes(q) ||
+      formatAddr(r.shipping_address).toLowerCase().includes(q)
+    )
+  }
+
   const allPhysical = useMemo(() => rows?.filter(r => PHYSICAL.includes(r.tier_id)) ?? [], [rows])
   const allNonPhysical = useMemo(() => rows?.filter(r => !PHYSICAL.includes(r.tier_id)) ?? [], [rows])
   const physical = useMemo(() => sortRows(filterRows(allPhysical), sortP), [allPhysical, search, sortP])
   const nonPhysical = useMemo(() => sortRows(filterRows(allNonPhysical), sortN), [allNonPhysical, search, sortN])
+  const boutique = useMemo(() => sortRows(filterOrders(orders), sortO), [orders, search, sortO])
   const nbEnvoye = allPhysical.filter(r => r.shipped_at).length
 
   const centerStyle = { minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.text3, fontFamily: 'system-ui' }
@@ -358,6 +390,85 @@ export default function CommandesAdmin() {
                       </td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Commandes boutique */}
+            <h2 style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 14, marginTop: 48, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Commandes boutique ({boutique.length})
+            </h2>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ minWidth: 800, borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                    <th style={thStyle}>Statut</th>
+                    <ThHead label="Email" col="email" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
+                    <ThHead label="Produit" col="product" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
+                    <ThHead label="Montant" col="amount" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
+                    <th style={thStyle}>Destinataire</th>
+                    <th style={thStyle}>Adresse</th>
+                    <ThHead label="Date" col="created_at" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
+                    <th style={{ ...thStyle, minWidth: 160 }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {boutique.length === 0 && (
+                    <tr><td colSpan={8} style={{ ...tdStyle, color: C.muted, textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
+                  )}
+                  {boutique.map(order => {
+                    const isPaid = order.status === 'paid'
+                    const isEpub = order.product === 'epub'
+                    const isLivre = order.product === 'livre'
+                    const PRODUCT_LABELS = { epub: 'EPUB', livre: 'Livre physique', pack3: 'Pack 3 ex.', pack10: 'Pack Église 10 ex.', physique: 'Livre (précommande)' }
+                    return (
+                      <tr key={order.id} style={{ borderBottom: `1px solid ${C.border}`, background: isLivre && isPaid ? C.shipped : 'transparent' }}>
+                        <td style={tdStyle}>
+                          <span style={{
+                            display: 'inline-block', padding: '2px 10px', borderRadius: 99,
+                            fontSize: 11, fontWeight: 600,
+                            background: isPaid ? C.shippedBorder : C.pendingBg,
+                            color: isPaid ? C.shippedText : C.pendingText,
+                            border: `1px solid ${isPaid ? C.shippedText + '44' : C.gold + '44'}`,
+                          }}>
+                            {isPaid ? 'Payé' : 'En attente'}
+                          </span>
+                          {order.delivery === 'pickup' && (
+                            <span style={{ display: 'inline-block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
+                              🏛️ Retrait église
+                            </span>
+                          )}
+                          {order.delivery === 'relay' && (
+                            <span style={{ display: 'inline-block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
+                              📦 Mondial Relay
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ ...tdStyle, color: C.text2 }}>{order.email}</td>
+                        <td style={tdStyle}>{PRODUCT_LABELS[order.product] || order.product}</td>
+                        <td style={{ ...tdStyle, color: C.gold, fontWeight: 600 }}>{(order.amount / 100).toFixed(2)} €</td>
+                        <td style={tdStyle}>{order.shipping_name || <span style={{ color: C.muted }}>—</span>}</td>
+                        <td style={{ ...tdStyle, color: C.text2, maxWidth: 220 }}>
+                          {order.relay_point
+                            ? <span>📦 {order.relay_point.Nom}<br /><span style={{ fontSize: 11 }}>{order.relay_point.Adresse1}, {order.relay_point.CP} {order.relay_point.Ville}</span></span>
+                            : formatAddr(order.shipping_address)}
+                        </td>
+                        <td style={{ ...tdStyle, color: C.text2, whiteSpace: 'nowrap' }}>{new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
+                        <td style={tdStyle}>
+                          {isEpub && isPaid ? (
+                            <button onClick={() => resendEpubOrder(order)} disabled={resendingOrder === order.id} style={{
+                              padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
+                              border: `1px solid ${C.border}`, background: C.surface, color: C.gold,
+                              fontWeight: 600, whiteSpace: 'nowrap',
+                              opacity: resendingOrder === order.id ? 0.5 : 1,
+                            }}>
+                              {resendingOrder === order.id ? '…' : '📨 Renvoyer ebook'}
+                            </button>
+                          ) : <span style={{ color: C.muted }}>—</span>}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

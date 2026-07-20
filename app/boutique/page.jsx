@@ -37,11 +37,63 @@ function Stars({ value, max = 5, size = 'text-xl', interactive = false, onHover,
   )
 }
 
+function DeliverySelector({ value, onChange, onOpenRelay, relayPoint, portPrice, mrPrice }) {
+  const btn = (v, label, sub) => (
+    <button
+      type="button"
+      onClick={() => { onChange(v); if (v === 'relay') onOpenRelay() }}
+      className={`flex-1 text-left px-3 py-2 rounded-xl border text-xs transition ${
+        value === v
+          ? 'border-gold/60 bg-gold/8 text-cream'
+          : 'border-border bg-surface2 text-muted hover:border-gold/30'
+      }`}
+    >
+      <span className={`font-semibold block mb-0.5 ${value === v ? 'text-gold' : ''}`}>{label}</span>
+      <span>{sub}</span>
+    </button>
+  )
+  return (
+    <div className="mb-4">
+      <div className="flex gap-2 mb-2">
+        {btn('postal', '📬 À domicile', `+ ${portPrice}`)}
+        {btn('relay', '📦 Point Relais', `+ ${mrPrice}`)}
+        {btn('pickup', '🏛️ Retrait église', 'Gratuit · Lieusaint')}
+      </div>
+      {value === 'relay' && relayPoint && (
+        <div className="flex items-center justify-between bg-surface2 border border-gold/20 rounded-lg px-3 py-2 text-xs">
+          <span className="text-cream">📍 <strong>{relayPoint.Nom}</strong> — {relayPoint.CP} {relayPoint.Ville}</span>
+          <button type="button" onClick={onOpenRelay} className="text-gold/70 hover:text-gold ml-2 flex-shrink-0">Changer</button>
+        </div>
+      )}
+      {value === 'relay' && !relayPoint && (
+        <button type="button" onClick={onOpenRelay} className="w-full text-xs border border-dashed border-gold/30 rounded-lg py-2 text-gold/70 hover:border-gold/60 hover:text-gold transition">
+          Cliquer pour choisir un point relais sur la carte →
+        </button>
+      )}
+    </div>
+  )
+}
+
 export default function BoutiquePage() {
   const [emailEpub, setEmailEpub] = useState('')
   const [loadingEpub, setLoadingEpub] = useState(false)
   const [emailLivre, setEmailLivre] = useState('')
   const [loadingLivre, setLoadingLivre] = useState(false)
+  const [deliveryLivre, setDeliveryLivre] = useState('postal')
+  const [emailPack3, setEmailPack3] = useState('')
+  const [loadingPack3, setLoadingPack3] = useState(false)
+  const [deliveryPack3, setDeliveryPack3] = useState('postal')
+  const [emailPack10, setEmailPack10] = useState('')
+  const [loadingPack10, setLoadingPack10] = useState(false)
+  const [deliveryPack10, setDeliveryPack10] = useState('postal')
+
+  // Sélecteur point relais Boxtal
+  const [relayModal, setRelayModal] = useState(null) // 'livre' | 'pack3' | 'pack10' | null
+  const [relayPoints, setRelayPoints] = useState({}) // { livre: {code,name,address,...}, ... }
+  const [relayZip, setRelayZip] = useState('')
+  const [relayList, setRelayList] = useState([])
+  const [relayLoading, setRelayLoading] = useState(false)
+  const [relayError, setRelayError] = useState('')
   const [error, setError] = useState('')
 
   const [reviews, setReviews] = useState([])
@@ -55,9 +107,31 @@ export default function BoutiquePage() {
     fetch('/api/reviews').then(r => r.json()).then(setReviews).catch(() => {})
   }, [])
 
-  async function handleBuy(product, email, setLoading) {
+  // Réinitialiser la liste quand le modal change
+  useEffect(() => {
+    if (!relayModal) return
+    setRelayZip(''); setRelayList([]); setRelayError('')
+  }, [relayModal])
+
+  async function searchRelayPoints(zip) {
+    if (!/^\d{5}$/.test(zip)) return
+    setRelayLoading(true); setRelayError(''); setRelayList([])
+    try {
+      const res = await fetch(`/api/parcel-points?zipCode=${zip}`)
+      const data = await res.json()
+      if (!res.ok || data.error) { setRelayError('Aucun point trouvé pour ce code postal.'); return }
+      setRelayList(data)
+    } catch { setRelayError('Erreur réseau. Réessaie.') }
+    finally { setRelayLoading(false) }
+  }
+
+  async function handleBuy(product, email, setLoading, delivery = 'postal') {
     if (!email || !email.includes('@')) {
       setError('Saisis ton adresse email pour continuer.')
+      return
+    }
+    if (delivery === 'relay' && !relayPoints[product]) {
+      setRelayModal(product)
       return
     }
     setError('')
@@ -66,7 +140,7 @@ export default function BoutiquePage() {
       const res = await fetch('/api/checkout-livre', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product, email }),
+        body: JSON.stringify({ product, email, delivery, relayPoint: relayPoints[product] || null }),
       })
       const data = await res.json()
       if (data.url) {
@@ -130,13 +204,17 @@ export default function BoutiquePage() {
         {/* Bloc principal : couverture + infos */}
         <div className="flex flex-col md:flex-row gap-12 items-start mb-16">
 
-          {/* Couverture */}
-          <div className="flex-shrink-0 mx-auto md:mx-0">
-            <img
-              src="/lurgence-des-temps-couv-v2.png"
-              alt="L'urgence des temps — Nicolas Salafranque"
-              className="w-52 rounded-xl shadow-[0_8px_40px_rgba(0,0,0,0.5)]"
-            />
+          {/* Couverture flottante */}
+          <div className="flex-shrink-0 mx-auto md:mx-0" style={{ animation: 'ls-float 3s ease-in-out infinite' }}>
+            <style>{`@keyframes ls-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }`}</style>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <img
+                src="/lurgence-des-temps-couv-v2.png"
+                alt="L'urgence des temps — Nicolas Salafranque"
+                className="w-52 rounded-xl shadow-[0_24px_80px_rgba(0,0,0,0.7)]"
+              />
+              <div style={{ position: 'absolute', inset: 0, borderRadius: '12px', background: 'linear-gradient(135deg, rgba(201,167,125,.08) 0%, transparent 60%)', pointerEvents: 'none' }} />
+            </div>
           </div>
 
           {/* Infos livre */}
@@ -173,7 +251,7 @@ export default function BoutiquePage() {
         )}
 
         {/* Options d'achat */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 mb-4">
 
           {/* EPUB */}
           <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col">
@@ -225,18 +303,22 @@ export default function BoutiquePage() {
                 <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream mt-1">
                   Livre physique
                 </h2>
-                <p className="text-muted text-xs mt-1">Expédié sous 3–5 jours ouvrés · France & Europe</p>
+                <p className="text-muted text-xs mt-1">Éditions Le Scribe · 211 pages</p>
               </div>
               <div className="text-right flex-shrink-0 mt-5">
                 <span className="text-2xl font-bold text-cream">18,99€</span>
-                <p className="text-xs text-muted">+ 3€ port</p>
+                <p className="text-xs text-muted">{deliveryLivre === 'pickup' ? 'Port offert' : '+ 3€ port'}</p>
               </div>
             </div>
 
+            <DeliverySelector value={deliveryLivre} onChange={setDeliveryLivre} onOpenRelay={() => setRelayModal('livre')} relayPoint={relayPoints['livre']} portPrice="3€" mrPrice="3,90€" />
+
             <ul className="text-sm text-muted space-y-1.5 mb-6 flex-1">
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Éditions Le Scribe · 211 pages</li>
-              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
-              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Adresse de livraison saisie au paiement</li>
+              {deliveryLivre === 'pickup'
+                ? <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Retrait à l'église La Rencontre · Lieusaint (77)</li>
+                : <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
+              }
             </ul>
 
             <input
@@ -247,12 +329,95 @@ export default function BoutiquePage() {
               className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition mb-3"
             />
             <button
-              onClick={() => handleBuy('livre', emailLivre, setLoadingLivre)}
+              onClick={() => handleBuy('livre', emailLivre, setLoadingLivre, deliveryLivre)}
               disabled={loadingLivre}
               className="w-full bg-gold text-bg font-semibold text-sm py-3 rounded-xl hover:bg-gold2 transition disabled:opacity-60">
-              {loadingLivre ? 'Redirection…' : 'Commander le livre — 18,99€'}
+              {loadingLivre ? 'Redirection…' : deliveryLivre === 'pickup' ? 'Commander — 18,99€ (retrait)' : 'Commander le livre — 18,99€'}
             </button>
           </div>
+        </div>
+
+        {/* Packs groupés */}
+        <div className="grid md:grid-cols-2 gap-6">
+
+          {/* Pack 3 */}
+          <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <span className="text-xs font-medium text-gold/60 uppercase tracking-widest">Pack famille · offrir</span>
+                <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream mt-1">
+                  3 exemplaires
+                </h2>
+                <p className="text-muted text-xs mt-1">16 € / ex. · Économisez 8,97 € vs prix unitaire</p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <span className="text-2xl font-bold text-cream">48€</span>
+                <p className="text-xs text-muted">{deliveryPack3 === 'pickup' ? 'Port offert' : '+ 5€ port'}</p>
+              </div>
+            </div>
+            <DeliverySelector value={deliveryPack3} onChange={setDeliveryPack3} onOpenRelay={() => setRelayModal('pack3')} relayPoint={relayPoints['pack3']} portPrice="5€" mrPrice="5,50€" />
+            <ul className="text-sm text-muted space-y-1.5 mb-6 flex-1">
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> 3 livres dans le même colis</li>
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Idéal pour offrir à des proches</li>
+              {deliveryPack3 === 'pickup'
+                ? <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Retrait à l'église La Rencontre · Lieusaint (77)</li>
+                : <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
+              }
+            </ul>
+            <input
+              type="email"
+              placeholder="ton@email.com"
+              value={emailPack3}
+              onChange={e => setEmailPack3(e.target.value)}
+              className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition mb-3"
+            />
+            <button
+              onClick={() => handleBuy('pack3', emailPack3, setLoadingPack3, deliveryPack3)}
+              disabled={loadingPack3}
+              className="w-full bg-surface2 border border-border text-cream font-semibold text-sm py-3 rounded-xl hover:border-gold/40 transition disabled:opacity-60">
+              {loadingPack3 ? 'Redirection…' : deliveryPack3 === 'pickup' ? 'Commander — 48€ (retrait)' : 'Commander le pack — 48€'}
+            </button>
+          </div>
+
+          {/* Pack Église */}
+          <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <span className="text-xs font-medium text-gold/60 uppercase tracking-widest">Pack Église · diffusion</span>
+                <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream mt-1">
+                  10 exemplaires
+                </h2>
+                <p className="text-muted text-xs mt-1">14 € / ex. · Remise spéciale communautés</p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <span className="text-2xl font-bold text-cream">140€</span>
+                <p className="text-xs text-muted">{deliveryPack10 === 'pickup' ? 'Port offert' : '+ 5€ port'}</p>
+              </div>
+            </div>
+            <DeliverySelector value={deliveryPack10} onChange={setDeliveryPack10} onOpenRelay={() => setRelayModal('pack10')} relayPoint={relayPoints['pack10']} portPrice="5€" mrPrice="9€" />
+            <ul className="text-sm text-muted space-y-1.5 mb-6 flex-1">
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> 10 livres dans le même colis</li>
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Idéal pour une église, un groupe d'études</li>
+              {deliveryPack10 === 'pickup'
+                ? <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Retrait à l'église La Rencontre · Lieusaint (77)</li>
+                : <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
+              }
+            </ul>
+            <input
+              type="email"
+              placeholder="ton@email.com"
+              value={emailPack10}
+              onChange={e => setEmailPack10(e.target.value)}
+              className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition mb-3"
+            />
+            <button
+              onClick={() => handleBuy('pack10', emailPack10, setLoadingPack10, deliveryPack10)}
+              disabled={loadingPack10}
+              className="w-full bg-surface2 border border-border text-cream font-semibold text-sm py-3 rounded-xl hover:border-gold/40 transition disabled:opacity-60">
+              {loadingPack10 ? 'Redirection…' : deliveryPack10 === 'pickup' ? 'Commander — 140€ (retrait)' : 'Commander le pack — 140€'}
+            </button>
+          </div>
+
         </div>
 
         {/* Paiement sécurisé */}
@@ -315,7 +480,7 @@ export default function BoutiquePage() {
                       {new Date(r.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </span>
                   </div>
-                  <p className="text-sm text-muted2 leading-relaxed">{r.comment}</p>
+                  <p className="text-sm text-cream leading-relaxed">{r.comment}</p>
                 </div>
               ))}
             </div>
@@ -413,6 +578,71 @@ export default function BoutiquePage() {
           </p>
         </div>
       </div>
+
+      {/* Modal sélection point relais Mondial Relay */}
+      {relayModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+          <div style={{ background: '#1a1510', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+              <div>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: '15px', color: '#e8dcc8' }}>Choisir un point Mondial Relay</p>
+                <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#a09070' }}>Entrez un code postal pour trouver les points proches</p>
+              </div>
+              <button onClick={() => setRelayModal(null)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 12px', cursor: 'pointer', fontSize: '14px', color: '#e8dcc8' }}>✕ Fermer</button>
+            </div>
+            {/* Recherche par CP */}
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={5}
+                  placeholder="Code postal (ex : 77127)"
+                  value={relayZip}
+                  onChange={e => setRelayZip(e.target.value.replace(/\D/g, ''))}
+                  onKeyDown={e => e.key === 'Enter' && searchRelayPoints(relayZip)}
+                  style={{ flex: 1, padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)', color: '#e8dcc8', fontSize: '15px', outline: 'none' }}
+                />
+                <button
+                  onClick={() => searchRelayPoints(relayZip)}
+                  disabled={relayLoading || relayZip.length !== 5}
+                  style={{ padding: '10px 18px', borderRadius: '8px', background: relayLoading || relayZip.length !== 5 ? 'rgba(139,107,71,0.3)' : '#8b6b47', color: '#e8dcc8', border: 'none', cursor: relayLoading || relayZip.length !== 5 ? 'not-allowed' : 'pointer', fontWeight: 600, fontSize: '14px', whiteSpace: 'nowrap' }}
+                >
+                  {relayLoading ? 'Recherche…' : 'Rechercher'}
+                </button>
+              </div>
+              {relayError && <p style={{ margin: '8px 0 0', color: '#e07070', fontSize: '13px' }}>{relayError}</p>}
+            </div>
+            {/* Liste des points */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '8px 12px' }}>
+              {relayList.length === 0 && !relayLoading && (
+                <p style={{ textAlign: 'center', color: '#a09070', fontSize: '13px', padding: '32px 0' }}>
+                  {relayZip.length < 5 ? 'Entrez un code postal pour démarrer la recherche.' : 'Aucun résultat.'}
+                </p>
+              )}
+              {relayList.map(point => (
+                <button
+                  key={point.code}
+                  onClick={() => {
+                    setRelayPoints(prev => ({ ...prev, [relayModal]: point }))
+                    setRelayModal(null)
+                  }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px', marginBottom: '8px', cursor: 'pointer', color: '#e8dcc8' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                    <div>
+                      <p style={{ margin: 0, fontWeight: 700, fontSize: '14px' }}>{point.name}</p>
+                      <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#a09070' }}>{point.address}, {point.zipCode} {point.city}</p>
+                    </div>
+                    <span style={{ flexShrink: 0, fontSize: '12px', color: '#8b6b47', fontWeight: 600 }}>{point.distance} m</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
