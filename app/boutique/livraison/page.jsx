@@ -173,7 +173,9 @@ function LivraisonForm() {
               Chargement de la carte…
             </div>
           )}
-          <div ref={widgetRef} className={widgetReady ? 'block' : 'hidden'} style={{ minHeight: '480px' }} />
+          <div style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', display: widgetReady ? 'block' : 'none', minHeight: '480px' }}>
+            <div ref={widgetRef} />
+          </div>
         </div>
       )}
 
