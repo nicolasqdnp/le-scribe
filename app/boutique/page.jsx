@@ -237,7 +237,6 @@ export default function BoutiquePage() {
               </div>
               <div className="text-right flex-shrink-0 mt-5">
                 <span className="text-2xl font-bold text-cream">18,99€</span>
-                <p className="text-xs text-muted">+ 3€ port</p>
               </div>
             </div>
 
@@ -246,6 +245,7 @@ export default function BoutiquePage() {
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
             </ul>
 
+            <p className="text-xs text-muted2 mb-3">+ frais d'envoi calculés à l'étape suivante</p>
             <input
               type="email"
               placeholder="ton@email.com"
@@ -277,7 +277,6 @@ export default function BoutiquePage() {
               </div>
               <div className="text-right flex-shrink-0">
                 <span className="text-2xl font-bold text-cream">48€</span>
-                <p className="text-xs text-muted">+ 5€ port</p>
               </div>
             </div>
             <ul className="text-sm text-muted space-y-1.5 mb-6 flex-1">
@@ -285,6 +284,7 @@ export default function BoutiquePage() {
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Idéal pour offrir à des proches</li>
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
             </ul>
+            <p className="text-xs text-muted2 mb-3">+ frais d'envoi calculés à l'étape suivante</p>
             <input
               type="email"
               placeholder="ton@email.com"
@@ -312,7 +312,6 @@ export default function BoutiquePage() {
               </div>
               <div className="text-right flex-shrink-0">
                 <span className="text-2xl font-bold text-cream">140€</span>
-                <p className="text-xs text-muted">+ 5€ port</p>
               </div>
             </div>
             <ul className="text-sm text-muted space-y-1.5 mb-6 flex-1">
@@ -320,6 +319,7 @@ export default function BoutiquePage() {
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Idéal pour une église, un groupe d'études</li>
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
             </ul>
+            <p className="text-xs text-muted2 mb-3">+ frais d'envoi calculés à l'étape suivante</p>
             <input
               type="email"
               placeholder="ton@email.com"
