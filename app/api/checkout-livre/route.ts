@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
     // Adresse domicile pour livraison postale classique ou MR domicile
     if (p.shipping && (isHomeMR || (!isPickup && !isRelay))) {
       sessionParams.shipping_address_collection = {
-        allowed_countries: ['FR', 'BE', 'CH', 'LU'],
+        allowed_countries: ['FR', 'BE', 'LU'],
       }
       sessionParams.phone_number_collection = { enabled: true }
     }
