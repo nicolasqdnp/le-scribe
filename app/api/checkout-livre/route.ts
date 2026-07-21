@@ -17,7 +17,7 @@ const PRODUCTS = {
     amount: 1899,
     shipping: true,
     shippingAmount: 300,
-    mrAmount: 390,
+    mrAmount: 415,
   },
   pack3: {
     name: 'L\'urgence des temps — Pack 3 exemplaires',

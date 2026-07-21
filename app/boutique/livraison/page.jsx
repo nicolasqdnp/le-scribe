@@ -3,9 +3,9 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 const PRODUCTS = {
-  livre:  { label: 'Livre physique',             priceStr: '18,99€', relayStr: '4,15€' },
-  pack3:  { label: 'Pack 3 exemplaires',         priceStr: '48€',    relayStr: '5,50€' },
-  pack10: { label: 'Pack Église 10 exemplaires', priceStr: '140€',   relayStr: '9€'    },
+  livre:  { label: 'Livre physique',             priceStr: '18,99€', relayStr: '4,15€', weight: 320  },
+  pack3:  { label: 'Pack 3 exemplaires',         priceStr: '48€',    relayStr: '5,50€', weight: 960  },
+  pack10: { label: 'Pack Église 10 exemplaires', priceStr: '140€',   relayStr: '9€',    weight: 3200 },
 }
 
 const MR_BRAND = 'BDTEST  '
@@ -61,11 +61,14 @@ function LivraisonForm() {
       Brand: MR_BRAND,
       Country: 'FR',
       Responsive: true,
+      Weight: info.weight,
+      NbResults: 7,
+      EnableGeolocalisatedSearch: true,
       OnParcelShopSelected: (data) => {
         setRelayPoint({
           code:    data.ID,
           name:    data.Nom,
-          address: data.Adresse1,
+          address: (data.Adresse1 + (data.Adresse2 ? ' ' + data.Adresse2 : '')).trim(),
           city:    data.Ville,
           zipCode: data.CP,
         })
