@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
           product_data: {
             name: isRelay ? 'Livraison Mondial Relay' : 'Frais de port',
             description: isRelay
-              ? `Point relais : ${relayPoint?.Nom || ''} — ${relayPoint?.CP || ''} ${relayPoint?.Ville || ''}`
+              ? `Point relais : ${relayPoint?.name || ''} — ${relayPoint?.zipCode || ''} ${relayPoint?.city || ''}`
               : 'Livraison France · Lettre suivie',
           },
           unit_amount: shippingCost,
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
         product,
         order_id: order?.id || '',
         delivery,
-        relay_id: relayPoint?.ID || '',
+        relay_id: relayPoint?.code || '',
       },
       payment_method_types: ['card'],
       phone_number_collection: { enabled: false },

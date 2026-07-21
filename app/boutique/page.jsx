@@ -59,30 +59,29 @@ export default function BoutiquePage() {
     fetch('/api/reviews').then(r => r.json()).then(setReviews).catch(() => {})
   }, [])
 
-  async function handleBuy(product, email, setLoading) {
+  function handleBuy(product, email, setLoading) {
     if (!email || !email.includes('@')) {
       setError('Saisis ton adresse email pour continuer.')
       return
     }
-    setError('')
-    setLoading(true)
-    try {
-      const res = await fetch('/api/checkout-livre', {
+    if (product === 'epub') {
+      setError('')
+      setLoading(true)
+      fetch('/api/checkout-livre', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ product, email }),
       })
-      const data = await res.json()
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        setError(data.error || 'Une erreur est survenue.')
-        setLoading(false)
-      }
-    } catch {
-      setError('Erreur réseau. Réessaie dans un instant.')
-      setLoading(false)
+        .then(r => r.json())
+        .then(data => {
+          if (data.url) { window.location.href = data.url }
+          else { setError(data.error || 'Une erreur est survenue.'); setLoading(false) }
+        })
+        .catch(() => { setError('Erreur réseau. Réessaie.'); setLoading(false) })
+      return
     }
+    setError('')
+    window.location.href = `/boutique/livraison?product=${product}&email=${encodeURIComponent(email)}`
   }
 
   async function handleReviewSubmit(e) {
