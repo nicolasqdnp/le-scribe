@@ -17,7 +17,8 @@ const PRODUCTS = {
     amount: 1899,
     shipping: true,
     shippingAmount: 300,
-    mrAmount: 415,
+    mrAmount: 410,
+    homeAmount: 749,
   },
   pack3: {
     name: 'L\'urgence des temps — Pack 3 exemplaires',
@@ -25,7 +26,8 @@ const PRODUCTS = {
     amount: 4800,
     shipping: true,
     shippingAmount: 500,
-    mrAmount: 550,
+    mrAmount: 451,
+    homeAmount: 948,
   },
   pack10: {
     name: 'L\'urgence des temps — Pack Église 10 exemplaires',
@@ -33,7 +35,8 @@ const PRODUCTS = {
     amount: 14000,
     shipping: true,
     shippingAmount: 500,
-    mrAmount: 900,
+    mrAmount: 671,
+    homeAmount: 1634,
   },
   physique: {
     name: 'L\'urgence des temps — Livre physique (précommande)',
@@ -65,7 +68,8 @@ export async function POST(req: NextRequest) {
 
     const isPickup = delivery === 'pickup'
     const isRelay = delivery === 'relay'
-    const shippingCost = isPickup ? 0 : isRelay ? p.mrAmount : p.shippingAmount
+    const isHomeMR = delivery === 'home-mr'
+    const shippingCost = isPickup ? 0 : isRelay ? p.mrAmount : isHomeMR ? p.homeAmount : p.shippingAmount
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -101,9 +105,11 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency: 'eur',
           product_data: {
-            name: isRelay ? 'Livraison Mondial Relay' : 'Frais de port',
+            name: isRelay ? 'Livraison Mondial Relay — Point Relais' : isHomeMR ? 'Livraison Mondial Relay — Domicile' : 'Frais de port',
             description: isRelay
               ? `Point relais : ${relayPoint?.name || ''} — ${relayPoint?.zipCode || ''} ${relayPoint?.city || ''}`
+              : isHomeMR
+              ? 'Livraison à domicile Mondial Relay · 3–5 jours ouvrés'
               : 'Livraison France · Lettre suivie',
           },
           unit_amount: shippingCost,
@@ -122,17 +128,18 @@ export async function POST(req: NextRequest) {
         product,
         order_id: order?.id || '',
         delivery,
-        relay_id: relayPoint?.code || '',
+        relay_id: isRelay ? (relayPoint?.code || '') : '',
       },
       payment_method_types: ['card'],
       phone_number_collection: { enabled: false },
     }
 
-    // Adresse domicile uniquement pour livraison postale classique
-    if (p.shipping && !isPickup && !isRelay) {
+    // Adresse domicile pour livraison postale classique ou MR domicile
+    if (p.shipping && (isHomeMR || (!isPickup && !isRelay))) {
       sessionParams.shipping_address_collection = {
-        allowed_countries: ['FR', 'BE', 'CH', 'LU', 'CA'],
+        allowed_countries: ['FR', 'BE', 'CH', 'LU'],
       }
+      sessionParams.phone_number_collection = { enabled: true }
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams)

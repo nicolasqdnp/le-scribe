@@ -3,9 +3,9 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 const PRODUCTS = {
-  livre:  { label: 'Livre physique',             priceStr: '18,99€', relayStr: '4,15€', weight: 320  },
-  pack3:  { label: 'Pack 3 exemplaires',         priceStr: '48€',    relayStr: '5,50€', weight: 960  },
-  pack10: { label: 'Pack Église 10 exemplaires', priceStr: '140€',   relayStr: '9€',    weight: 3200 },
+  livre:  { label: 'Livre physique',             priceStr: '18,99€', relayStr: '4,10€', homeStr: '7,49€',  weight: 320  },
+  pack3:  { label: 'Pack 3 exemplaires',         priceStr: '48€',    relayStr: '4,51€', homeStr: '9,48€',  weight: 960  },
+  pack10: { label: 'Pack Église 10 exemplaires', priceStr: '140€',   relayStr: '6,71€', homeStr: '16,34€', weight: 3200 },
 }
 
 const MR_BRAND = 'CC23ZZZP'
@@ -102,7 +102,7 @@ function LivraisonForm() {
     } catch { setError('Erreur réseau. Réessaie.'); setLoading(false) }
   }
 
-  const canConfirm = mode === 'pickup' || (mode === 'relay' && relayPoint)
+  const canConfirm = mode === 'pickup' || mode === 'home-mr' || (mode === 'relay' && relayPoint)
 
   return (
     <main className="min-h-screen bg-bg text-cream px-4 py-12 max-w-2xl mx-auto">
@@ -144,6 +144,19 @@ function LivraisonForm() {
 
         <button
           type="button"
+          onClick={() => setMode('home-mr')}
+          className={`text-left p-4 rounded-2xl border transition ${
+            mode === 'home-mr' ? 'border-gold/60 bg-gold/5' : 'border-border bg-surface hover:border-gold/30'
+          }`}
+        >
+          <p className={`font-semibold text-sm ${mode === 'home-mr' ? 'text-gold' : 'text-cream'}`}>
+            🏠 Livraison à domicile Mondial Relay
+          </p>
+          <p className="text-xs text-muted mt-0.5">+ {info.homeStr} · Livraison en 3–5 jours ouvrés</p>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setMode('pickup')}
           className={`text-left p-4 rounded-2xl border transition ${
             mode === 'pickup' ? 'border-gold/60 bg-gold/5' : 'border-border bg-surface hover:border-gold/30'
@@ -180,6 +193,16 @@ function LivraisonForm() {
             `}</style>
             <div ref={widgetRef} className="mr-widget-root" />
           </div>
+        </div>
+      )}
+
+      {/* Domicile MR */}
+      {mode === 'home-mr' && (
+        <div className="bg-surface border border-gold/10 rounded-2xl p-4 mb-6 text-sm text-muted">
+          <p className="font-semibold text-cream mb-1">Livraison à votre adresse</p>
+          <p>Mondial Relay livrera le colis à l'adresse que tu indiqueras à l'étape suivante.</p>
+          <p className="mt-1">Délai estimé : 3 à 5 jours ouvrés après expédition.</p>
+          <p className="mt-2 text-xs text-muted2">Ton adresse sera saisie sur la page de paiement sécurisée Stripe.</p>
         </div>
       )}
 
