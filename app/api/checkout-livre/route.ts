@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     const isPickup = delivery === 'pickup'
     const isRelay = delivery === 'relay'
     const isHomeMR = delivery === 'home-mr'
-    const shippingCost = isPickup ? 0 : isRelay ? p.mrAmount : isHomeMR ? p.homeAmount : p.shippingAmount
+    const shippingCost = isPickup ? 0 : isRelay ? p.mrAmount : isHomeMR ? ((p as any).homeAmount ?? 0) : p.shippingAmount
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
