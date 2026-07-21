@@ -8,7 +8,7 @@ const PRODUCTS = {
   pack10: { label: 'Pack Église 10 exemplaires', priceStr: '140€',   relayStr: '9€',    weight: 3200 },
 }
 
-const MR_BRAND = 'BDTEST  '
+const MR_BRAND = 'CC23ZZZP'
 
 function LivraisonForm() {
   const params  = useSearchParams()
