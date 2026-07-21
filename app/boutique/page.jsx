@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react'
-import ThemeToggle from '../components/ThemeToggle'
 
 const TESTIMONIALS = [
   { initials: 'PS', name: 'Patrick Salafranque', role: "Pasteur · Préface · Père de l'auteur",
@@ -117,10 +116,7 @@ export default function BoutiquePage() {
         <a href="/" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">
           Le Scribe
         </a>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-muted">Éditions Le Scribe</span>
-          <ThemeToggle />
-        </div>
+        <span className="text-xs text-muted">Éditions Le Scribe</span>
       </header>
 
       <div className="max-w-4xl mx-auto px-6 py-16">

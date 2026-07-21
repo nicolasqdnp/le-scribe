@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
-import ThemeToggle from '../components/ThemeToggle'
 import { useTheme } from '../components/ThemeProvider'
 import { track } from '@vercel/analytics'
 
@@ -529,7 +528,6 @@ export default function CampagnePage() {
               style={{ background: C.gold, color: C.bg, fontWeight: 700, fontSize: '13px', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none' }}>
               Acheter le livre
             </a>
-            <ThemeToggle />
           </nav>
         </header>
 

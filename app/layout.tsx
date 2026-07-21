@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "./components/ThemeProvider";
+import ThemeToggle from "./components/ThemeToggle";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -37,6 +38,9 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning style={{ fontFamily: "var(--font-inter, system-ui, sans-serif)" }}>
         <ThemeProvider>
+          <div style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999 }}>
+            <ThemeToggle />
+          </div>
           {children}
         </ThemeProvider>
         <footer style={{ textAlign: 'center', padding: '1rem', fontSize: '0.75rem', opacity: 0.5 }}>
