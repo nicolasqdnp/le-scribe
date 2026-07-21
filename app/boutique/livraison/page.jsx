@@ -173,8 +173,12 @@ function LivraisonForm() {
               Chargement de la carte…
             </div>
           )}
-          <div style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', display: widgetReady ? 'block' : 'none', minHeight: '480px' }}>
-            <div ref={widgetRef} />
+          <div style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', display: widgetReady ? 'block' : 'none', minHeight: '480px', color: '#111' }}>
+            <style>{`
+              .mr-widget-root, .mr-widget-root *, .mr-widget-root input, .mr-widget-root select, .mr-widget-root label, .mr-widget-root p, .mr-widget-root span, .mr-widget-root div, .mr-widget-root td, .mr-widget-root th, .mr-widget-root a { color: #111 !important; }
+              .mr-widget-root input, .mr-widget-root select { background: #fff !important; border-color: #ccc !important; }
+            `}</style>
+            <div ref={widgetRef} className="mr-widget-root" />
           </div>
         </div>
       )}
