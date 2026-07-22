@@ -235,6 +235,7 @@ export default function CommandesAdmin() {
       else if (sort.col === 'public_name') { va = (a.public_name || a.shipping_name || '').toLowerCase(); vb = (b.public_name || b.shipping_name || '').toLowerCase() }
       else if (sort.col === 'email') { va = a.email?.toLowerCase(); vb = b.email?.toLowerCase() }
       else if (sort.col === 'tier_id') { va = TIER_LABELS[a.tier_id] || a.tier_id; vb = TIER_LABELS[b.tier_id] || b.tier_id }
+      else if (sort.col === 'shipped') { va = a.shipped_at ? 1 : 0; vb = b.shipped_at ? 1 : 0 }
       else { va = a.created_at; vb = b.created_at }
       if (va < vb) return sort.dir === 'asc' ? -1 : 1
       if (va > vb) return sort.dir === 'asc' ? 1 : -1
@@ -319,7 +320,7 @@ export default function CommandesAdmin() {
               <table style={{ minWidth: 900, borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                    <th style={thStyle}>Statut</th>
+                    <ThHead label="Statut" col="shipped" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
                     <ThHead label="Prénom dédicace" col="public_name" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
                     <th style={thStyle}>Destinataire</th>
                     <ThHead label="Email" col="email" sort={sortP} onSort={col => handleSort(setSortP, col)} C={C} />
@@ -435,7 +436,7 @@ export default function CommandesAdmin() {
               <table style={{ minWidth: 800, borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                    <th style={thStyle}>Statut</th>
+                    <ThHead label="Statut" col="shipped" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
                     <ThHead label="Email" col="email" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
                     <ThHead label="Produit" col="product" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
                     <ThHead label="Montant" col="amount" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
