@@ -203,7 +203,7 @@ function TierVisual({ visual, isLight }) {
         {/* Tranche du livre (effet pages) */}
         <div style={{ position: 'absolute', right: '-9px', top: '6px', bottom: '6px', width: '12px', background: 'linear-gradient(90deg, #c8b99a, #f0e8d8 40%, #e4d8c0)', borderRadius: '0 2px 2px 0', zIndex: 0 }} />
         <div style={{ position: 'absolute', right: '-6px', top: '6px', bottom: '6px', width: '8px', background: '#d4c9b0', zIndex: 0 }} />
-        <img src={COVER} alt="" style={{ height: '158px', borderRadius: '5px 2px 2px 5px', boxShadow: '0 16px 36px rgba(0,0,0,.65)', transform: 'perspective(700px) rotateY(-9deg)', position: 'relative', zIndex: 1 }} />
+        <img src={COVER} alt="" loading="lazy" style={{ height: '158px', borderRadius: '5px 2px 2px 5px', boxShadow: '0 16px 36px rgba(0,0,0,.65)', transform: 'perspective(700px) rotateY(-9deg)', position: 'relative', zIndex: 1 }} />
       </div>
     )
   } else if (visual === 'ereader') {
@@ -211,7 +211,7 @@ function TierVisual({ visual, isLight }) {
       <div style={{ position: 'relative', width: '132px', height: '182px', background: '#141414', border: '2px solid #303030', borderRadius: '18px', padding: '14px 14px 24px', boxShadow: '0 16px 36px rgba(0,0,0,.65)' }}>
         {/* Écran avec léger reflet bleuté typique e-ink */}
         <div style={{ width: '100%', height: '100%', borderRadius: '4px', overflow: 'hidden', position: 'relative', background: '#e8f0f0' }}>
-          <img src={COVER} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={COVER} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(180,220,220,.18) 0%, transparent 50%)', pointerEvents: 'none' }} />
         </div>
         {/* Bouton home */}
@@ -225,13 +225,13 @@ function TierVisual({ visual, isLight }) {
     scene = (
       <div style={{ position: 'relative', width: '200px', height: '186px' }}>
         <div style={{ position: 'absolute', left: '18px', top: '24px', width: '92px', height: '128px', background: '#0c0c0c', border: '1px solid #2a2a2a', borderRadius: '11px', padding: '6px', boxShadow: '0 10px 26px rgba(0,0,0,.55)', transform: 'rotate(-8deg)' }}>
-          <img src={COVER} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px' }} />
+          <img src={COVER} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px' }} />
         </div>
         <div style={{ position: 'absolute', right: '6px', bottom: '8px', transform: 'rotate(7deg)', transformOrigin: 'bottom center', zIndex: 1 }}>
           <div style={{ position: 'relative' }}>
             <div style={{ position: 'absolute', right: '-9px', top: '4px', bottom: '4px', width: '11px', background: 'linear-gradient(90deg, #c8b99a, #f0e8d8 40%, #e4d8c0)', borderRadius: '0 2px 2px 0', zIndex: 0 }} />
             <div style={{ position: 'absolute', right: '-6px', top: '4px', bottom: '4px', width: '7px', background: '#d4c9b0', zIndex: 0 }} />
-            <img src={COVER} alt="" style={{ height: '144px', borderRadius: '5px 2px 2px 5px', boxShadow: '0 16px 34px rgba(0,0,0,.62)', position: 'relative', zIndex: 1 }} />
+            <img src={COVER} alt="" loading="lazy" style={{ height: '144px', borderRadius: '5px 2px 2px 5px', boxShadow: '0 16px 34px rgba(0,0,0,.62)', position: 'relative', zIndex: 1 }} />
           </div>
         </div>
       </div>
@@ -242,7 +242,7 @@ function TierVisual({ visual, isLight }) {
         <div style={{ position: 'absolute', left: 0, top: '8px', width: '168px' }}>
           <div style={{ width: '156px', margin: '0 auto', background: '#0c0c0c', border: '2px solid #2a2a2a', borderBottom: 'none', borderRadius: '10px 10px 0 0', padding: '8px' }}>
             <div style={{ position: 'relative', borderRadius: '5px', overflow: 'hidden', aspectRatio: '16 / 10', background: '#1b262d' }}>
-              <img src="/photo_nico_profil.jpg" alt="Nicolas Salafranque" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }} />
+              <Image src="/photo_nico_profil.jpg" alt="Nicolas Salafranque" fill style={{ objectFit: 'cover', objectPosition: 'center 15%' }} />
               <span style={{ position: 'absolute', top: '5px', left: '5px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '8px', fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,.55)', padding: '2px 6px', borderRadius: '99px' }}>
                 <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#4ade80' }} />En direct
               </span>
@@ -256,7 +256,7 @@ function TierVisual({ visual, isLight }) {
           <div style={{ position: 'relative' }}>
             <div style={{ position: 'absolute', right: '-9px', top: '4px', bottom: '4px', width: '11px', background: 'linear-gradient(90deg, #c8b99a, #f0e8d8 40%, #e4d8c0)', borderRadius: '0 2px 2px 0', zIndex: 0 }} />
             <div style={{ position: 'absolute', right: '-6px', top: '4px', bottom: '4px', width: '7px', background: '#d4c9b0', zIndex: 0 }} />
-            <img src={COVER} alt="" style={{ height: '128px', borderRadius: '5px 2px 2px 5px', boxShadow: '0 14px 30px rgba(0,0,0,.62)', position: 'relative', zIndex: 1 }} />
+            <img src={COVER} alt="" loading="lazy" style={{ height: '128px', borderRadius: '5px 2px 2px 5px', boxShadow: '0 14px 30px rgba(0,0,0,.62)', position: 'relative', zIndex: 1 }} />
           </div>
         </div>
       </div>
@@ -264,14 +264,14 @@ function TierVisual({ visual, isLight }) {
   } else if (visual === 'stack3') {
     scene = (
       <div style={{ position: 'relative', width: '188px', height: '176px' }}>
-        <img src={COVER} alt="" style={{ position: 'absolute', left: '50%', top: '50%', height: '134px', borderRadius: '4px', boxShadow: '0 10px 26px rgba(0,0,0,.5)', transform: 'translate(-50%,-50%) translateX(-40px) rotate(-17deg)' }} />
-        <img src={COVER} alt="" style={{ position: 'absolute', left: '50%', top: '50%', height: '134px', borderRadius: '4px', boxShadow: '0 10px 26px rgba(0,0,0,.5)', transform: 'translate(-50%,-50%) translateX(40px) rotate(17deg)' }} />
+        <img src={COVER} alt="" loading="lazy" style={{ position: 'absolute', left: '50%', top: '50%', height: '134px', borderRadius: '4px', boxShadow: '0 10px 26px rgba(0,0,0,.5)', transform: 'translate(-50%,-50%) translateX(-40px) rotate(-17deg)' }} />
+        <img src={COVER} alt="" loading="lazy" style={{ position: 'absolute', left: '50%', top: '50%', height: '134px', borderRadius: '4px', boxShadow: '0 10px 26px rgba(0,0,0,.5)', transform: 'translate(-50%,-50%) translateX(40px) rotate(17deg)' }} />
         {/* Livre du centre avec tranche */}
         <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%) translateY(-5px)' }}>
           <div style={{ position: 'relative' }}>
             <div style={{ position: 'absolute', right: '-9px', top: '4px', bottom: '4px', width: '11px', background: 'linear-gradient(90deg, #c8b99a, #f0e8d8 40%, #e4d8c0)', borderRadius: '0 2px 2px 0', zIndex: 0 }} />
             <div style={{ position: 'absolute', right: '-6px', top: '4px', bottom: '4px', width: '7px', background: '#d4c9b0', zIndex: 0 }} />
-            <img src={COVER} alt="" style={{ height: '142px', borderRadius: '4px 2px 2px 4px', boxShadow: '0 14px 30px rgba(0,0,0,.6)', position: 'relative', zIndex: 1 }} />
+            <img src={COVER} alt="" loading="lazy" style={{ height: '142px', borderRadius: '4px 2px 2px 4px', boxShadow: '0 14px 30px rgba(0,0,0,.6)', position: 'relative', zIndex: 1 }} />
           </div>
         </div>
       </div>
@@ -287,7 +287,7 @@ function TierVisual({ visual, isLight }) {
           <div style={{ position: 'relative' }}>
             <div style={{ position: 'absolute', right: '-9px', top: '4px', bottom: '4px', width: '11px', background: 'linear-gradient(90deg, #c8b99a, #f0e8d8 40%, #e4d8c0)', borderRadius: '0 2px 2px 0', zIndex: 0 }} />
             <div style={{ position: 'absolute', right: '-6px', top: '4px', bottom: '4px', width: '7px', background: '#d4c9b0', zIndex: 0 }} />
-            <img src={COVER} alt="" style={{ height: '142px', borderRadius: '4px 2px 2px 4px', boxShadow: '0 14px 30px rgba(0,0,0,.6)', position: 'relative', zIndex: 1 }} />
+            <img src={COVER} alt="" loading="lazy" style={{ height: '142px', borderRadius: '4px 2px 2px 4px', boxShadow: '0 14px 30px rgba(0,0,0,.6)', position: 'relative', zIndex: 1 }} />
           </div>
         </div>
         <span style={{ position: 'absolute', right: '-2px', bottom: '2px', background: '#c9a77d', color: '#0d0d0d', fontWeight: 700, fontSize: '15px', padding: '5px 13px', borderRadius: '99px', boxShadow: '0 6px 16px rgba(0,0,0,.5)' }}>×10</span>
@@ -484,7 +484,7 @@ export default function CampagnePage() {
         @keyframes ls-rise  { 0% { opacity: 0; transform: translateY(20px) scale(.8); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-90px) scale(1.1); } }
         .ls-fade { animation: ls-fade .5s ease both; }
         .ls-pop  { animation: ls-pop  .3s ease both; }
-        .ls-float { animation: ls-float 3s ease-in-out infinite; }
+        .ls-float { animation: ls-float 3s ease-in-out infinite; will-change: transform; }
         .ls-rise  { animation: ls-rise 1.8s ease forwards; }
         .ls-tier:hover { border-color: rgba(201,167,125,.35) !important; box-shadow: 0 4px 20px rgba(0,0,0,.1) !important; }
         .ls-tier-featured:hover { border-color: rgba(201,167,125,.75) !important; }
@@ -517,7 +517,7 @@ export default function CampagnePage() {
       <div className="ls-page-root" style={{ background: C.bg, color: C.text, minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
 
         {/* ── Header ────────────────────────────────────────────────────────── */}
-        <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(13,13,13,.92)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${C.border}`, padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px' }}>
+        <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(13,13,13,.92)', backdropFilter: 'blur(6px)', borderBottom: `1px solid ${C.border}`, padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px' }}>
           <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
             <img src={isLight ? '/lescribe-icon.png' : '/lescribe-icon-sombre.png'} alt="Le Scribe" style={{ height: '34px' }} />
           </a>
@@ -538,10 +538,13 @@ export default function CampagnePage() {
           {/* Couverture flottante */}
           <div className="ls-hero-cover" style={{ display: 'flex', justifyContent: 'center' }}>
             <div className="ls-float" style={{ position: 'relative' }}>
-              <img
+              <Image
                 src="/lurgence-des-temps-couv-v2.png"
                 alt="L'urgence des temps — Nicolas Salafranque"
-                style={{ width: '220px', borderRadius: '12px', boxShadow: '0 24px 80px rgba(0,0,0,.7)', display: 'block' }}
+                width={220}
+                height={330}
+                priority
+                style={{ borderRadius: '12px', boxShadow: '0 24px 80px rgba(0,0,0,.7)', display: 'block' }}
               />
               <div style={{ position: 'absolute', inset: 0, borderRadius: '12px', background: 'linear-gradient(135deg, rgba(201,167,125,.08) 0%, transparent 60%)', pointerEvents: 'none' }} />
             </div>
@@ -870,7 +873,7 @@ export default function CampagnePage() {
         </footer>
 
         {/* ── Barre sticky basse ────────────────────────────────────────────── */}
-        <div className={`ls-sticky-bar${scrolled ? ' ls-scrolled' : ''}`} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40, background: 'rgba(13,13,13,.95)', backdropFilter: 'blur(12px)', borderTop: `1px solid ${C.border}`, padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+        <div className={`ls-sticky-bar${scrolled ? ' ls-scrolled' : ''}`} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40, background: 'rgba(13,13,13,.95)', backdropFilter: 'blur(6px)', borderTop: `1px solid ${C.border}`, padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
           <div className="ls-sticky-left" style={{ flex: 1, maxWidth: '280px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: C.text3, marginBottom: '4px' }}>
               <span>{Math.round(pct)}% financé</span>
