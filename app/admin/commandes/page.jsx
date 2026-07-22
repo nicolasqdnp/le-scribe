@@ -113,6 +113,7 @@ export default function CommandesAdmin() {
   const [toggling, setToggling] = useState(null)
   const [resending, setResending] = useState(null)
   const [resendingOrder, setResendingOrder] = useState(null)
+  const [creatingLabel, setCreatingLabel] = useState(null)
   const [auth, setAuth] = useState(null)
   const [search, setSearch] = useState('')
   const [sortP, setSortP] = useState({ col: 'created_at', dir: 'asc' })
@@ -177,6 +178,27 @@ export default function CommandesAdmin() {
     })
     setResending(null)
     alert(`Email renvoyé à ${row.email}`)
+  }
+
+  async function createLabel(order) {
+    setCreatingLabel(order.id)
+    try {
+      const res = await fetch('/api/admin/create-label', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: order.id }),
+      })
+      const data = await res.json()
+      if (data.label_url) {
+        window.open(data.label_url, '_blank')
+      } else {
+        alert('Erreur : ' + (data.error || 'inconnue'))
+      }
+      await load()
+    } catch (e) {
+      alert('Erreur réseau')
+    }
+    setCreatingLabel(null)
   }
 
   async function toggleOrderShipped(order) {
@@ -476,6 +498,16 @@ export default function CommandesAdmin() {
                         </td>
                         <td style={{ ...tdStyle, color: C.text2, whiteSpace: 'nowrap' }}>{new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
                         <td style={{ ...tdStyle, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {!isEpub && isPaid && (order.delivery === 'relay' || order.delivery === 'home-mr') && !order.shipped_at && (
+                            <button onClick={() => createLabel(order)} disabled={creatingLabel === order.id} style={{
+                              padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
+                              border: `1px solid ${C.gold}`, background: C.gold,
+                              color: '#0e0e0e', fontWeight: 700, whiteSpace: 'nowrap',
+                              opacity: creatingLabel === order.id ? 0.5 : 1,
+                            }}>
+                              {creatingLabel === order.id ? '…' : '🏷️ Créer étiquette'}
+                            </button>
+                          )}
                           {!isEpub && isPaid && (
                             <button onClick={() => toggleOrderShipped(order)} disabled={toggling === order.id} style={{
                               padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
