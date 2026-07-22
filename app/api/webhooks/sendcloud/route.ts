@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
 
+// Sendcloud vérifie le webhook avec un GET avant activation
+export async function GET() {
+  return NextResponse.json({ ok: true })
+}
+
 // Statuts Sendcloud considérés comme "expédié"
 const SHIPPED_STATUS_IDS = [
   1000, // Ready to send (étiquette créée)
