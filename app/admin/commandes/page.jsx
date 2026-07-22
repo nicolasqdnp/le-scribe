@@ -179,6 +179,17 @@ export default function CommandesAdmin() {
     alert(`Email renvoyé à ${row.email}`)
   }
 
+  async function toggleOrderShipped(order) {
+    setToggling(order.id)
+    await fetch('/api/admin/orders', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: order.id, shipped: !order.shipped_at }),
+    })
+    await load()
+    setToggling(null)
+  }
+
   async function resendEpubOrder(order) {
     setResendingOrder(order.id)
     await fetch('/api/admin/resend-epub-order', {
@@ -422,7 +433,7 @@ export default function CommandesAdmin() {
                     const isLivre = order.product === 'livre'
                     const PRODUCT_LABELS = { epub: 'EPUB', livre: 'Livre physique', pack3: 'Pack 3 ex.', pack10: 'Pack Église 10 ex.', physique: 'Livre (précommande)' }
                     return (
-                      <tr key={order.id} style={{ borderBottom: `1px solid ${C.border}`, background: isLivre && isPaid ? C.shipped : 'transparent' }}>
+                      <tr key={order.id} style={{ borderBottom: `1px solid ${C.border}`, background: order.shipped_at ? C.shipped : 'transparent' }}>
                         <td style={tdStyle}>
                           <span style={{
                             display: 'inline-block', padding: '2px 10px', borderRadius: 99,
@@ -433,14 +444,24 @@ export default function CommandesAdmin() {
                           }}>
                             {isPaid ? 'Payé' : 'En attente'}
                           </span>
+                          {order.shipped_at && (
+                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.shippedBorder, color: C.shippedText, border: `1px solid ${C.shippedText}44` }}>
+                              ✓ Envoyé
+                            </span>
+                          )}
                           {order.delivery === 'pickup' && (
-                            <span style={{ display: 'inline-block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
+                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
                               🏛️ Retrait église
                             </span>
                           )}
                           {order.delivery === 'relay' && (
-                            <span style={{ display: 'inline-block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
-                              📦 Mondial Relay
+                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
+                              📦 Point Relais
+                            </span>
+                          )}
+                          {order.delivery === 'home-mr' && (
+                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
+                              🏠 Domicile MR
                             </span>
                           )}
                         </td>
@@ -454,8 +475,20 @@ export default function CommandesAdmin() {
                             : formatAddr(order.shipping_address)}
                         </td>
                         <td style={{ ...tdStyle, color: C.text2, whiteSpace: 'nowrap' }}>{new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
-                        <td style={tdStyle}>
-                          {isEpub && isPaid ? (
+                        <td style={{ ...tdStyle, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {!isEpub && isPaid && (
+                            <button onClick={() => toggleOrderShipped(order)} disabled={toggling === order.id} style={{
+                              padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
+                              border: `1px solid ${order.shipped_at ? C.border : C.gold}`,
+                              background: order.shipped_at ? C.surface : C.gold,
+                              color: order.shipped_at ? C.text3 : '#0e0e0e',
+                              fontWeight: 600, whiteSpace: 'nowrap',
+                              opacity: toggling === order.id ? 0.5 : 1,
+                            }}>
+                              {toggling === order.id ? '…' : order.shipped_at ? '↩ Annuler envoi' : '✓ Marquer envoyé'}
+                            </button>
+                          )}
+                          {isEpub && isPaid && (
                             <button onClick={() => resendEpubOrder(order)} disabled={resendingOrder === order.id} style={{
                               padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
                               border: `1px solid ${C.border}`, background: C.surface, color: C.gold,
@@ -464,7 +497,12 @@ export default function CommandesAdmin() {
                             }}>
                               {resendingOrder === order.id ? '…' : '📨 Renvoyer ebook'}
                             </button>
-                          ) : <span style={{ color: C.muted }}>—</span>}
+                          )}
+                          {order.tracking_url && (
+                            <a href={order.tracking_url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: C.gold, textDecoration: 'underline' }}>
+                              Suivi colis →
+                            </a>
+                          )}
                         </td>
                       </tr>
                     )
