@@ -102,7 +102,7 @@ function LivraisonForm() {
     } catch { setError('Erreur réseau. Réessaie.'); setLoading(false) }
   }
 
-  const canConfirm = mode === 'pickup' || mode === 'home-mr' || (mode === 'relay' && relayPoint)
+  const canConfirm = mode === 'pickup' || mode === 'home-mr' || mode === 'switzerland' || (mode === 'relay' && relayPoint)
 
   return (
     <main className="min-h-screen bg-bg text-cream px-4 py-12 max-w-2xl mx-auto">
@@ -167,6 +167,19 @@ function LivraisonForm() {
           </p>
           <p className="text-xs text-muted mt-0.5">Gratuit · 441 av. Marguerite Perrey, Lieusaint (77)</p>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setMode('switzerland')}
+          className={`text-left p-4 rounded-2xl border transition ${
+            mode === 'switzerland' ? 'border-gold/60 bg-gold/5' : 'border-border bg-surface hover:border-gold/30'
+          }`}
+        >
+          <p className={`font-semibold text-sm ${mode === 'switzerland' ? 'text-gold' : 'text-cream'}`}>
+            🇨🇭 Livraison en Suisse (Colissimo)
+          </p>
+          <p className="text-xs text-muted mt-0.5">+ 12€ · Livraison en 3–5 jours ouvrés</p>
+        </button>
       </div>
 
       {/* Widget Mondial Relay */}
@@ -203,6 +216,16 @@ function LivraisonForm() {
           <p>Mondial Relay livrera le colis à l'adresse que tu indiqueras à l'étape suivante.</p>
           <p className="mt-1">Délai estimé : 3 à 5 jours ouvrés après expédition.</p>
           <p className="mt-2 text-xs text-muted2">Ton adresse sera saisie sur la page de paiement sécurisée Stripe.</p>
+        </div>
+      )}
+
+      {/* Suisse */}
+      {mode === 'switzerland' && (
+        <div className="bg-surface border border-gold/10 rounded-2xl p-4 mb-6 text-sm text-muted">
+          <p className="font-semibold text-cream mb-1">Livraison en Suisse</p>
+          <p>Colissimo livrera le colis à l'adresse que tu indiqueras à l'étape suivante.</p>
+          <p className="mt-1">Délai estimé : 3 à 5 jours ouvrés après expédition.</p>
+          <p className="mt-2 text-xs text-muted2">Ton adresse suisse sera saisie sur la page de paiement sécurisée Stripe.</p>
         </div>
       )}
 

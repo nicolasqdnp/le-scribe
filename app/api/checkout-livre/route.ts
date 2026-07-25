@@ -69,7 +69,8 @@ export async function POST(req: NextRequest) {
     const isPickup = delivery === 'pickup'
     const isRelay = delivery === 'relay'
     const isHomeMR = delivery === 'home-mr'
-    const shippingCost = isPickup ? 0 : isRelay ? p.mrAmount : isHomeMR ? ((p as any).homeAmount ?? 0) : p.shippingAmount
+    const isSwitzerland = delivery === 'switzerland'
+    const shippingCost = isPickup ? 0 : isRelay ? p.mrAmount : isHomeMR ? ((p as any).homeAmount ?? 0) : isSwitzerland ? 1200 : p.shippingAmount
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -105,11 +106,13 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency: 'eur',
           product_data: {
-            name: isRelay ? 'Livraison Mondial Relay — Point Relais' : isHomeMR ? 'Livraison Mondial Relay — Domicile' : 'Frais de port',
+            name: isRelay ? 'Livraison Mondial Relay — Point Relais' : isHomeMR ? 'Livraison Mondial Relay — Domicile' : isSwitzerland ? 'Livraison Suisse — Colissimo' : 'Frais de port',
             description: isRelay
               ? `Point relais : ${relayPoint?.name || ''} — ${relayPoint?.zipCode || ''} ${relayPoint?.city || ''}`
               : isHomeMR
               ? 'Livraison à domicile Mondial Relay · 3–5 jours ouvrés'
+              : isSwitzerland
+              ? 'Livraison Colissimo en Suisse · 3–5 jours ouvrés'
               : 'Livraison France · Lettre suivie',
           },
           unit_amount: shippingCost,
@@ -135,9 +138,17 @@ export async function POST(req: NextRequest) {
     }
 
     // Adresse domicile pour livraison postale classique ou MR domicile
-    if (p.shipping && (isHomeMR || (!isPickup && !isRelay))) {
+    if (p.shipping && (isHomeMR || (!isPickup && !isRelay && !isSwitzerland))) {
       sessionParams.shipping_address_collection = {
         allowed_countries: ['FR', 'BE', 'LU'],
+      }
+      sessionParams.phone_number_collection = { enabled: true }
+    }
+
+    // Adresse pour livraison Suisse
+    if (p.shipping && isSwitzerland) {
+      sessionParams.shipping_address_collection = {
+        allowed_countries: ['CH'],
       }
       sessionParams.phone_number_collection = { enabled: true }
     }
