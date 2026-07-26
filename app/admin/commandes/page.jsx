@@ -352,21 +352,6 @@ export default function CommandesAdmin() {
                               À envoyer
                             </span>
                           )}
-                          {order.delivery === 'pickup' && (
-                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
-                              🏛️ Retrait église
-                            </span>
-                          )}
-                          {order.delivery === 'relay' && (
-                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
-                              📦 Point Relais
-                            </span>
-                          )}
-                          {order.delivery === 'home-mr' && (
-                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
-                              🏠 Domicile MR
-                            </span>
-                          )}
                         </td>
                         <td style={{ ...tdStyle, color: C.text2 }}>{order.email}</td>
                         <td style={tdStyle}>{PRODUCT_LABELS[order.product] || order.product}</td>
