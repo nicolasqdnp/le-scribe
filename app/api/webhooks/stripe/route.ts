@@ -6,6 +6,7 @@ import {
   sendEpubEmail,
   sendPhysiqueConfirmationEmail,
   sendCampaignConfirmationEmail,
+  sendLivreConfirmationEmail,
 } from '../../../../lib/email'
 
 export async function POST(req: NextRequest) {
@@ -56,45 +57,72 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Achat boutique (livre) ──────────────────────────────────────────────────
-    if (product && order_id) {
+    if (product) {
       const email = session.customer_email || ''
-
-      // Marquer la commande comme payée + stocker adresse si physique
       const shipping = (session as any).shipping_details || (session as any).shipping
       const shippingAddress = shipping?.address || null
       const shippingName = shipping?.name || null
 
-      await supabaseAdmin
-        .from('orders')
-        .update({
-          status: 'paid',
-          stripe_session_id: session.id,
-          shipping_name: shippingName,
-          shipping_address: shippingAddress,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', order_id)
+      if (order_id) {
+        // Cas normal : commande créée au moment du checkout
+        await supabaseAdmin
+          .from('orders')
+          .update({
+            status: 'paid',
+            stripe_session_id: session.id,
+            shipping_name: shippingName,
+            shipping_address: shippingAddress,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', order_id)
+      } else {
+        // Cas de fallback : l'insert Supabase a échoué au checkout (order_id vide)
+        // On crée la commande directement depuis les données Stripe
+        console.warn('[webhook/stripe] order_id vide pour session', session.id, '— création fallback')
+        const delivery = session.metadata?.delivery || 'postal'
+        const { error: insertErr } = await supabaseAdmin
+          .from('orders')
+          .insert({
+            email,
+            product,
+            amount: session.amount_total || 0,
+            status: 'paid',
+            stripe_session_id: session.id,
+            delivery,
+            relay_point: null,
+            shipping_name: shippingName,
+            shipping_address: shippingAddress,
+          })
+        if (insertErr) console.error('[webhook/stripe] Fallback insert error:', insertErr.message)
+      }
 
       // Livraison EPUB : URL signée Supabase Storage (48h)
       if (product === 'epub' && email) {
         const { data: signedUrl } = await supabaseAdmin.storage
           .from('boutique')
-          .createSignedUrl('lurgence-des-temps.epub', 60 * 60 * 48) // 48 heures
+          .createSignedUrl('lurgence-des-temps.epub', 60 * 60 * 48)
 
         if (signedUrl?.signedUrl) {
           await sendEpubEmail(email, signedUrl.signedUrl)
-          await supabaseAdmin
-            .from('orders')
-            .update({ epub_sent_at: new Date().toISOString() })
-            .eq('id', order_id)
+          if (order_id) {
+            await supabaseAdmin
+              .from('orders')
+              .update({ epub_sent_at: new Date().toISOString() })
+              .eq('id', order_id)
+          }
         } else {
           console.error('[webhook/stripe] Impossible de générer l\'URL signée EPUB')
         }
       }
 
-      // Confirmation précommande physique
+      // Confirmation précommande physique (ancien produit)
       if (product === 'physique' && email) {
         await sendPhysiqueConfirmationEmail(email, shippingName || '')
+      }
+
+      // Confirmation commande boutique physique (livre/pack3/pack10)
+      if (['livre', 'pack3', 'pack10'].includes(product) && email) {
+        await sendLivreConfirmationEmail(email, product, shippingName)
       }
 
       console.log(`[webhook/stripe] Commande ${product} confirmée → ${email}`)

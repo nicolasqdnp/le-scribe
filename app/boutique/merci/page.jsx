@@ -14,7 +14,7 @@ function MerciContent() {
         <div className="text-5xl mb-6">{isEpub ? '📖' : '📦'}</div>
 
         <h1 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-cream mb-4">
-          {isEpub ? 'Merci pour ton achat !' : 'Précommande confirmée !'}
+          {isEpub ? 'Merci pour ton achat !' : 'Commande confirmée !'}
         </h1>
 
         {isEpub ? (
@@ -24,14 +24,14 @@ function MerciContent() {
           </p>
         ) : (
           <p className="text-cream2 text-sm leading-relaxed mb-8">
-            Ta précommande est enregistrée. Dès que l'impression est prête,
-            ton livre sera expédié à l'adresse indiquée. Tu recevras un email de confirmation.
+            Merci ! Tu recevras un email de confirmation dans quelques minutes.
+            Ton livre sera expédié sous 3–5 jours ouvrés.
           </p>
         )}
 
         <div className="bg-surface border border-border rounded-2xl p-5 mb-8 text-left">
           <p className="text-xs text-muted uppercase tracking-widest font-medium mb-3">
-            {isEpub ? 'Ton achat' : 'Ta précommande'}
+            {isEpub ? 'Ton achat' : 'Ta commande'}
           </p>
           <p className="text-cream font-[family-name:var(--font-playfair)] font-bold mb-1">
             L'urgence des temps

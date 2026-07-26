@@ -195,6 +195,37 @@ export async function sendCampaignConfirmationEmail(to: string, tierId: string) 
   }
 }
 
+// ─── Email : Commande livre physique confirmée ────────────────────────────────
+
+const LIVRE_LABELS: Record<string, string> = {
+  livre:  'L\'urgence des temps — Livre physique',
+  pack3:  'L\'urgence des temps — Pack 3 exemplaires',
+  pack10: 'L\'urgence des temps — Pack Église 10 exemplaires',
+}
+
+export async function sendLivreConfirmationEmail(to: string, product: string, shippingName: string | null) {
+  try {
+    const label = LIVRE_LABELS[product] || product
+    await sendEmail(
+      to,
+      '✓ Commande confirmée — L\'urgence des temps',
+      baseTemplate(`
+        <h1>Commande confirmée ✓</h1>
+        <p>Merci ${shippingName || ''} ! Votre commande de <strong style="color:#c9a77d;">${label}</strong>
+        a bien été enregistrée et votre paiement est confirmé.</p>
+        <p>Votre livre sera expédié sous <strong style="color:#e8e0d0;">3 à 5 jours ouvrés</strong>.
+        Vous recevrez un email dès l'expédition avec le numéro de suivi.</p>
+        <p style="font-size:13px;color:#7a6a50;">Pour toute question, répondez directement à cet email.</p>
+        <p>Merci pour votre confiance !</p>
+        <p style="color:#c9a77d;">Nicolas Salafranque<br/>
+        <span style="color:#a09070;font-size:13px;">Pasteur · Auteur · Éditions Le Scribe</span></p>
+      `)
+    )
+  } catch (e) {
+    console.error('[email] sendLivreConfirmationEmail error:', e)
+  }
+}
+
 // ─── Email : Paiement confirmé ─────────────────────────────────────────────────
 
 const PLAN_LABELS: Record<string, string> = {

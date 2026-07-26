@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    const { data: order } = await supabase
+    const { data: order, error: orderErr } = await supabase
       .from('orders')
       .insert({
         email,
@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
       })
       .select('id')
       .single()
+    if (orderErr) console.error('[checkout-livre] Supabase insert error:', orderErr.message)
 
     const lineItems: Array<{ price_data: { currency: string; product_data: { name: string; description?: string }; unit_amount: number }; quantity: number }> = [
       {
