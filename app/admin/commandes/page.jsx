@@ -343,18 +343,13 @@ export default function CommandesAdmin() {
                     return (
                       <tr key={order.id} style={{ borderBottom: `1px solid ${C.border}`, background: order.shipped_at ? C.shipped : 'transparent' }}>
                         <td style={tdStyle}>
-                          <span style={{
-                            display: 'inline-block', padding: '2px 10px', borderRadius: 99,
-                            fontSize: 11, fontWeight: 600,
-                            background: isPaid ? C.shippedBorder : C.pendingBg,
-                            color: isPaid ? C.shippedText : C.pendingText,
-                            border: `1px solid ${isPaid ? C.shippedText + '44' : C.gold + '44'}`,
-                          }}>
-                            {isPaid ? 'Payé' : 'En attente'}
-                          </span>
-                          {order.shipped_at && (
-                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.shippedBorder, color: C.shippedText, border: `1px solid ${C.shippedText}44` }}>
+                          {order.shipped_at ? (
+                            <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: 99, fontSize: 11, fontWeight: 600, background: C.shippedBorder, color: C.shippedText, border: `1px solid ${C.shippedText}44` }}>
                               ✓ Envoyé
+                            </span>
+                          ) : (
+                            <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: 99, fontSize: 11, fontWeight: 600, background: C.surface2, color: C.text3, border: `1px solid ${C.border}` }}>
+                              À envoyer
                             </span>
                           )}
                           {order.delivery === 'pickup' && (
