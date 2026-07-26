@@ -61,7 +61,9 @@ export async function POST(req: NextRequest) {
       const email = session.customer_email || ''
       const shipping = (session as any).shipping_details || (session as any).shipping
       const shippingAddress = shipping?.address || null
-      const shippingName = shipping?.name || null
+      const shippingName = shipping?.name
+        || (session as any).customer_details?.name
+        || null
 
       if (order_id) {
         // Cas normal : commande créée au moment du checkout
@@ -80,6 +82,7 @@ export async function POST(req: NextRequest) {
         // On crée la commande directement depuis les données Stripe
         console.warn('[webhook/stripe] order_id vide pour session', session.id, '— création fallback')
         const delivery = session.metadata?.delivery || 'postal'
+        const relayId = session.metadata?.relay_id || null
         const { error: insertErr } = await supabaseAdmin
           .from('orders')
           .insert({
@@ -89,7 +92,7 @@ export async function POST(req: NextRequest) {
             status: 'paid',
             stripe_session_id: session.id,
             delivery,
-            relay_point: null,
+            relay_point: relayId ? { code: relayId } : null,
             shipping_name: shippingName,
             shipping_address: shippingAddress,
           })

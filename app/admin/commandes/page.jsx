@@ -379,8 +379,19 @@ export default function CommandesAdmin() {
                         <td style={tdStyle}>{order.shipping_name || <span style={{ color: C.muted }}>—</span>}</td>
                         <td style={{ ...tdStyle, color: C.text2, maxWidth: 220 }}>
                           {order.relay_point
-                            ? <span>📦 {order.relay_point.Nom}<br /><span style={{ fontSize: 11 }}>{order.relay_point.Adresse1}, {order.relay_point.CP} {order.relay_point.Ville}</span></span>
-                            : formatAddr(order.shipping_address)}
+                            ? (() => {
+                                const rp = order.relay_point
+                                const name = rp.name || rp.Nom
+                                const addr = rp.address || rp.Adresse1
+                                const zip  = rp.zipCode || rp.CP
+                                const city = rp.city || rp.Ville
+                                const code = rp.code
+                                if (name) return <span>📦 {name}<br /><span style={{ fontSize: 11 }}>{addr}, {zip} {city}</span></span>
+                                return <span style={{ color: C.gold }}>📦 Point relais #{code}<br /><span style={{ fontSize: 11, color: C.muted }}>Détails à récupérer</span></span>
+                              })()
+                            : order.delivery === 'pickup'
+                              ? <span style={{ color: C.text3 }}>🏛️ Retrait église</span>
+                              : formatAddr(order.shipping_address)}
                         </td>
                         <td style={{ ...tdStyle, color: C.text2, whiteSpace: 'nowrap' }}>{new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
                         <td style={{ ...tdStyle, display: 'flex', flexDirection: 'column', gap: 6 }}>

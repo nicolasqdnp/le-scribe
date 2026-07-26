@@ -154,6 +154,11 @@ export async function POST(req: NextRequest) {
       sessionParams.phone_number_collection = { enabled: true }
     }
 
+    // Nom du client pour relay et pickup (pas d'adresse collectée, mais le nom est nécessaire)
+    if (isRelay || isPickup) {
+      sessionParams.billing_address_collection = 'required'
+    }
+
     const session = await stripe.checkout.sessions.create(sessionParams)
     return NextResponse.json({ url: session.url })
   } catch (err) {
