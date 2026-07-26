@@ -314,6 +314,121 @@ export default function CommandesAdmin() {
 
         {!loading && (
           <>
+            {/* Commandes boutique */}
+            <h2 style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Commandes boutique ({boutique.length})
+            </h2>
+            <div style={{ overflowX: 'auto', marginBottom: 48 }}>
+              <table style={{ minWidth: 800, borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                    <ThHead label="Statut" col="shipped" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
+                    <ThHead label="Email" col="email" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
+                    <ThHead label="Produit" col="product" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
+                    <ThHead label="Montant" col="amount" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
+                    <th style={thStyle}>Destinataire</th>
+                    <ThHead label="Adresse" col="address" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
+                    <ThHead label="Date" col="created_at" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
+                    <th style={{ ...thStyle, minWidth: 160 }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {boutique.length === 0 && (
+                    <tr><td colSpan={8} style={{ ...tdStyle, color: C.muted, textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
+                  )}
+                  {boutique.map(order => {
+                    const isPaid = order.status === 'paid'
+                    const isEpub = order.product === 'epub'
+                    const PRODUCT_LABELS = { epub: 'EPUB', livre: 'Livre physique', pack3: 'Pack 3 ex.', pack10: 'Pack Église 10 ex.', physique: 'Livre (précommande)' }
+                    return (
+                      <tr key={order.id} style={{ borderBottom: `1px solid ${C.border}`, background: order.shipped_at ? C.shipped : 'transparent' }}>
+                        <td style={tdStyle}>
+                          <span style={{
+                            display: 'inline-block', padding: '2px 10px', borderRadius: 99,
+                            fontSize: 11, fontWeight: 600,
+                            background: isPaid ? C.shippedBorder : C.pendingBg,
+                            color: isPaid ? C.shippedText : C.pendingText,
+                            border: `1px solid ${isPaid ? C.shippedText + '44' : C.gold + '44'}`,
+                          }}>
+                            {isPaid ? 'Payé' : 'En attente'}
+                          </span>
+                          {order.shipped_at && (
+                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.shippedBorder, color: C.shippedText, border: `1px solid ${C.shippedText}44` }}>
+                              ✓ Envoyé
+                            </span>
+                          )}
+                          {order.delivery === 'pickup' && (
+                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
+                              🏛️ Retrait église
+                            </span>
+                          )}
+                          {order.delivery === 'relay' && (
+                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
+                              📦 Point Relais
+                            </span>
+                          )}
+                          {order.delivery === 'home-mr' && (
+                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
+                              🏠 Domicile MR
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ ...tdStyle, color: C.text2 }}>{order.email}</td>
+                        <td style={tdStyle}>{PRODUCT_LABELS[order.product] || order.product}</td>
+                        <td style={{ ...tdStyle, color: C.gold, fontWeight: 600 }}>{(order.amount / 100).toFixed(2)} €</td>
+                        <td style={tdStyle}>{order.shipping_name || <span style={{ color: C.muted }}>—</span>}</td>
+                        <td style={{ ...tdStyle, color: C.text2, maxWidth: 220 }}>
+                          {order.relay_point
+                            ? <span>📦 {order.relay_point.Nom}<br /><span style={{ fontSize: 11 }}>{order.relay_point.Adresse1}, {order.relay_point.CP} {order.relay_point.Ville}</span></span>
+                            : formatAddr(order.shipping_address)}
+                        </td>
+                        <td style={{ ...tdStyle, color: C.text2, whiteSpace: 'nowrap' }}>{new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
+                        <td style={{ ...tdStyle, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {!isEpub && isPaid && (order.delivery === 'relay' || order.delivery === 'home-mr') && !order.shipped_at && (
+                            <button onClick={() => createLabel(order)} disabled={creatingLabel === order.id} style={{
+                              padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
+                              border: `1px solid ${C.gold}`, background: C.gold,
+                              color: '#0e0e0e', fontWeight: 700, whiteSpace: 'nowrap',
+                              opacity: creatingLabel === order.id ? 0.5 : 1,
+                            }}>
+                              {creatingLabel === order.id ? '…' : '🏷️ Créer étiquette'}
+                            </button>
+                          )}
+                          {!isEpub && isPaid && (
+                            <button onClick={() => toggleOrderShipped(order)} disabled={toggling === order.id} style={{
+                              padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
+                              border: `1px solid ${order.shipped_at ? C.border : C.gold}`,
+                              background: order.shipped_at ? C.surface : C.gold,
+                              color: order.shipped_at ? C.text3 : '#0e0e0e',
+                              fontWeight: 600, whiteSpace: 'nowrap',
+                              opacity: toggling === order.id ? 0.5 : 1,
+                            }}>
+                              {toggling === order.id ? '…' : order.shipped_at ? '↩ Annuler envoi' : '✓ Marquer envoyé'}
+                            </button>
+                          )}
+                          {isEpub && isPaid && (
+                            <button onClick={() => resendEpubOrder(order)} disabled={resendingOrder === order.id} style={{
+                              padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
+                              border: `1px solid ${C.border}`, background: C.surface, color: C.gold,
+                              fontWeight: 600, whiteSpace: 'nowrap',
+                              opacity: resendingOrder === order.id ? 0.5 : 1,
+                            }}>
+                              {resendingOrder === order.id ? '…' : '📨 Renvoyer ebook'}
+                            </button>
+                          )}
+                          {order.tracking_url && (
+                            <a href={order.tracking_url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: C.gold, textDecoration: 'underline' }}>
+                              Suivi colis →
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+
             <h2 style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Envois physiques ({physical.length})
             </h2>
@@ -429,121 +544,6 @@ export default function CommandesAdmin() {
               </table>
             </div>
 
-            {/* Commandes boutique */}
-            <h2 style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 14, marginTop: 48, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Commandes boutique ({boutique.length})
-            </h2>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ minWidth: 800, borderCollapse: 'collapse', fontSize: 13 }}>
-                <thead>
-                  <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                    <ThHead label="Statut" col="shipped" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
-                    <ThHead label="Email" col="email" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
-                    <ThHead label="Produit" col="product" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
-                    <ThHead label="Montant" col="amount" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
-                    <th style={thStyle}>Destinataire</th>
-                    <ThHead label="Adresse" col="address" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
-                    <ThHead label="Date" col="created_at" sort={sortO} onSort={col => handleSort(setSortO, col)} C={C} />
-                    <th style={{ ...thStyle, minWidth: 160 }}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {boutique.length === 0 && (
-                    <tr><td colSpan={8} style={{ ...tdStyle, color: C.muted, textAlign: 'center', padding: 24 }}>Aucun résultat</td></tr>
-                  )}
-                  {boutique.map(order => {
-                    const isPaid = order.status === 'paid'
-                    const isEpub = order.product === 'epub'
-                    const isLivre = order.product === 'livre'
-                    const PRODUCT_LABELS = { epub: 'EPUB', livre: 'Livre physique', pack3: 'Pack 3 ex.', pack10: 'Pack Église 10 ex.', physique: 'Livre (précommande)' }
-                    return (
-                      <tr key={order.id} style={{ borderBottom: `1px solid ${C.border}`, background: order.shipped_at ? C.shipped : 'transparent' }}>
-                        <td style={tdStyle}>
-                          <span style={{
-                            display: 'inline-block', padding: '2px 10px', borderRadius: 99,
-                            fontSize: 11, fontWeight: 600,
-                            background: isPaid ? C.shippedBorder : C.pendingBg,
-                            color: isPaid ? C.shippedText : C.pendingText,
-                            border: `1px solid ${isPaid ? C.shippedText + '44' : C.gold + '44'}`,
-                          }}>
-                            {isPaid ? 'Payé' : 'En attente'}
-                          </span>
-                          {order.shipped_at && (
-                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.shippedBorder, color: C.shippedText, border: `1px solid ${C.shippedText}44` }}>
-                              ✓ Envoyé
-                            </span>
-                          )}
-                          {order.delivery === 'pickup' && (
-                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
-                              🏛️ Retrait église
-                            </span>
-                          )}
-                          {order.delivery === 'relay' && (
-                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
-                              📦 Point Relais
-                            </span>
-                          )}
-                          {order.delivery === 'home-mr' && (
-                            <span style={{ display: 'block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 600, background: C.surface2, color: C.gold, border: `1px solid ${C.gold}44` }}>
-                              🏠 Domicile MR
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ ...tdStyle, color: C.text2 }}>{order.email}</td>
-                        <td style={tdStyle}>{PRODUCT_LABELS[order.product] || order.product}</td>
-                        <td style={{ ...tdStyle, color: C.gold, fontWeight: 600 }}>{(order.amount / 100).toFixed(2)} €</td>
-                        <td style={tdStyle}>{order.shipping_name || <span style={{ color: C.muted }}>—</span>}</td>
-                        <td style={{ ...tdStyle, color: C.text2, maxWidth: 220 }}>
-                          {order.relay_point
-                            ? <span>📦 {order.relay_point.Nom}<br /><span style={{ fontSize: 11 }}>{order.relay_point.Adresse1}, {order.relay_point.CP} {order.relay_point.Ville}</span></span>
-                            : formatAddr(order.shipping_address)}
-                        </td>
-                        <td style={{ ...tdStyle, color: C.text2, whiteSpace: 'nowrap' }}>{new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
-                        <td style={{ ...tdStyle, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                          {!isEpub && isPaid && (order.delivery === 'relay' || order.delivery === 'home-mr') && !order.shipped_at && (
-                            <button onClick={() => createLabel(order)} disabled={creatingLabel === order.id} style={{
-                              padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
-                              border: `1px solid ${C.gold}`, background: C.gold,
-                              color: '#0e0e0e', fontWeight: 700, whiteSpace: 'nowrap',
-                              opacity: creatingLabel === order.id ? 0.5 : 1,
-                            }}>
-                              {creatingLabel === order.id ? '…' : '🏷️ Créer étiquette'}
-                            </button>
-                          )}
-                          {!isEpub && isPaid && (
-                            <button onClick={() => toggleOrderShipped(order)} disabled={toggling === order.id} style={{
-                              padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
-                              border: `1px solid ${order.shipped_at ? C.border : C.gold}`,
-                              background: order.shipped_at ? C.surface : C.gold,
-                              color: order.shipped_at ? C.text3 : '#0e0e0e',
-                              fontWeight: 600, whiteSpace: 'nowrap',
-                              opacity: toggling === order.id ? 0.5 : 1,
-                            }}>
-                              {toggling === order.id ? '…' : order.shipped_at ? '↩ Annuler envoi' : '✓ Marquer envoyé'}
-                            </button>
-                          )}
-                          {isEpub && isPaid && (
-                            <button onClick={() => resendEpubOrder(order)} disabled={resendingOrder === order.id} style={{
-                              padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
-                              border: `1px solid ${C.border}`, background: C.surface, color: C.gold,
-                              fontWeight: 600, whiteSpace: 'nowrap',
-                              opacity: resendingOrder === order.id ? 0.5 : 1,
-                            }}>
-                              {resendingOrder === order.id ? '…' : '📨 Renvoyer ebook'}
-                            </button>
-                          )}
-                          {order.tracking_url && (
-                            <a href={order.tracking_url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: C.gold, textDecoration: 'underline' }}>
-                              Suivi colis →
-                            </a>
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
           </>
         )}
       </div>
