@@ -384,7 +384,7 @@ export default function CommandesAdmin() {
                         </td>
                         <td style={{ ...tdStyle, color: C.text2, whiteSpace: 'nowrap' }}>{new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
                         <td style={{ ...tdStyle, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                          {!isEpub && isPaid && (order.delivery === 'relay' || order.delivery === 'home-mr') && !order.shipped_at && (
+                          {!isEpub && isPaid && (order.delivery === 'relay' || order.delivery === 'home-mr' || order.delivery === 'switzerland') && !order.shipped_at && (
                             <button onClick={() => createLabel(order)} disabled={creatingLabel === order.id} style={{
                               padding: '4px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
                               border: `1px solid ${C.gold}`, background: C.gold,
