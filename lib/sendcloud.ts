@@ -50,28 +50,34 @@ export async function createSendcloudParcel(order: SendcloudOrder) {
 
   if (isRelay && order.relay_point) {
     const rp = order.relay_point
-    // Cherche le service point Sendcloud correspondant au code MR
-    const spRes = await fetch(
-      `${BASE}/service-points/?carrier=mondial_relay&country=FR&postal_code=${rp.zipCode}`,
-      { headers: { Authorization: auth() } }
+
+    // Cherche le service point Sendcloud par code MR
+    const spUrl = rp.zipCode
+      ? `${BASE}/service-points/?carrier=mondial_relay&country=FR&postal_code=${rp.zipCode}`
+      : `${BASE}/service-points/?carrier=mondial_relay&country=FR&house_number=${rp.code}`
+    const spRes = await fetch(spUrl, { headers: { Authorization: auth() } })
+    const spRaw = await spRes.json()
+    // La réponse Sendcloud peut être un tableau ou un objet { service_points: [...] }
+    const spList: any[] = Array.isArray(spRaw) ? spRaw : (spRaw.service_points ?? spRaw.results ?? [])
+    const servicePoint = spList.find(
+      (sp: any) => String(sp.code) === String(rp.code)
+        || (rp.name && sp.name?.toLowerCase().includes(String(rp.name).toLowerCase().slice(0, 8)))
     )
-    const spData = await spRes.json()
-    const servicePoint = (spData as any[]).find(
-      (sp: any) => sp.code === rp.code || sp.name?.toLowerCase().includes(rp.name?.toLowerCase().slice(0, 8))
-    )
+
+    if (!servicePoint) throw new Error(`Point relais MR introuvable dans Sendcloud (code ${rp.code}). Ajoute le manuellement dans Sendcloud.`)
 
     parcelBody = {
       name:             order.shipping_name || order.email.split('@')[0],
-      address:          rp.address,
-      postal_code:      rp.zipCode,
-      city:             rp.city,
+      address:          rp.address || servicePoint.street,
+      postal_code:      rp.zipCode || servicePoint.postal_code,
+      city:             rp.city || servicePoint.city,
       country:          { iso_2: 'FR' },
       email:            order.email,
       weight,
       shipment:         { id: methodId },
       order_number:     order.id,
       request_label:    true,
-      ...(servicePoint ? { to_service_point: servicePoint.id } : {}),
+      to_service_point: servicePoint.id,
     }
   } else if (isHome && order.shipping_address) {
     const addr = order.shipping_address
