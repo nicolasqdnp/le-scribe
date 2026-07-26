@@ -1,4 +1,5 @@
-const BASE = 'https://panel.sendcloud.sc/api/v2'
+const BASE_V2_V2 = 'https://panel.sendcloud.sc/api/v2'
+const BASE_V2_V3 = 'https://panel.sendcloud.sc/api/v3'
 
 function auth() {
   const pub = process.env.SENDCLOUD_PUBLIC_KEY!
@@ -53,8 +54,8 @@ export async function createSendcloudParcel(order: SendcloudOrder) {
 
     // Cherche le service point Sendcloud par code MR
     const spUrl = rp.zipCode
-      ? `${BASE}/service-points/?carrier=mondial_relay&country=FR&postal_code=${rp.zipCode}`
-      : `${BASE}/service-points/?carrier=mondial_relay&country=FR&house_number=${rp.code}`
+      ? `${BASE_V2}/service-points/?carrier=mondial_relay&country=FR&postal_code=${rp.zipCode}`
+      : `${BASE_V2}/service-points/?carrier=mondial_relay&country=FR&house_number=${rp.code}`
     const spRes = await fetch(spUrl, { headers: { Authorization: auth() } })
     const spRaw = await spRes.json()
     // La réponse Sendcloud peut être un tableau ou un objet { service_points: [...] }
@@ -98,7 +99,7 @@ export async function createSendcloudParcel(order: SendcloudOrder) {
     throw new Error('Données de livraison insuffisantes pour créer une étiquette')
   }
 
-  const res = await fetch(`${BASE}/parcels`, {
+  const res = await fetch(`${BASE_V3}/parcels`, {
     method: 'POST',
     headers: { Authorization: auth(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ parcel: parcelBody }),
