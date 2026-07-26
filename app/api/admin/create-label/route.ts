@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
   const { data: order, error } = await supabase
     .from('orders')
-    .select('id, email, product, delivery, relay_point, shipping_name, shipping_address, shipping_phone')
+    .select('id, email, product, delivery, relay_point, shipping_name, shipping_address')
     .eq('id', order_id)
     .single()
 
