@@ -343,7 +343,7 @@ export default function CommandesAdmin() {
                     return (
                       <tr key={order.id} style={{ borderBottom: `1px solid ${C.border}`, background: order.shipped_at ? C.shipped : 'transparent' }}>
                         <td style={tdStyle}>
-                          {order.shipped_at ? (
+                          {(order.shipped_at || isEpub) ? (
                             <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: 99, fontSize: 11, fontWeight: 600, background: C.shippedBorder, color: C.shippedText, border: `1px solid ${C.shippedText}44` }}>
                               ✓ Envoyé
                             </span>
