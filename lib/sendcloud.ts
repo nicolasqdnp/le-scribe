@@ -1,5 +1,5 @@
-const BASE_V2_V2 = 'https://panel.sendcloud.sc/api/v2'
-const BASE_V2_V3 = 'https://panel.sendcloud.sc/api/v3'
+const BASE_V2 = 'https://panel.sendcloud.sc/api/v2'
+const BASE_V3 = 'https://panel.sendcloud.sc/api/v3'
 
 function auth() {
   const pub = process.env.SENDCLOUD_PUBLIC_KEY!
