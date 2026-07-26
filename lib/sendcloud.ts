@@ -102,8 +102,18 @@ export async function createSendcloudParcel(order: SendcloudOrder) {
   const data = await res.json()
   if (!res.ok) throw new Error(JSON.stringify(data))
 
-  const shipment = data.data
-  const parcel   = shipment?.parcels?.[0]
+  const shipmentId = data.data?.id
+  let parcel = data.data?.parcels?.[0]
+
+  // Sendcloud génère le label en asynchrone — on poll jusqu'à ANNOUNCED
+  for (let i = 0; i < 6 && !parcel?.documents?.length; i++) {
+    await new Promise(r => setTimeout(r, 1500))
+    const poll = await fetch(`${BASE_V3}/shipments/${shipmentId}`, {
+      headers: { Authorization: auth() },
+    })
+    const pollData = await poll.json()
+    parcel = pollData.data?.parcels?.[0]
+  }
 
   const labelDoc = parcel?.documents?.find(
     (d: any) => d.type === 'label' || String(d.type ?? '').includes('label')
@@ -113,6 +123,6 @@ export async function createSendcloudParcel(order: SendcloudOrder) {
     sendcloud_id:    parcel?.id ?? null,
     tracking_number: parcel?.tracking_number ?? '',
     tracking_url:    parcel?.tracking_url ?? null,
-    label_url:       labelDoc?.url ?? null,
+    label_url:       labelDoc?.link ?? null,
   }
 }
