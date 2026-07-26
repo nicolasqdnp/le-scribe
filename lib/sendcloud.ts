@@ -74,6 +74,7 @@ export async function createSendcloudParcel(order: SendcloudOrder) {
       city:             rp.city || servicePoint.city,
       country:          'FR',
       email:            order.email,
+      telephone:        order.shipping_phone ?? '',
       weight,
       shipment:         { id: methodId },
       order_number:     order.id,

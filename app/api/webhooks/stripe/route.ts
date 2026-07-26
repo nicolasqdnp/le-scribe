@@ -60,10 +60,11 @@ export async function POST(req: NextRequest) {
     if (product) {
       const email = session.customer_email || ''
       const shipping = (session as any).shipping_details || (session as any).shipping
+      const customerDetails = (session as any).customer_details
       const shippingAddress = shipping?.address || null
-      const shippingName = shipping?.name
-        || (session as any).customer_details?.name
-        || null
+      const billingAddress = customerDetails?.address || null
+      const shippingName = shipping?.name || customerDetails?.name || null
+      const shippingPhone = customerDetails?.phone || null
 
       if (order_id) {
         // Cas normal : commande créée au moment du checkout
@@ -73,13 +74,13 @@ export async function POST(req: NextRequest) {
             status: 'paid',
             stripe_session_id: session.id,
             shipping_name: shippingName,
-            shipping_address: shippingAddress,
+            shipping_address: shippingAddress || billingAddress,
+            shipping_phone: shippingPhone,
             updated_at: new Date().toISOString(),
           })
           .eq('id', order_id)
       } else {
         // Cas de fallback : l'insert Supabase a échoué au checkout (order_id vide)
-        // On crée la commande directement depuis les données Stripe
         console.warn('[webhook/stripe] order_id vide pour session', session.id, '— création fallback')
         const delivery = session.metadata?.delivery || 'postal'
         const relayId = session.metadata?.relay_id || null
@@ -94,7 +95,8 @@ export async function POST(req: NextRequest) {
             delivery,
             relay_point: relayId ? { code: relayId } : null,
             shipping_name: shippingName,
-            shipping_address: shippingAddress,
+            shipping_address: shippingAddress || billingAddress,
+            shipping_phone: shippingPhone,
           })
         if (insertErr) console.error('[webhook/stripe] Fallback insert error:', insertErr.message)
       }
