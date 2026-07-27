@@ -7,6 +7,7 @@ import {
   sendPhysiqueConfirmationEmail,
   sendCampaignConfirmationEmail,
   sendLivreConfirmationEmail,
+  sendNewOrderNotification,
 } from '../../../../lib/email'
 
 export async function POST(req: NextRequest) {
@@ -129,6 +130,15 @@ export async function POST(req: NextRequest) {
       if (['livre', 'pack3', 'pack10'].includes(product) && email) {
         await sendLivreConfirmationEmail(email, product, shippingName)
       }
+
+      await sendNewOrderNotification({
+        email,
+        product,
+        delivery: session.metadata?.delivery || 'postal',
+        amount:   session.amount_total || 0,
+        shippingName: shippingName,
+        orderId:  order_id || '',
+      })
 
       console.log(`[webhook/stripe] Commande ${product} confirmée → ${email}`)
     }

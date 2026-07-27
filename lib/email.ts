@@ -226,6 +226,60 @@ export async function sendLivreConfirmationEmail(to: string, product: string, sh
   }
 }
 
+// ─── Email : Notif interne nouvelle commande boutique ─────────────────────────
+
+const PRODUCT_LABELS: Record<string, string> = {
+  epub:   'EPUB',
+  livre:  'Livre physique',
+  pack3:  'Pack 3 exemplaires',
+  pack10: 'Pack Église 10 ex.',
+}
+const DELIVERY_LABELS: Record<string, string> = {
+  relay:       'Point Relais MR',
+  'home-mr':   'Domicile MR',
+  postal:      'Lettre suivie',
+  pickup:      'Retrait',
+  switzerland: 'Suisse Colissimo',
+}
+
+export async function sendNewOrderNotification(params: {
+  email: string
+  product: string
+  delivery: string
+  amount: number
+  shippingName: string | null
+  orderId: string
+}) {
+  try {
+    const { email, product, delivery, amount, shippingName, orderId } = params
+    const label    = PRODUCT_LABELS[product] || product
+    const livraison = DELIVERY_LABELS[delivery] || delivery
+    const euros    = (amount / 100).toFixed(2).replace('.', ',')
+
+    await sendEmail(
+      'nicolas.salafranque@lescribe.app',
+      `🛒 Nouvelle commande — ${label}`,
+      `<div style="font-family:sans-serif;font-size:15px;color:#222;padding:24px;">
+        <h2 style="margin:0 0 16px;">Nouvelle commande boutique</h2>
+        <table style="border-collapse:collapse;width:100%;max-width:480px;">
+          <tr><td style="padding:6px 12px 6px 0;color:#666;">Produit</td><td style="padding:6px 0;font-weight:bold;">${label}</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;color:#666;">Livraison</td><td style="padding:6px 0;">${livraison}</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;color:#666;">Montant</td><td style="padding:6px 0;">${euros} €</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;color:#666;">Client</td><td style="padding:6px 0;">${shippingName || '—'}</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;color:#666;">Email</td><td style="padding:6px 0;">${email}</td></tr>
+        </table>
+        <p style="margin:20px 0 0;">
+          <a href="https://lescribe.app/admin/commandes" style="background:#c9a77d;color:#000;font-weight:bold;padding:10px 20px;border-radius:8px;text-decoration:none;">
+            Voir la commande →
+          </a>
+        </p>
+      </div>`
+    )
+  } catch (e) {
+    console.error('[email] sendNewOrderNotification error:', e)
+  }
+}
+
 // ─── Email : Paiement confirmé ─────────────────────────────────────────────────
 
 const PLAN_LABELS: Record<string, string> = {
