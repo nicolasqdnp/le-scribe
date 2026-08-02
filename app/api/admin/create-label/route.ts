@@ -31,7 +31,12 @@ export async function POST(req: NextRequest) {
       })
       .eq('id', order_id)
 
-    return NextResponse.json(result)
+    // Remplace l'URL Sendcloud (auth requise) par le proxy local
+    const proxyLabelUrl = result.sendcloud_id
+      ? `/api/admin/label?parcel_id=${result.sendcloud_id}`
+      : null
+
+    return NextResponse.json({ ...result, label_url: proxyLabelUrl })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     console.error('[create-label]', message)
