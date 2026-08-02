@@ -137,6 +137,7 @@ export async function POST(req: NextRequest) {
         delivery: session.metadata?.delivery || 'postal',
         amount:   session.amount_total || 0,
         shippingName: shippingName,
+        phone:    shippingPhone,
         orderId:  order_id || '',
       })
 

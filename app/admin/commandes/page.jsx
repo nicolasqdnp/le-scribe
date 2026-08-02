@@ -356,7 +356,10 @@ export default function CommandesAdmin() {
                         <td style={{ ...tdStyle, color: C.text2 }}>{order.email}</td>
                         <td style={tdStyle}>{PRODUCT_LABELS[order.product] || order.product}</td>
                         <td style={{ ...tdStyle, color: C.gold, fontWeight: 600 }}>{(order.amount / 100).toFixed(2)} €</td>
-                        <td style={tdStyle}>{order.shipping_name || <span style={{ color: C.muted }}>—</span>}</td>
+                        <td style={tdStyle}>
+                          {order.shipping_name || <span style={{ color: C.muted }}>—</span>}
+                          {order.shipping_phone && <div style={{ fontSize: 11, color: C.text3, marginTop: 2 }}>{order.shipping_phone}</div>}
+                        </td>
                         <td style={{ ...tdStyle, color: C.text2, maxWidth: 220 }}>
                           {order.relay_point
                             ? (() => {

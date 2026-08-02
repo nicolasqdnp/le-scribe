@@ -248,6 +248,7 @@ export async function sendNewOrderNotification(params: {
   delivery: string
   amount: number
   shippingName: string | null
+  phone: string | null
   orderId: string
 }) {
   try {
@@ -266,6 +267,7 @@ export async function sendNewOrderNotification(params: {
           <tr><td style="padding:6px 12px 6px 0;color:#666;">Livraison</td><td style="padding:6px 0;">${livraison}</td></tr>
           <tr><td style="padding:6px 12px 6px 0;color:#666;">Montant</td><td style="padding:6px 0;">${euros} €</td></tr>
           <tr><td style="padding:6px 12px 6px 0;color:#666;">Client</td><td style="padding:6px 0;">${shippingName || '—'}</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;color:#666;">Téléphone</td><td style="padding:6px 0;">${params.phone || '—'}</td></tr>
           <tr><td style="padding:6px 12px 6px 0;color:#666;">Email</td><td style="padding:6px 0;">${email}</td></tr>
         </table>
         <p style="margin:20px 0 0;">
