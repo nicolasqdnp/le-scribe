@@ -198,7 +198,8 @@ export default function LivresPage() {
 
         {/* Bloc couverture + résumé */}
         <div className="flex flex-col md:flex-row gap-10 items-start mb-10">
-          <div className="flex-shrink-0 mx-auto md:mx-0">
+          <style>{`@keyframes ls-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }`}</style>
+          <div className="flex-shrink-0 mx-auto md:mx-0" style={{ animation: 'ls-float 3s ease-in-out infinite' }}>
             <img
               src="/lurgence-des-temps-couv-v2.png"
               alt="L'urgence des temps — Nicolas Salafranque"
