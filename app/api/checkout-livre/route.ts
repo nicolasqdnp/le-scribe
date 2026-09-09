@@ -2,7 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
+const PROMO_CODES: Record<string, { product: string; amount: number }> = {
+  DISTINCTION: { product: 'tshirt', amount: 1990 },
+}
+
 const PRODUCTS = {
+  tshirt: {
+    name: 'T-shirt Distinction — Le Scribe',
+    description: 'T-shirt · Col rond · Impression sérigraphiée',
+    amount: 2490,
+    shipping: true,
+    shippingAmount: 0,
+    mrAmount: 410,
+    homeAmount: 749,
+  },
   epub: {
     name: 'L\'urgence des temps — EPUB',
     description: 'Livre numérique · Téléchargement immédiat après paiement',
@@ -50,7 +63,7 @@ const PRODUCTS = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { product, email, delivery = 'postal', relayPoint = null } = await req.json()
+    const { product, email, delivery = 'postal', relayPoint = null, size = null, promoCode = null } = await req.json()
 
     if (!PRODUCTS[product as keyof typeof PRODUCTS]) {
       return NextResponse.json({ error: 'Produit invalide' }, { status: 400 })
@@ -62,7 +75,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Point relais non sélectionné' }, { status: 400 })
     }
 
-    const p = PRODUCTS[product as keyof typeof PRODUCTS]
+    // Validation taille pour t-shirt
+    if (product === 'tshirt' && !['S','M','L','XL','XXL'].includes(size)) {
+      return NextResponse.json({ error: 'Taille invalide' }, { status: 400 })
+    }
+
+    let p = { ...PRODUCTS[product as keyof typeof PRODUCTS] }
+
+    // Validation & application du code promo
+    const promoUpper = promoCode?.trim().toUpperCase() || null
+    if (promoUpper) {
+      const promo = PROMO_CODES[promoUpper]
+      if (!promo || promo.product !== product) {
+        return NextResponse.json({ error: 'Code promo invalide ou non applicable à ce produit.' }, { status: 400 })
+      }
+      p = { ...p, amount: promo.amount }
+    }
+
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
     const origin = req.headers.get('origin') || 'https://lescribe.app'
 
@@ -86,6 +115,8 @@ export async function POST(req: NextRequest) {
         status: 'pending',
         delivery,
         relay_point: relayPoint,
+        size: size || null,
+        promo_code: promoUpper || null,
       })
       .select('id')
       .single()

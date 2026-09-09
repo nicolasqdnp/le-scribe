@@ -129,9 +129,10 @@ export default function VetementsPage() {
             <h3 className="font-semibold text-cream mb-3 text-sm uppercase tracking-widest">Livraison</h3>
             <ul className="text-sm text-muted space-y-2">
               <li className="flex items-center gap-2"><span className="text-gold text-xs">→</span> Retrait gratuit · Église La Rencontre, Lieusaint</li>
-              <li className="flex items-center gap-2"><span className="text-gold text-xs">→</span> Point Relais Mondial Relay · + 4,10€</li>
-              <li className="flex items-center gap-2"><span className="text-gold text-xs">→</span> Livraison domicile · + 5,00€</li>
+              <li className="flex items-center gap-2"><span className="text-gold text-xs">→</span> Point Relais Mondial Relay</li>
+              <li className="flex items-center gap-2"><span className="text-gold text-xs">→</span> Livraison à domicile (Mondial Relay)</li>
             </ul>
+            <p className="text-xs text-muted2 mt-3">Frais d'envoi calculés à l'étape suivante.</p>
           </div>
         </div>
 

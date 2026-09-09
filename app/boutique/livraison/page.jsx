@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 const PRODUCTS = {
-  tshirt: { label: 'T-shirt Distinction',        priceStr: '24,90€', relayStr: '4,10€', homeStr: '5,00€',  weight: 300,  isTshirt: true },
+  tshirt: { label: 'T-shirt Distinction',        priceStr: '24,90€', relayStr: '4,10€', homeStr: '7,49€',  weight: 300,  isTshirt: true },
   livre:  { label: 'Livre physique',             priceStr: '18,99€', relayStr: '4,10€', homeStr: '7,49€',  weight: 320  },
   pack3:  { label: 'Pack 3 exemplaires',         priceStr: '48€',    relayStr: '4,51€', homeStr: '9,48€',  weight: 960  },
   pack10: { label: 'Pack Église 10 exemplaires', priceStr: '140€',   relayStr: '6,71€', homeStr: '16,34€', weight: 3200 },
