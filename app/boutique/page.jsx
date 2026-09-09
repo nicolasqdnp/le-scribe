@@ -128,15 +128,13 @@ export default function BoutiquePage() {
           {/* Livres */}
           <a
             href="/boutique/livres"
-            className="group relative overflow-hidden rounded-2xl border border-border bg-surface hover:border-gold/50 hover:bg-surface2 transition-all duration-200 flex flex-col items-center justify-center py-12 gap-4 cursor-pointer"
+            className="group relative overflow-hidden rounded-2xl border border-border bg-surface hover:border-gold/50 hover:bg-surface2 transition-all duration-200 flex flex-col items-center justify-center py-12 gap-3 cursor-pointer"
           >
-            <div className="relative">
-              <img
-                src="/lurgence-des-temps-couv-v2.png"
-                alt="Livres"
-                className="h-28 object-contain rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-14 h-14 text-gold/70 group-hover:text-gold transition-colors duration-200" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="8" y="6" width="22" height="36" rx="2"/>
+              <path d="M8 10h22M8 16h22M8 22h14"/>
+              <path d="M30 24v16l5-3 5 3V24" strokeWidth="1.8"/>
+            </svg>
             <div className="text-center">
               <span className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream group-hover:text-gold transition block">Livres</span>
               <span className="text-xs text-muted mt-0.5 block">EPUB · Physique · Packs</span>
@@ -147,15 +145,11 @@ export default function BoutiquePage() {
           {/* Vêtements */}
           <a
             href="/boutique/vetements"
-            className="group relative overflow-hidden rounded-2xl border border-border bg-surface hover:border-gold/50 hover:bg-surface2 transition-all duration-200 flex flex-col items-center justify-center py-12 gap-4 cursor-pointer"
+            className="group relative overflow-hidden rounded-2xl border border-border bg-surface hover:border-gold/50 hover:bg-surface2 transition-all duration-200 flex flex-col items-center justify-center py-12 gap-3 cursor-pointer"
           >
-            <div className="relative">
-              <img
-                src="/distinction.png"
-                alt="Vêtements"
-                className="h-28 object-contain group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-14 h-14 text-gold/70 group-hover:text-gold transition-colors duration-200" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 6 L8 14 L14 18 L14 42 L34 42 L34 18 L40 14 L32 6 C32 6 30 10 24 10 C18 10 16 6 16 6 Z"/>
+            </svg>
             <div className="text-center">
               <span className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream group-hover:text-gold transition block">Vêtements</span>
               <span className="text-xs text-muted mt-0.5 block">T-shirt Distinction</span>
