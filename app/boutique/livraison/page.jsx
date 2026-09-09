@@ -10,7 +10,29 @@ const PRODUCTS = {
 }
 
 const TAILLES = ['S', 'M', 'L', 'XL', 'XXL']
-const PROMO_TSHIRT = { code: 'DISTINCTION', priceStr: '19,90€', label: 'Tarif Église La Rencontre' }
+const TSHIRT_UNIT_CENTS  = 2490
+const TSHIRT_PROMO_CENTS = 1990
+const PROMO_TSHIRT = { code: 'DISTINCTION', label: 'Tarif Église La Rencontre' }
+
+// ⚠️ À ajuster quand le poids réel est mesuré
+const TSHIRT_WEIGHT_G = 300
+
+function shippingCostCents(mode, weightG) {
+  if (mode === 'pickup') return 0
+  if (mode === 'relay') {
+    if (weightG <=  500) return  410
+    if (weightG <= 2000) return  451
+    return 671
+  }
+  if (mode === 'home-mr') {
+    if (weightG <=  500) return  749
+    if (weightG <= 2000) return  948
+    return 1634
+  }
+  if (mode === 'switzerland') return 1200
+  return 0
+}
+function centsToStr(c) { return (c / 100).toFixed(2).replace('.', ',') + '€' }
 
 const MR_BRAND = 'CC23ZZZP'
 
@@ -21,17 +43,28 @@ function LivraisonForm() {
   const email   = params.get('email')
   const info    = PRODUCTS[product]
 
-  const [mode, setMode]           = useState(null)
+  const [mode, setMode]             = useState(null)
   const [relayPoint, setRelayPoint] = useState(null)
   const [widgetReady, setWidgetReady] = useState(false)
-  const [loading, setLoading]     = useState(false)
-  const [error, setError]         = useState('')
-  const [size, setSize]           = useState('')
-  const [promoCode, setPromoCode] = useState('')
-  const promoValid = info?.isTshirt && promoCode.trim().toUpperCase() === PROMO_TSHIRT.code
+  const [loading, setLoading]       = useState(false)
+  const [error, setError]           = useState('')
+  // Multi-taille t-shirt
+  const [sizes, setSizes]           = useState({S:0, M:0, L:0, XL:0, XXL:0})
+  const [promoCode, setPromoCode]   = useState('')
+  const promoValid    = info?.isTshirt && promoCode.trim().toUpperCase() === PROMO_TSHIRT.code
+  const totalQty      = info?.isTshirt ? Object.values(sizes).reduce((s, n) => s + n, 0) : 1
+  const totalWeightG  = info?.isTshirt ? TSHIRT_WEIGHT_G * totalQty : info?.weight ?? 0
+  const unitCents     = promoValid ? TSHIRT_PROMO_CENTS : TSHIRT_UNIT_CENTS
+  const productCents  = info?.isTshirt ? unitCents * totalQty : null
+  // Prix affiché dans le résumé
   const displayedPrice = info?.isTshirt
-    ? (promoValid ? PROMO_TSHIRT.priceStr : info.priceStr)
+    ? (totalQty > 0
+        ? `${totalQty} × ${centsToStr(unitCents)} = ${centsToStr(productCents)}`
+        : centsToStr(unitCents) + ' / pièce')
     : info?.priceStr
+  // Frais de port calculés dynamiquement
+  const shippingCents = shippingCostCents(mode, totalWeightG)
+  const shippingStr   = shippingCents === 0 ? 'Gratuit' : '+ ' + centsToStr(shippingCents)
   const widgetRef = useRef(null)
 
   // Charger jQuery + Leaflet + widget MR quand le mode relay est sélectionné
@@ -99,8 +132,8 @@ function LivraisonForm() {
       setError('Sélectionne un point Mondial Relay sur la carte avant de continuer.')
       return
     }
-    if (info?.isTshirt && !size) {
-      setError('Merci de sélectionner une taille.')
+    if (info?.isTshirt && totalQty === 0) {
+      setError('Sélectionne au moins une taille.')
       return
     }
     setError(''); setLoading(true)
@@ -110,7 +143,7 @@ function LivraisonForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           product, email, delivery: mode, relayPoint: relayPoint || null,
-          size: size || null,
+          sizes: info?.isTshirt ? sizes : null,
           promoCode: promoCode.trim() || null,
         }),
       })
@@ -121,7 +154,7 @@ function LivraisonForm() {
   }
 
   const canConfirm = (mode === 'pickup' || mode === 'home-mr' || mode === 'switzerland' || (mode === 'relay' && relayPoint))
-    && (!info?.isTshirt || size)
+    && (!info?.isTshirt || totalQty > 0)
 
   return (
     <main className="min-h-screen bg-bg text-cream px-4 py-12 max-w-2xl mx-auto">
@@ -138,37 +171,53 @@ function LivraisonForm() {
       <div className="bg-surface border border-gold/20 rounded-2xl p-5 mb-8">
         <p className="text-xs text-gold/60 uppercase tracking-widest mb-1">Ta commande</p>
         <p className="font-[family-name:var(--font-playfair)] text-lg font-bold">{info.label}</p>
-        <div className="flex items-baseline gap-3 mt-1">
-          <p className="text-2xl font-bold text-cream">{displayedPrice}</p>
-          {promoValid && (
-            <p className="text-sm text-muted2 line-through">{info.priceStr}</p>
-          )}
-        </div>
-        {promoValid && (
-          <p className="text-xs text-ok mt-1">✓ Code {PROMO_TSHIRT.code} appliqué — {PROMO_TSHIRT.label}</p>
+        <p className="text-xl font-bold text-cream mt-1">{displayedPrice}</p>
+        {info.isTshirt && promoValid && (
+          <p className="text-xs text-ok mt-1">✓ Code {PROMO_TSHIRT.code} — {PROMO_TSHIRT.label}</p>
+        )}
+        {mode && (
+          <p className="text-xs text-muted2 mt-1">
+            Livraison : {shippingStr}
+            {totalQty > 0 && productCents != null && shippingCents > 0 && (
+              <> · Total : {centsToStr(productCents + shippingCents)}</>
+            )}
+          </p>
         )}
         <p className="text-xs text-muted2 mt-1">{email}</p>
       </div>
 
-      {/* Sélecteur de taille (t-shirt uniquement) */}
+      {/* Sélecteur de tailles + quantités (t-shirt) */}
       {info.isTshirt && (
         <div className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-gold/70 mb-4">
-            Taille
-          </h2>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex items-baseline justify-between mb-4">
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-gold/70">Tailles & quantités</h2>
+            {totalQty > 0 && (
+              <span className="text-xs text-muted">{totalQty} article{totalQty > 1 ? 's' : ''}</span>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
             {TAILLES.map(t => (
-              <button
-                key={t} type="button"
-                onClick={() => setSize(t)}
-                className={`w-14 h-14 rounded-xl border text-sm font-bold transition ${
-                  size === t
-                    ? 'border-gold bg-gold/10 text-gold'
-                    : 'border-border bg-surface text-muted hover:border-gold/40'
-                }`}
-              >
-                {t}
-              </button>
+              <div key={t} className={`flex items-center justify-between rounded-xl border px-4 py-3 transition ${
+                sizes[t] > 0 ? 'border-gold/50 bg-gold/5' : 'border-border bg-surface'
+              }`}>
+                <span className={`text-sm font-bold w-10 ${sizes[t] > 0 ? 'text-gold' : 'text-muted'}`}>{t}</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSizes(s => ({ ...s, [t]: Math.max(0, s[t] - 1) }))}
+                    disabled={sizes[t] === 0}
+                    className="w-8 h-8 rounded-lg border border-border bg-surface2 text-cream text-lg leading-none flex items-center justify-center hover:border-gold/40 transition disabled:opacity-30"
+                  >−</button>
+                  <span className={`w-5 text-center text-sm font-bold ${sizes[t] > 0 ? 'text-cream' : 'text-muted2'}`}>
+                    {sizes[t]}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setSizes(s => ({ ...s, [t]: s[t] + 1 }))}
+                    className="w-8 h-8 rounded-lg border border-border bg-surface2 text-cream text-lg leading-none flex items-center justify-center hover:border-gold/40 transition"
+                  >+</button>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -209,7 +258,9 @@ function LivraisonForm() {
           <p className={`font-semibold text-sm ${mode === 'relay' ? 'text-gold' : 'text-cream'}`}>
             📦 Point Relais Mondial Relay
           </p>
-          <p className="text-xs text-muted mt-0.5">+ {info.relayStr} · Retrait en 2–4 jours</p>
+          <p className="text-xs text-muted mt-0.5">
+            {info.isTshirt ? '+ ' + centsToStr(shippingCostCents('relay', totalWeightG)) : '+ ' + info.relayStr} · Retrait en 2–4 jours
+          </p>
         </button>
 
         <button
@@ -222,7 +273,9 @@ function LivraisonForm() {
           <p className={`font-semibold text-sm ${mode === 'home-mr' ? 'text-gold' : 'text-cream'}`}>
             🏠 Livraison à domicile Mondial Relay
           </p>
-          <p className="text-xs text-muted mt-0.5">+ {info.homeStr} · Livraison en 3–5 jours ouvrés</p>
+          <p className="text-xs text-muted mt-0.5">
+            {info.isTshirt ? '+ ' + centsToStr(shippingCostCents('home-mr', totalWeightG)) : '+ ' + info.homeStr} · Livraison en 3–5 jours ouvrés
+          </p>
         </button>
 
         <button

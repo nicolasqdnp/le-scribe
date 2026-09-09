@@ -6,6 +6,20 @@ const PROMO_CODES: Record<string, { product: string; amount: number }> = {
   DISTINCTION: { product: 'tshirt', amount: 1990 },
 }
 
+// ⚠️ À ajuster quand le poids réel est mesuré
+const TSHIRT_WEIGHT_G = 300
+
+function mrRelayCost(weightG: number): number {
+  if (weightG <=  500) return  410
+  if (weightG <= 2000) return  451
+  return 671
+}
+function mrHomeCost(weightG: number): number {
+  if (weightG <=  500) return  749
+  if (weightG <= 2000) return  948
+  return 1634
+}
+
 const PRODUCTS = {
   tshirt: {
     name: 'T-shirt Distinction — Le Scribe',
@@ -63,7 +77,7 @@ const PRODUCTS = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { product, email, delivery = 'postal', relayPoint = null, size = null, promoCode = null } = await req.json()
+    const { product, email, delivery = 'postal', relayPoint = null, sizes = null, promoCode = null } = await req.json()
 
     if (!PRODUCTS[product as keyof typeof PRODUCTS]) {
       return NextResponse.json({ error: 'Produit invalide' }, { status: 400 })
@@ -75,9 +89,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Point relais non sélectionné' }, { status: 400 })
     }
 
-    // Validation taille pour t-shirt
-    if (product === 'tshirt' && !['S','M','L','XL','XXL'].includes(size)) {
-      return NextResponse.json({ error: 'Taille invalide' }, { status: 400 })
+    // Validation t-shirt : sizes est un objet {S:0, M:1, L:2, ...}
+    const VALID_SIZES = ['S','M','L','XL','XXL']
+    let totalQty = 1
+    let sizeLabel = ''
+    if (product === 'tshirt') {
+      if (!sizes || typeof sizes !== 'object') {
+        return NextResponse.json({ error: 'Tailles invalides' }, { status: 400 })
+      }
+      const entries = Object.entries(sizes as Record<string, number>)
+        .filter(([s, q]) => VALID_SIZES.includes(s) && Number.isInteger(q) && q > 0)
+      if (entries.length === 0) {
+        return NextResponse.json({ error: 'Sélectionne au moins une taille.' }, { status: 400 })
+      }
+      totalQty = entries.reduce((sum, [, q]) => sum + q, 0)
+      sizeLabel = entries.map(([s, q]) => q > 1 ? `${s}×${q}` : s).join(', ')
     }
 
     let p = { ...PRODUCTS[product as keyof typeof PRODUCTS] }
@@ -99,23 +125,37 @@ export async function POST(req: NextRequest) {
     const isRelay = delivery === 'relay'
     const isHomeMR = delivery === 'home-mr'
     const isSwitzerland = delivery === 'switzerland'
-    const shippingCost = isPickup ? 0 : isRelay ? p.mrAmount : isHomeMR ? ((p as any).homeAmount ?? 0) : isSwitzerland ? 1200 : p.shippingAmount
+
+    // Pour le t-shirt, shipping dynamique selon poids total
+    let shippingCost: number
+    if (product === 'tshirt') {
+      const totalWeightG = TSHIRT_WEIGHT_G * totalQty
+      shippingCost = isPickup ? 0
+        : isRelay ? mrRelayCost(totalWeightG)
+        : isHomeMR ? mrHomeCost(totalWeightG)
+        : isSwitzerland ? 1200
+        : 0
+    } else {
+      shippingCost = isPickup ? 0 : isRelay ? p.mrAmount : isHomeMR ? ((p as any).homeAmount ?? 0) : isSwitzerland ? 1200 : p.shippingAmount
+    }
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
+    const productTotal = p.amount * totalQty
+
     const { data: order, error: orderErr } = await supabase
       .from('orders')
       .insert({
         email,
         product,
-        amount: p.amount + shippingCost,
+        amount: productTotal + shippingCost,
         status: 'pending',
         delivery,
         relay_point: relayPoint,
-        size: size || null,
+        size: sizeLabel || null,
         promo_code: promoUpper || null,
       })
       .select('id')
@@ -126,10 +166,13 @@ export async function POST(req: NextRequest) {
       {
         price_data: {
           currency: 'eur',
-          product_data: { name: p.name, description: p.description },
+          product_data: {
+            name: p.name,
+            description: sizeLabel ? `${p.description} · Taille${totalQty > 1 ? 's' : ''} : ${sizeLabel}` : p.description,
+          },
           unit_amount: p.amount,
         },
-        quantity: 1,
+        quantity: totalQty,
       },
     ]
 
