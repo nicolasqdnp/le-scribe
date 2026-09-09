@@ -94,7 +94,7 @@ export default function OrdinationPage() {
               27 septembre 2026
             </p>
             <p style={{ fontSize: '15px', color: '#c8c3bb', lineHeight: 1.8, maxWidth: '400px', margin: '0 auto' }}>
-              À l'occasion de cette cérémonie, tu es invité à contribuer à l'enveloppe de soutien pour Audrey, en signe de ton affection et de ta bénédiction.
+              Si tu as à cœur de marquer ce moment, tu peux participer à l'enveloppe de soutien — un geste simple, si tu le souhaites, pour exprimer ton affection et ta bénédiction pour Audrey.
             </p>
           </div>
 
