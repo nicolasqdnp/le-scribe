@@ -4,8 +4,9 @@ import { useState } from 'react'
 const TAILLES = ['S', 'M', 'L', 'XL', 'XXL']
 
 export default function VetementsPage() {
-  const [email, setEmail]   = useState('')
-  const [error, setError]   = useState('')
+  const [email, setEmail]     = useState('')
+  const [error, setError]     = useState('')
+  const [lightbox, setLightbox] = useState(false)
 
   function handleBuy() {
     if (!email || !email.includes('@')) { setError('Saisis ton adresse email pour continuer.'); return }
@@ -33,14 +34,43 @@ export default function VetementsPage() {
         {/* Carte produit */}
         <div className="flex flex-col md:flex-row gap-10 items-start">
 
-          {/* Visuel */}
-          <div className="flex-shrink-0 w-full md:w-80 bg-surface2 rounded-2xl border border-border overflow-hidden flex items-center justify-center p-8" style={{ minHeight: '320px' }}>
+          {/* Visuel + lightbox */}
+          <div
+            className="flex-shrink-0 w-full md:w-80 bg-surface2 rounded-2xl border border-border overflow-hidden flex items-center justify-center p-8 cursor-zoom-in group relative"
+            style={{ minHeight: '320px' }}
+            onClick={() => setLightbox(true)}
+            title="Cliquer pour agrandir"
+          >
             <img
               src="/distinction.png"
               alt="T-shirt Distinction — Le Scribe"
               style={{ maxHeight: '280px', objectFit: 'contain', display: 'block' }}
+              className="group-hover:scale-105 transition-transform duration-300"
             />
+            <span className="absolute bottom-3 right-3 bg-bg/70 text-muted text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              🔍 Agrandir
+            </span>
           </div>
+
+          {/* Lightbox */}
+          {lightbox && (
+            <div
+              style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out' }}
+              onClick={() => setLightbox(false)}
+            >
+              <img
+                src="/distinction.png"
+                alt="T-shirt Distinction — Le Scribe"
+                style={{ maxWidth: 'min(90vw, 600px)', maxHeight: '85vh', objectFit: 'contain', borderRadius: '16px', boxShadow: '0 40px 120px rgba(0,0,0,0.8)' }}
+                onClick={e => e.stopPropagation()}
+              />
+              <button
+                onClick={() => setLightbox(false)}
+                style={{ position: 'fixed', top: '20px', right: '24px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', borderRadius: '50%', width: '40px', height: '40px', fontSize: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
+                aria-label="Fermer"
+              >×</button>
+            </div>
+          )}
 
           {/* Infos */}
           <div className="flex-1">
