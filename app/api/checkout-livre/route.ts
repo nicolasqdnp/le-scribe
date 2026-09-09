@@ -208,7 +208,7 @@ export async function POST(req: NextRequest) {
         delivery,
         relay_id: isRelay ? (relayPoint?.code || '') : '',
       },
-      payment_method_types: ['card'],
+      // Pas de payment_method_types → Stripe active automatiquement carte, Apple Pay, Google Pay, Link…
       phone_number_collection: { enabled: false },
     }
 

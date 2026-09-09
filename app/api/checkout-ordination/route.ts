@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       customer_email: email,
       success_url: `${origin}/ordination/merci?montant=${amtInt}`,
       cancel_url: `${origin}/ordination`,
-      payment_method_types: ['card'],
+      // Pas de payment_method_types → Stripe active automatiquement carte, Apple Pay, Google Pay, Link…
       metadata: {
         type: 'ordination',
         donateur: name?.trim() || '',
