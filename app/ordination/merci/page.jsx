@@ -9,12 +9,9 @@ function MerciContent() {
   return (
     <main style={{ minHeight: '100vh', background: 'radial-gradient(ellipse at 50% -10%, rgba(196,120,158,0.18) 0%, transparent 60%), radial-gradient(ellipse at 80% 90%, rgba(212,175,122,0.10) 0%, transparent 55%), #130910', display: 'flex', flexDirection: 'column', fontFamily: 'system-ui, sans-serif' }}>
 
-      <header style={{ borderBottom: '1px solid #3a1a2c', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <header style={{ borderBottom: '1px solid #3a1a2c', padding: '16px 24px' }}>
         <span style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontSize: '18px', fontWeight: 700, color: '#d4af7a' }}>
           Le Scribe
-        </span>
-        <span style={{ fontSize: '11px', color: '#6a445a', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-          Cérémonie privée
         </span>
       </header>
 

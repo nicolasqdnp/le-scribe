@@ -65,12 +65,9 @@ export default function OrdinationPage() {
     <main style={{ minHeight: '100vh', background: C.bgGlow, display: 'flex', flexDirection: 'column', fontFamily: 'system-ui, sans-serif' }}>
 
       {/* Header */}
-      <header style={{ borderBottom: `1px solid ${C.border}`, padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <header style={{ borderBottom: `1px solid ${C.border}`, padding: '16px 24px' }}>
         <span style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontSize: '18px', fontWeight: 700, color: C.gold }}>
           Le Scribe
-        </span>
-        <span style={{ fontSize: '11px', color: C.faint, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-          Cérémonie privée
         </span>
       </header>
 
