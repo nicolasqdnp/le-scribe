@@ -54,9 +54,8 @@ export default function BoutiquePage() {
   return (
     <main className="min-h-screen page-glow">
       {/* Header */}
-      <header className="border-b border-border px-6 py-4 flex items-center justify-between">
+      <header className="border-b border-border px-6 py-4 flex items-center">
         <a href="/" className="font-[family-name:var(--font-playfair)] text-xl font-bold text-gold">Le Scribe</a>
-        <span className="text-xs text-muted">Éditions Le Scribe</span>
       </header>
 
       {/* ── Bandeau héro défilant ─────────────────────────────────── */}
