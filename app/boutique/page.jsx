@@ -465,6 +465,60 @@ export default function BoutiquePage() {
           EPUB : paiement sécurisé par Stripe · Carte bancaire, Apple Pay, Google Pay
         </p>
 
+        {/* ── Merchandising ─────────────────────────────────────────── */}
+        <div className="mt-20 pt-10 border-t border-border">
+          <p className="text-xs font-medium text-gold/60 uppercase tracking-widest mb-6">
+            Merchandising
+          </p>
+          <div className="grid md:grid-cols-2 gap-6">
+
+            {/* T-shirt Distinction */}
+            <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col">
+              <div className="rounded-xl overflow-hidden mb-5 bg-surface2">
+                <img
+                  src="/distinction.png"
+                  alt="T-shirt Distinction — Le Scribe"
+                  className="w-full object-contain max-h-64"
+                />
+              </div>
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <span className="text-xs font-medium text-gold/60 uppercase tracking-widest">T-shirt</span>
+                  <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream mt-1">
+                    Distinction
+                  </h2>
+                  <p className="text-muted text-xs mt-1">Col rond · Impression sérigraphiée · S / M / L / XL / XXL</p>
+                </div>
+                <div className="text-right flex-shrink-0 mt-5">
+                  <span className="text-2xl font-bold text-cream">24,90€</span>
+                </div>
+              </div>
+              <p className="text-xs text-muted2 mb-5">+ frais d'envoi ou retrait gratuit à l'église</p>
+
+              <div className="mt-auto">
+                <input
+                  type="email"
+                  placeholder="ton@email.com"
+                  id="email-tshirt"
+                  className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition mb-3"
+                />
+                <button
+                  onClick={() => {
+                    const email = document.getElementById('email-tshirt').value
+                    if (!email || !email.includes('@')) { setError('Saisis ton adresse email pour continuer.'); return }
+                    setError('')
+                    window.location.href = `/boutique/livraison?product=tshirt&email=${encodeURIComponent(email)}`
+                  }}
+                  className="w-full bg-gold text-bg font-semibold text-sm py-3 rounded-xl hover:bg-gold2 transition"
+                >
+                  Commander le t-shirt — 24,90€
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         {/* ── Témoignages ──────────────────────────────────────────── */}
         <div className="mt-20 pt-10 border-t border-border">
           <h3 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-cream mb-8">

@@ -66,9 +66,9 @@ export default function OrdinationPage() {
 
       {/* Header */}
       <header style={{ borderBottom: `1px solid ${C.border}`, padding: '16px 24px' }}>
-        <span style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontSize: '18px', fontWeight: 700, color: C.gold }}>
+        <a href="/" style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontSize: '18px', fontWeight: 700, color: C.gold, textDecoration: 'none' }}>
           Le Scribe
-        </span>
+        </a>
       </header>
 
       <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '52px 24px 80px' }}>

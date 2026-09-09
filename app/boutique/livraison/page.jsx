@@ -3,10 +3,14 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 const PRODUCTS = {
+  tshirt: { label: 'T-shirt Distinction',        priceStr: '24,90€', relayStr: '4,10€', homeStr: '5,00€',  weight: 300,  isTshirt: true },
   livre:  { label: 'Livre physique',             priceStr: '18,99€', relayStr: '4,10€', homeStr: '7,49€',  weight: 320  },
   pack3:  { label: 'Pack 3 exemplaires',         priceStr: '48€',    relayStr: '4,51€', homeStr: '9,48€',  weight: 960  },
   pack10: { label: 'Pack Église 10 exemplaires', priceStr: '140€',   relayStr: '6,71€', homeStr: '16,34€', weight: 3200 },
 }
+
+const TAILLES = ['S', 'M', 'L', 'XL', 'XXL']
+const PROMO_TSHIRT = { code: 'DISTINCTION', priceStr: '19,90€', label: 'Tarif Église La Rencontre' }
 
 const MR_BRAND = 'CC23ZZZP'
 
@@ -22,6 +26,12 @@ function LivraisonForm() {
   const [widgetReady, setWidgetReady] = useState(false)
   const [loading, setLoading]     = useState(false)
   const [error, setError]         = useState('')
+  const [size, setSize]           = useState('')
+  const [promoCode, setPromoCode] = useState('')
+  const promoValid = info?.isTshirt && promoCode.trim().toUpperCase() === PROMO_TSHIRT.code
+  const displayedPrice = info?.isTshirt
+    ? (promoValid ? PROMO_TSHIRT.priceStr : info.priceStr)
+    : info?.priceStr
   const widgetRef = useRef(null)
 
   // Charger jQuery + Leaflet + widget MR quand le mode relay est sélectionné
@@ -89,12 +99,20 @@ function LivraisonForm() {
       setError('Sélectionne un point Mondial Relay sur la carte avant de continuer.')
       return
     }
+    if (info?.isTshirt && !size) {
+      setError('Merci de sélectionner une taille.')
+      return
+    }
     setError(''); setLoading(true)
     try {
       const res  = await fetch('/api/checkout-livre', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product, email, delivery: mode, relayPoint: relayPoint || null }),
+        body: JSON.stringify({
+          product, email, delivery: mode, relayPoint: relayPoint || null,
+          size: size || null,
+          promoCode: promoCode.trim() || null,
+        }),
       })
       const data = await res.json()
       if (data.url) { window.location.href = data.url }
@@ -102,7 +120,8 @@ function LivraisonForm() {
     } catch { setError('Erreur réseau. Réessaie.'); setLoading(false) }
   }
 
-  const canConfirm = mode === 'pickup' || mode === 'home-mr' || mode === 'switzerland' || (mode === 'relay' && relayPoint)
+  const canConfirm = (mode === 'pickup' || mode === 'home-mr' || mode === 'switzerland' || (mode === 'relay' && relayPoint))
+    && (!info?.isTshirt || size)
 
   return (
     <main className="min-h-screen bg-bg text-cream px-4 py-12 max-w-2xl mx-auto">
@@ -119,9 +138,60 @@ function LivraisonForm() {
       <div className="bg-surface border border-gold/20 rounded-2xl p-5 mb-8">
         <p className="text-xs text-gold/60 uppercase tracking-widest mb-1">Ta commande</p>
         <p className="font-[family-name:var(--font-playfair)] text-lg font-bold">{info.label}</p>
-        <p className="text-2xl font-bold text-cream mt-1">{info.priceStr}</p>
+        <div className="flex items-baseline gap-3 mt-1">
+          <p className="text-2xl font-bold text-cream">{displayedPrice}</p>
+          {promoValid && (
+            <p className="text-sm text-muted2 line-through">{info.priceStr}</p>
+          )}
+        </div>
+        {promoValid && (
+          <p className="text-xs text-ok mt-1">✓ Code {PROMO_TSHIRT.code} appliqué — {PROMO_TSHIRT.label}</p>
+        )}
         <p className="text-xs text-muted2 mt-1">{email}</p>
       </div>
+
+      {/* Sélecteur de taille (t-shirt uniquement) */}
+      {info.isTshirt && (
+        <div className="mb-8">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-gold/70 mb-4">
+            Taille
+          </h2>
+          <div className="flex gap-2 flex-wrap">
+            {TAILLES.map(t => (
+              <button
+                key={t} type="button"
+                onClick={() => setSize(t)}
+                className={`w-14 h-14 rounded-xl border text-sm font-bold transition ${
+                  size === t
+                    ? 'border-gold bg-gold/10 text-gold'
+                    : 'border-border bg-surface text-muted hover:border-gold/40'
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Code promo (t-shirt uniquement) */}
+      {info.isTshirt && (
+        <div className="mb-8">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-gold/70 mb-4">
+            Code promo (optionnel)
+          </h2>
+          <input
+            type="text"
+            placeholder="ex. DISTINCTION"
+            value={promoCode}
+            onChange={e => setPromoCode(e.target.value.toUpperCase())}
+            className="w-full text-sm bg-surface2 border border-border rounded-xl px-4 py-3 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition uppercase tracking-widest"
+          />
+          {promoCode && !promoValid && (
+            <p className="text-xs text-muted2 mt-2">Code non reconnu ou non applicable.</p>
+          )}
+        </div>
+      )}
 
       {/* Choix livraison */}
       <h2 className="text-sm font-semibold uppercase tracking-widest text-gold/70 mb-4">
