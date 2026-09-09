@@ -182,7 +182,7 @@ function LivraisonForm() {
           </h2>
           <input
             type="text"
-            placeholder="ex. DISTINCTION"
+            placeholder="Code promo"
             value={promoCode}
             onChange={e => setPromoCode(e.target.value.toUpperCase())}
             className="w-full text-sm bg-surface2 border border-border rounded-xl px-4 py-3 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition uppercase tracking-widest"
