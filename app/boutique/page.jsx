@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const INTRO_RAW = [
   { t: 'h',  text: 'Un avertissement avant de continuer' },
@@ -118,6 +118,55 @@ function Stars({ value, max = 5, size = 'text-xl', interactive = false, onHover,
   )
 }
 
+function TshirtCard({ setError }) {
+  const [email, setEmail] = useState('')
+  return (
+    <div className="bg-surface border border-border rounded-2xl overflow-hidden flex flex-col">
+      {/* Visuel pleine largeur */}
+      <div className="bg-surface2 flex items-center justify-center p-6" style={{ minHeight: '220px' }}>
+        <img
+          src="/distinction.png"
+          alt="T-shirt Distinction — Le Scribe"
+          style={{ maxHeight: '200px', objectFit: 'contain', display: 'block' }}
+        />
+      </div>
+
+      <div className="p-6 flex flex-col flex-1">
+        <span className="text-xs font-medium text-gold/60 uppercase tracking-widest">T-shirt</span>
+        <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream mt-1 mb-1">
+          Distinction
+        </h2>
+        <p className="text-muted text-xs mb-3">Col rond · Impression sérigraphiée · S / M / L / XL / XXL</p>
+
+        <div className="flex items-baseline gap-3 mb-1">
+          <span className="text-2xl font-bold text-cream">24,90€</span>
+        </div>
+        <p className="text-xs text-muted2 mb-5">+ frais d'envoi ou retrait gratuit à l'église La Rencontre</p>
+
+        <div className="mt-auto">
+          <input
+            type="email"
+            placeholder="ton@email.com"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition mb-3"
+          />
+          <button
+            onClick={() => {
+              if (!email || !email.includes('@')) { setError('Saisis ton adresse email pour continuer.'); return }
+              setError('')
+              window.location.href = `/boutique/livraison?product=tshirt&email=${encodeURIComponent(email)}`
+            }}
+            className="w-full bg-gold text-bg font-semibold text-sm py-3 rounded-xl hover:bg-gold2 transition"
+          >
+            Commander — 24,90€
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function BoutiquePage() {
   const [emailEpub, setEmailEpub] = useState('')
   const [loadingEpub, setLoadingEpub] = useState(false)
@@ -192,6 +241,42 @@ export default function BoutiquePage() {
     ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
     : 0
 
+  // Bandeau défilant automatique
+  const FEATURED = [
+    { id: 'livre',  img: '/lurgence-des-temps-couv-v2.png', label: "L'urgence des temps", sub: 'Livre physique', price: '18,99€', tag: '📖 Livres' },
+    { id: 'epub',   img: '/lurgence-des-temps-couv-v2.png', label: "L'urgence des temps", sub: 'Format numérique EPUB', price: '9€', tag: '📖 Livres' },
+    { id: 'tshirt', img: '/distinction.png',                label: 'T-shirt Distinction', sub: 'Col rond · sérigraphie', price: '24,90€', tag: '👕 Vêtements' },
+  ]
+  const [slide, setSlide] = useState(0)
+  const [emailBanner, setEmailBanner] = useState('')
+  const timerRef = useRef(null)
+
+  function goSlide(i) {
+    setSlide((i + FEATURED.length) % FEATURED.length)
+    clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => setSlide(s => (s + 1) % FEATURED.length), 4000)
+  }
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => setSlide(s => (s + 1) % FEATURED.length), 4000)
+    return () => clearInterval(timerRef.current)
+  }, [])
+
+  const feat = FEATURED[slide]
+
+  function handleBannerBuy() {
+    if (feat.id === 'epub') {
+      if (!emailBanner || !emailBanner.includes('@')) { setError('Saisis ton email pour continuer.'); return }
+      setError('')
+      fetch('/api/checkout-livre', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product: 'epub', email: emailBanner }) })
+        .then(r => r.json()).then(d => { if (d.url) window.location.href = d.url; else setError(d.error || 'Erreur') })
+      return
+    }
+    if (!emailBanner || !emailBanner.includes('@')) { setError('Saisis ton email pour continuer.'); return }
+    setError('')
+    window.location.href = `/boutique/livraison?product=${feat.id}&email=${encodeURIComponent(emailBanner)}`
+  }
+
   return (
     <main className="min-h-screen page-glow">
       {/* Header */}
@@ -202,57 +287,93 @@ export default function BoutiquePage() {
         <span className="text-xs text-muted">Éditions Le Scribe</span>
       </header>
 
-      <div className="max-w-4xl mx-auto px-6 py-16">
+      {/* ── Bandeau héro défilant ────────────────────────────────── */}
+      <div className="relative overflow-hidden bg-surface border-b border-border">
+        <style>{`
+          @keyframes ls-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+          .feat-img { animation: ls-float 3s ease-in-out infinite; }
+        `}</style>
 
-        {/* Titre éditeur */}
-        <p className="text-xs font-medium text-gold/60 uppercase tracking-widest mb-6 text-center">
-          Éditions Le Scribe — Premier titre
-        </p>
-
-        {/* Bloc principal : couverture + infos */}
-        <div className="flex flex-col md:flex-row gap-12 items-start mb-16">
-
-          {/* Couverture flottante */}
-          <div className="flex-shrink-0 mx-auto md:mx-0" style={{ animation: 'ls-float 3s ease-in-out infinite' }}>
-            <style>{`@keyframes ls-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }`}</style>
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-              <img
-                src="/lurgence-des-temps-couv-v2.png"
-                alt="L'urgence des temps — Nicolas Salafranque"
-                className="w-52 rounded-xl shadow-[0_24px_80px_rgba(0,0,0,0.7)]"
-              />
-              <div style={{ position: 'absolute', inset: 0, borderRadius: '12px', background: 'linear-gradient(135deg, rgba(201,167,125,.08) 0%, transparent 60%)', pointerEvents: 'none' }} />
-            </div>
+        <div className="max-w-5xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center gap-10">
+          {/* Visuel */}
+          <div className="flex-shrink-0 flex justify-center feat-img" key={slide}>
+            <img
+              src={feat.img}
+              alt={feat.label}
+              className="h-52 object-contain rounded-xl shadow-[0_24px_80px_rgba(0,0,0,0.7)]"
+            />
           </div>
 
-          {/* Infos livre */}
-          <div className="flex-1">
-            <p className="text-xs font-medium text-gold/60 uppercase tracking-widest mb-3">
-              Et si nous étions la génération dont parle Jésus ?
-            </p>
-            <h1 className="font-[family-name:var(--font-playfair)] text-4xl font-bold text-cream leading-tight mb-2">
-              L'urgence des temps
+          {/* Texte */}
+          <div className="flex-1 text-center md:text-left">
+            <span className="text-xs font-medium text-gold/60 uppercase tracking-widest block mb-2">{feat.tag}</span>
+            <h1 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl font-bold text-cream leading-tight mb-1">
+              {feat.label}
             </h1>
-            <p className="text-gold text-base mb-1">Nicolas Salafranque</p>
-            <p className="text-muted2 text-xs mb-6">Éditions Le Scribe · 2026 · 211 pages · ISBN 979-1098694301</p>
+            <p className="text-muted text-sm mb-2">{feat.sub}</p>
+            <p className="text-2xl font-bold text-gold mb-6">{feat.price}</p>
 
-            <p className="text-cream2 text-sm leading-relaxed mb-3">
-              Pendant des années, des prédicateurs ont annoncé la fin du monde. Ils se sont trompés — pas par manque de zèle, mais parce qu'ils ont sauté des étapes que Jésus Lui-même a décrites dans les Évangiles.
-            </p>
-            <p className="text-cream2 text-sm leading-relaxed mb-4">
-              En croisant <strong className="text-cream">Daniel, Matthieu 24, 2 Thessaloniciens 2 et l'Apocalypse</strong>, une chronologie se dessine — cohérente, ancrée dans la Parole — qui change tout à la manière dont on aborde la fin des temps.
-            </p>
-            <ul className="text-sm text-muted space-y-1.5">
-              <li className="flex items-start gap-2"><span className="text-gold text-xs mt-0.5 flex-shrink-0">→</span> La différence cruciale entre « grande tribulation » et « colère divine »</li>
-              <li className="flex items-start gap-2"><span className="text-gold text-xs mt-0.5 flex-shrink-0">→</span> Où se situe vraiment l'enlèvement dans la séquence des sceaux</li>
-              <li className="flex items-start gap-2"><span className="text-gold text-xs mt-0.5 flex-shrink-0">→</span> Les hypothèses 2029-2032 — sans panique ni obsession des dates</li>
-              <li className="flex items-start gap-2"><span className="text-gold text-xs mt-0.5 flex-shrink-0">→</span> Le concept de « Goshen » : bâtir des lieux de refuge</li>
-            </ul>
+            {error && <p className="text-err text-xs mb-3">{error}</p>}
+            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto md:mx-0">
+              <input
+                type="email"
+                placeholder="ton@email.com"
+                value={emailBanner}
+                onChange={e => { setEmailBanner(e.target.value); setError('') }}
+                className="flex-1 text-sm bg-surface2 border border-border rounded-xl px-4 py-3 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition"
+              />
+              <button
+                onClick={handleBannerBuy}
+                className="bg-gold text-bg font-bold text-sm px-6 py-3 rounded-xl hover:bg-gold2 transition whitespace-nowrap"
+              >
+                Commander →
+              </button>
+            </div>
+            {feat.id === 'livre' && (
+              <button onClick={() => setExcerptOpen(true)} className="mt-4 text-xs text-gold/70 hover:text-gold transition underline underline-offset-2 block">
+                Lire l'introduction et le chapitre 1
+              </button>
+            )}
           </div>
         </div>
 
+        {/* Bullets navigation */}
+        <div className="flex justify-center gap-2 pb-5">
+          {FEATURED.map((_, i) => (
+            <button
+              key={i} type="button" onClick={() => goSlide(i)}
+              className={`w-2 h-2 rounded-full transition ${i === slide ? 'bg-gold' : 'bg-border hover:bg-gold/40'}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* ── Cartes catégories ─────────────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-6 py-10">
+        <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-cream mb-6 text-center">
+          Nos rayons
+        </h2>
+        <div className="grid grid-cols-2 gap-4 md:gap-6 mb-16">
+          <a
+            href="#livres"
+            className="group relative overflow-hidden rounded-2xl border border-border bg-surface hover:border-gold/40 transition flex flex-col items-center justify-center py-10 gap-3 cursor-pointer"
+          >
+            <span className="text-4xl">📖</span>
+            <span className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream group-hover:text-gold transition">Livres</span>
+            <span className="text-xs text-muted">2 formats disponibles</span>
+          </a>
+          <a
+            href="#vetements"
+            className="group relative overflow-hidden rounded-2xl border border-border bg-surface hover:border-gold/40 transition flex flex-col items-center justify-center py-10 gap-3 cursor-pointer"
+          >
+            <span className="text-4xl">👕</span>
+            <span className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream group-hover:text-gold transition">Vêtements</span>
+            <span className="text-xs text-muted">T-shirt Distinction</span>
+          </a>
+        </div>
+
         {/* Bouton extrait */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-2 -mt-10">
           <button
             onClick={() => setExcerptOpen(true)}
             className="text-sm font-semibold text-gold border border-gold/40 px-6 py-2.5 rounded-xl hover:bg-gold/10 transition"
@@ -302,6 +423,11 @@ export default function BoutiquePage() {
             {error}
           </div>
         )}
+
+        {/* ── Section Livres ─────────────────────────────────────── */}
+        <div id="livres" className="scroll-mt-6 mb-4">
+          <p className="text-xs font-medium text-gold/60 uppercase tracking-widest mb-6">📖 Livres</p>
+        </div>
 
         {/* Options d'achat */}
         <div className="grid md:grid-cols-2 gap-6 mb-4">
@@ -386,7 +512,7 @@ export default function BoutiquePage() {
         </div>
 
         {/* Packs groupés */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div id="packs" className="grid md:grid-cols-2 gap-6">
 
           {/* Pack 3 */}
           <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col">
@@ -465,56 +591,13 @@ export default function BoutiquePage() {
           EPUB : paiement sécurisé par Stripe · Carte bancaire, Apple Pay, Google Pay
         </p>
 
-        {/* ── Merchandising ─────────────────────────────────────────── */}
-        <div className="mt-20 pt-10 border-t border-border">
-          <p className="text-xs font-medium text-gold/60 uppercase tracking-widest mb-6">
-            Merchandising
-          </p>
+        {/* ── Section Vêtements ─────────────────────────────────────── */}
+        <div id="vetements" className="scroll-mt-6 mt-20 pt-10 border-t border-border">
+          <p className="text-xs font-medium text-gold/60 uppercase tracking-widest mb-6">👕 Vêtements</p>
           <div className="grid md:grid-cols-2 gap-6">
 
             {/* T-shirt Distinction */}
-            <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col">
-              <div className="rounded-xl overflow-hidden mb-5 bg-surface2">
-                <img
-                  src="/distinction.png"
-                  alt="T-shirt Distinction — Le Scribe"
-                  className="w-full object-contain max-h-64"
-                />
-              </div>
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <span className="text-xs font-medium text-gold/60 uppercase tracking-widest">T-shirt</span>
-                  <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-cream mt-1">
-                    Distinction
-                  </h2>
-                  <p className="text-muted text-xs mt-1">Col rond · Impression sérigraphiée · S / M / L / XL / XXL</p>
-                </div>
-                <div className="text-right flex-shrink-0 mt-5">
-                  <span className="text-2xl font-bold text-cream">24,90€</span>
-                </div>
-              </div>
-              <p className="text-xs text-muted2 mb-5">+ frais d'envoi ou retrait gratuit à l'église</p>
-
-              <div className="mt-auto">
-                <input
-                  type="email"
-                  placeholder="ton@email.com"
-                  id="email-tshirt"
-                  className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition mb-3"
-                />
-                <button
-                  onClick={() => {
-                    const email = document.getElementById('email-tshirt').value
-                    if (!email || !email.includes('@')) { setError('Saisis ton adresse email pour continuer.'); return }
-                    setError('')
-                    window.location.href = `/boutique/livraison?product=tshirt&email=${encodeURIComponent(email)}`
-                  }}
-                  className="w-full bg-gold text-bg font-semibold text-sm py-3 rounded-xl hover:bg-gold2 transition"
-                >
-                  Commander le t-shirt — 24,90€
-                </button>
-              </div>
-            </div>
+            <TshirtCard setError={setError} />
 
           </div>
         </div>
