@@ -357,7 +357,7 @@ function LivraisonForm() {
         <div className="bg-surface border border-gold/10 rounded-2xl p-4 mb-6 text-sm text-muted">
           <p className="font-semibold text-cream mb-1">Informations de retrait</p>
           <p>Église La Rencontre · 441 av. Marguerite Perrey, 77127 Lieusaint</p>
-          <p className="mt-1">Dimanche 9h30–13h · Mardi 20h–22h</p>
+          <p className="mt-1">Dimanche jusqu'à 13h</p>
           <p className="mt-2 text-xs text-muted2">Nicolas te contactera pour confirmer la date de retrait.</p>
         </div>
       )}
