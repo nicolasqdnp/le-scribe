@@ -9,7 +9,7 @@ const PRODUCTS = {
   pack10: { label: 'Pack Église 10 exemplaires', priceStr: '140€',   relayStr: '6,71€', homeStr: '16,34€', weight: 3200 },
 }
 
-const TAILLES = ['S', 'M', 'L', 'XL', 'XXL']
+const TAILLES = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL']
 const TSHIRT_UNIT_CENTS  = 2490
 const TSHIRT_PROMO_CENTS = 1990
 const PROMO_TSHIRT = { code: 'DISTINCTION', label: 'Tarif Église La Rencontre' }
@@ -49,7 +49,7 @@ function LivraisonForm() {
   const [loading, setLoading]       = useState(false)
   const [error, setError]           = useState('')
   // Multi-taille t-shirt
-  const [sizes, setSizes]           = useState({S:0, M:0, L:0, XL:0, XXL:0})
+  const [sizes, setSizes]           = useState({S:0, M:0, L:0, XL:0, XXL:0, '3XL':0, '4XL':0})
   const [promoCode, setPromoCode]   = useState('')
   const promoValid    = info?.isTshirt && promoCode.trim().toUpperCase() === PROMO_TSHIRT.code
   const totalQty      = info?.isTshirt ? Object.values(sizes).reduce((s, n) => s + n, 0) : 1

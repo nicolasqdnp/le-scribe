@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Validation t-shirt : sizes est un objet {S:0, M:1, L:2, ...}
-    const VALID_SIZES = ['S','M','L','XL','XXL']
+    const VALID_SIZES = ['S','M','L','XL','XXL','3XL','4XL']
     let totalQty = 1
     let sizeLabel = ''
     if (product === 'tshirt') {

@@ -79,7 +79,7 @@ export default function VetementsPage() {
               Distinction
             </h1>
             <p className="text-muted text-sm mb-1">Col rond · Impression sérigraphiée</p>
-            <p className="text-muted text-sm mb-6">Tailles disponibles : S / M / L / XL / XXL</p>
+            <p className="text-muted text-sm mb-6">Tailles disponibles : S / M / L / XL / XXL / 3XL / 4XL</p>
 
             <div className="flex items-baseline gap-3 mb-1">
               <span className="text-3xl font-bold text-cream">24,90€</span>
@@ -121,7 +121,7 @@ export default function VetementsPage() {
             <ul className="text-sm text-muted space-y-2">
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Col rond, coupe unisexe</li>
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Impression sérigraphiée</li>
-              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Tailles S, M, L, XL, XXL</li>
+              <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Tailles S, M, L, XL, XXL, 3XL, 4XL</li>
             </ul>
           </div>
           <div>
