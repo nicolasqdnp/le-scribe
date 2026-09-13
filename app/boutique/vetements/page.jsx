@@ -84,8 +84,7 @@ export default function VetementsPage() {
             <div className="flex items-baseline gap-3 mb-1">
               <span className="text-3xl font-bold text-cream">24,90€</span>
             </div>
-            <p className="text-xs text-muted2 mb-2">Code promo <span className="text-gold font-mono tracking-widest">DISTINCTION</span> → 19,90€ (tarif Église La Rencontre)</p>
-            <p className="text-xs text-muted2 mb-8">+ frais d'envoi ou retrait gratuit à l'église La Rencontre — Lieusaint (77)</p>
+            <p className="text-xs text-muted2 mb-8">+ frais d'envoi calculés à l'étape suivante, ou retrait gratuit à l'église La Rencontre — Lieusaint (77)</p>
 
             <div className="bg-surface border border-border rounded-2xl p-6">
               <p className="text-xs text-muted uppercase tracking-widest mb-4">Commander</p>
