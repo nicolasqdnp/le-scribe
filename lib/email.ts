@@ -229,6 +229,7 @@ export async function sendLivreConfirmationEmail(to: string, product: string, sh
 // ─── Email : Notif interne nouvelle commande boutique ─────────────────────────
 
 const PRODUCT_LABELS: Record<string, string> = {
+  tshirt: 'T-shirt Distinction',
   epub:   'EPUB',
   livre:  'Livre physique',
   pack3:  'Pack 3 exemplaires',
@@ -250,12 +251,21 @@ export async function sendNewOrderNotification(params: {
   shippingName: string | null
   phone: string | null
   orderId: string
+  size?: string | null
+  promoCode?: string | null
 }) {
   try {
-    const { email, product, delivery, amount, shippingName, orderId } = params
+    const { email, product, delivery, amount, shippingName, orderId, size, promoCode } = params
     const label    = PRODUCT_LABELS[product] || product
     const livraison = DELIVERY_LABELS[delivery] || delivery
     const euros    = (amount / 100).toFixed(2).replace('.', ',')
+
+    const sizeRow = size
+      ? `<tr><td style="padding:6px 12px 6px 0;color:#666;">Taille(s)</td><td style="padding:6px 0;font-weight:bold;color:#b45309;">${size}</td></tr>`
+      : ''
+    const promoRow = promoCode
+      ? `<tr><td style="padding:6px 12px 6px 0;color:#666;">Code promo</td><td style="padding:6px 0;">${promoCode}</td></tr>`
+      : ''
 
     await sendEmail(
       'nicolas.salafranque@lescribe.app',
@@ -264,8 +274,10 @@ export async function sendNewOrderNotification(params: {
         <h2 style="margin:0 0 16px;">Nouvelle commande boutique</h2>
         <table style="border-collapse:collapse;width:100%;max-width:480px;">
           <tr><td style="padding:6px 12px 6px 0;color:#666;">Produit</td><td style="padding:6px 0;font-weight:bold;">${label}</td></tr>
+          ${sizeRow}
           <tr><td style="padding:6px 12px 6px 0;color:#666;">Livraison</td><td style="padding:6px 0;">${livraison}</td></tr>
           <tr><td style="padding:6px 12px 6px 0;color:#666;">Montant</td><td style="padding:6px 0;">${euros} €</td></tr>
+          ${promoRow}
           <tr><td style="padding:6px 12px 6px 0;color:#666;">Client</td><td style="padding:6px 0;">${shippingName || '—'}</td></tr>
           <tr><td style="padding:6px 12px 6px 0;color:#666;">Téléphone</td><td style="padding:6px 0;">${params.phone || '—'}</td></tr>
           <tr><td style="padding:6px 12px 6px 0;color:#666;">Email</td><td style="padding:6px 0;">${email}</td></tr>

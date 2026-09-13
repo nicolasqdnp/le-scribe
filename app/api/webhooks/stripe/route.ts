@@ -67,9 +67,12 @@ export async function POST(req: NextRequest) {
       const shippingName = shipping?.name || customerDetails?.name || null
       const shippingPhone = customerDetails?.phone || null
 
+      let orderSize: string | null = null
+      let orderPromoCode: string | null = null
+
       if (order_id) {
         // Cas normal : commande créée au moment du checkout
-        await supabaseAdmin
+        const { data: updatedOrder } = await supabaseAdmin
           .from('orders')
           .update({
             status: 'paid',
@@ -80,6 +83,10 @@ export async function POST(req: NextRequest) {
             updated_at: new Date().toISOString(),
           })
           .eq('id', order_id)
+          .select('size, promo_code')
+          .single()
+        orderSize = updatedOrder?.size ?? null
+        orderPromoCode = updatedOrder?.promo_code ?? null
       } else {
         // Cas de fallback : l'insert Supabase a échoué au checkout (order_id vide)
         console.warn('[webhook/stripe] order_id vide pour session', session.id, '— création fallback')
@@ -139,6 +146,8 @@ export async function POST(req: NextRequest) {
         shippingName: shippingName,
         phone:    shippingPhone,
         orderId:  order_id || '',
+        size:     orderSize,
+        promoCode: orderPromoCode,
       })
 
       console.log(`[webhook/stripe] Commande ${product} confirmée → ${email}`)
