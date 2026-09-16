@@ -73,6 +73,14 @@ const PRODUCTS = {
     shippingAmount: 600,
     mrAmount: 390,
   },
+  audio: {
+    name: 'L\'urgence des temps — Audiobook',
+    description: 'Éditions Le Scribe · 3h32 · 25 chapitres · Accès streaming + téléchargement M4B',
+    amount: 990,
+    shipping: false,
+    shippingAmount: 0,
+    mrAmount: 0,
+  },
 }
 
 export async function POST(req: NextRequest) {

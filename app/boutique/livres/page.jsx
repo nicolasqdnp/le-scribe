@@ -274,6 +274,7 @@ export default function LivresPage() {
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Liseuse Kindle, Kobo, Apple Books…</li>
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison instantanée par email</li>
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Aucun frais de port</li>
+              <li className="flex items-center gap-2"><span className="text-gold text-xs">🎧</span> <span className="text-gold/80">Audiobook inclus (3h32)</span></li>
             </ul>
             <input type="email" placeholder="ton@email.com" value={emailEpub} onChange={e => setEmailEpub(e.target.value)}
               className="w-full text-sm bg-surface2 border border-border rounded-lg px-4 py-2.5 text-cream placeholder:text-muted2 focus:outline-none focus:border-gold/50 transition mb-3" />
@@ -299,6 +300,7 @@ export default function LivresPage() {
             <ul className="text-sm text-muted space-y-1.5 mb-6 flex-1">
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Éditions Le Scribe · 211 pages</li>
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
+              <li className="flex items-center gap-2"><span className="text-gold text-xs">🎧</span> <span className="text-gold/80">Audiobook inclus (3h32)</span></li>
             </ul>
             <p className="text-xs text-muted2 mb-3">+ frais d'envoi calculés à l'étape suivante</p>
             <input type="email" placeholder="ton@email.com" value={emailLivre} onChange={e => setEmailLivre(e.target.value)}
@@ -327,6 +329,7 @@ export default function LivresPage() {
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> 3 livres dans le même colis</li>
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Idéal pour offrir à des proches</li>
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
+              <li className="flex items-center gap-2"><span className="text-gold text-xs">🎧</span> <span className="text-gold/80">Audiobook inclus (3h32)</span></li>
             </ul>
             <p className="text-xs text-muted2 mb-3">+ frais d'envoi calculés à l'étape suivante</p>
             <input type="email" placeholder="ton@email.com" value={emailPack3} onChange={e => setEmailPack3(e.target.value)}
@@ -351,6 +354,7 @@ export default function LivresPage() {
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> 10 livres dans le même colis</li>
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Idéal pour une église, un groupe d'études</li>
               <li className="flex items-center gap-2"><span className="text-ok text-xs">✓</span> Livraison France, Belgique, Suisse, Luxembourg</li>
+              <li className="flex items-center gap-2"><span className="text-gold text-xs">🎧</span> <span className="text-gold/80">Audiobook inclus (3h32)</span></li>
             </ul>
             <p className="text-xs text-muted2 mb-3">+ frais d'envoi calculés à l'étape suivante</p>
             <input type="email" placeholder="ton@email.com" value={emailPack10} onChange={e => setEmailPack10(e.target.value)}

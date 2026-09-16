@@ -231,6 +231,7 @@ export async function sendLivreConfirmationEmail(to: string, product: string, sh
 const PRODUCT_LABELS: Record<string, string> = {
   tshirt: 'T-shirt Distinction',
   epub:   'EPUB',
+  audio:  'Audiobook',
   livre:  'Livre physique',
   pack3:  'Pack 3 exemplaires',
   pack10: 'Pack Église 10 ex.',
@@ -291,6 +292,33 @@ export async function sendNewOrderNotification(params: {
     )
   } catch (e) {
     console.error('[email] sendNewOrderNotification error:', e)
+  }
+}
+
+// ─── Email : Accès audiobook ───────────────────────────────────────────────────
+
+export async function sendAudiobookEmail(to: string) {
+  try {
+    await sendEmail(
+      to,
+      '🎧 Votre audiobook est prêt — L\'urgence des temps',
+      baseTemplate(`
+        <h1>Merci pour votre achat !</h1>
+        <p>Votre accès à l'audiobook de <strong style="color:#c9a77d;">L'urgence des temps</strong>
+        par Nicolas Salafranque est actif.</p>
+        <p>Pour écouter ou télécharger votre audiobook (3h32 · 25 chapitres), rendez-vous sur votre espace d'écoute :</p>
+        <a href="https://lescribe.app/mon-audiobook" class="btn">🎧 Accéder à mon audiobook →</a>
+        <p style="font-size:13px;color:#7a6a50;">Entrez simplement votre adresse email pour accéder à votre contenu. Le lien de téléchargement direct est valable 7 jours ; vous pouvez en générer un nouveau à tout moment en revenant sur cette page.</p>
+        <p style="font-size:13px;color:#7a6a50;background:#1f1c16;border:1px solid #3a2f20;border-radius:8px;padding:12px 16px;">
+          📬 <strong style="color:#e8e0d0;">Vous ne retrouvez pas cet email ?</strong> Vérifiez vos <strong style="color:#e8e0d0;">spams ou courriers indésirables</strong>. Ou accédez directement à <a href="https://lescribe.app/mon-audiobook" style="color:#c9a77d;">lescribe.app/mon-audiobook</a>.
+        </p>
+        <p style="margin-top:24px;">Bonne écoute !</p>
+        <p style="color:#c9a77d;">Nicolas Salafranque<br/>
+        <span style="color:#a09070;font-size:13px;">Pasteur · Auteur · Éditions Le Scribe</span></p>
+      `)
+    )
+  } catch (e) {
+    console.error('[email] sendAudiobookEmail error:', e)
   }
 }
 

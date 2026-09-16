@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import {
   sendPaymentConfirmationEmail,
   sendEpubEmail,
+  sendAudiobookEmail,
   sendPhysiqueConfirmationEmail,
   sendCampaignConfirmationEmail,
   sendLivreConfirmationEmail,
@@ -126,6 +127,11 @@ export async function POST(req: NextRequest) {
         } else {
           console.error('[webhook/stripe] Impossible de générer l\'URL signée EPUB')
         }
+      }
+
+      // Livraison Audiobook (achat direct ou inclus avec epub/livre/packs)
+      if (['audio', 'epub', 'livre', 'pack3', 'pack10'].includes(product) && email) {
+        await sendAudiobookEmail(email)
       }
 
       // Confirmation précommande physique (ancien produit)
