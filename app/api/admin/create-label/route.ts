@@ -25,9 +25,10 @@ export async function POST(req: NextRequest) {
     await supabase
       .from('orders')
       .update({
-        shipped_at:      new Date().toISOString(),
-        tracking_number: result.tracking_number,
-        tracking_url:    result.tracking_url,
+        shipped_at:        new Date().toISOString(),
+        tracking_number:   result.tracking_number,
+        tracking_url:      result.tracking_url,
+        sendcloud_parcel_id: result.sendcloud_id,
       })
       .eq('id', order_id)
 

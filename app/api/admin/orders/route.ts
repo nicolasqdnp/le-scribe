@@ -11,7 +11,7 @@ function supabase() {
 export async function GET() {
   const { data, error } = await supabase()
     .from('orders')
-    .select('id, email, product, amount, status, delivery, relay_point, shipping_name, shipping_address, epub_sent_at, shipped_at, tracking_number, tracking_url, created_at')
+    .select('id, email, product, amount, status, delivery, relay_point, shipping_name, shipping_address, epub_sent_at, shipped_at, tracking_number, tracking_url, sendcloud_parcel_id, created_at')
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

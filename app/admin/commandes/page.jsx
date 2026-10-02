@@ -410,6 +410,15 @@ export default function CommandesAdmin() {
                               {resendingOrder === order.id ? '…' : '📨 Renvoyer ebook'}
                             </button>
                           )}
+                          {order.sendcloud_parcel_id && (
+                            <a href={`/api/admin/label?parcel_id=${order.sendcloud_parcel_id}`} target="_blank" rel="noreferrer" style={{
+                              fontSize: 11, color: C.gold, textDecoration: 'none',
+                              padding: '3px 10px', borderRadius: 5, border: `1px solid ${C.gold}44`,
+                              background: C.surface2, whiteSpace: 'nowrap',
+                            }}>
+                              🏷️ Voir étiquette
+                            </a>
+                          )}
                           {order.tracking_url && (
                             <a href={order.tracking_url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: C.gold, textDecoration: 'underline' }}>
                               Suivi colis →

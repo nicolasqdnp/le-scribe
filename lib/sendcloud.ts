@@ -82,6 +82,7 @@ export async function createSendcloudParcel(order: SendcloudOrder) {
       request_label: true,
     }
   } else if (isHome && order.shipping_address) {
+    if (!phone) throw new Error('Téléphone requis pour la livraison à domicile Mondial Relay')
     const addr = order.shipping_address
     const line = [addr.line1, addr.line2].filter(Boolean).join(' ')
     const { street: homeStreet, number: homeNumber } = splitAddress(line)
