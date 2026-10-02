@@ -22,6 +22,19 @@ function mrCodeToCsid(mrCode: string): string {
   return 'FR' + String(parseInt(mrCode, 10)).padStart(5, '0')
 }
 
+// Sendcloud : address_line_1 + house_number ≤ 32 chars
+// On extrait le numéro en tête ("15", "100 bis") et on tronque si besoin
+function splitAddress(line: string): { street: string; number: string } {
+  const m = line.match(/^(\d+(?:\s?(?:bis|ter|b|t))?)\s+(.+)$/i)
+  if (m) {
+    const number = m[1].trim()
+    const street = m[2].trim()
+    const maxStreet = 32 - number.length
+    return { number, street: street.slice(0, maxStreet) }
+  }
+  return { number: '', street: line.slice(0, 32) }
+}
+
 export type SendcloudOrder = {
   id: string
   email: string
@@ -45,11 +58,12 @@ export async function createSendcloudParcel(order: SendcloudOrder) {
 
   if (isRelay && order.relay_point) {
     const rp = order.relay_point
+    const { street: rpStreet, number: rpNumber } = splitAddress(rp.address || '')
     body = {
       to_address: {
         name,
-        address_line_1: rp.address || '',
-        house_number:   '',
+        address_line_1: rpStreet,
+        house_number:   rpNumber,
         postal_code:    rp.zipCode || '',
         city:           rp.city || '',
         country_code:   'FR',
@@ -69,11 +83,12 @@ export async function createSendcloudParcel(order: SendcloudOrder) {
   } else if (isHome && order.shipping_address) {
     const addr = order.shipping_address
     const line = [addr.line1, addr.line2].filter(Boolean).join(' ')
+    const { street: homeStreet, number: homeNumber } = splitAddress(line)
     body = {
       to_address: {
         name,
-        address_line_1: line || '',
-        house_number:   '',
+        address_line_1: homeStreet,
+        house_number:   homeNumber,
         postal_code:    addr.postal_code ?? '',
         city:           addr.city ?? '',
         country_code:   (addr.country ?? 'FR').toUpperCase(),
