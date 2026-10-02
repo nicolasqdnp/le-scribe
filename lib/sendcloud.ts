@@ -29,7 +29,8 @@ function splitAddress(line: string): { street: string; number: string } {
   if (m) {
     const number = m[1].trim()
     const street = m[2].trim()
-    const maxStreet = 32 - number.length
+    // Sendcloud combine comme "street + espace + number" → soustraire 1 pour l'espace
+    const maxStreet = 32 - number.length - 1
     return { number, street: street.slice(0, maxStreet) }
   }
   return { number: '', street: line.slice(0, 32) }
