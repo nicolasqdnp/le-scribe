@@ -53,7 +53,8 @@ export async function createSendcloudParcel(order: SendcloudOrder) {
 
   const weightKg = WEIGHT_KG[order.product] ?? 0.500
   const name  = order.shipping_name || order.email.split('@')[0]
-  const phone = order.shipping_phone ?? ''
+  // Mondial Relay refuse le préfixe "+" — on le retire
+  const phone = (order.shipping_phone ?? '').replace(/^\+/, '')
 
   let body: Record<string, unknown>
 
