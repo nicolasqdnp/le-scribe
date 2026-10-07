@@ -11,6 +11,8 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    // Projet vidéo autonome (motion design Instagram) : hors périmètre de l'app Next.js
+    "motion/**",
     "next-env.d.ts",
   ]),
 ]);

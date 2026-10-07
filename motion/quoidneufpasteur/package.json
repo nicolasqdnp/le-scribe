@@ -1,0 +1,11 @@
+{
+  "name": "quoidneufpasteur-motion",
+  "private": true,
+  "type": "module",
+  "description": "Motion design 30s @quoidneufpasteur — Canvas + WebGL + Web Audio, rendu Playwright, encodage ffmpeg",
+  "dependencies": {
+    "@fontsource/anton": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/playfair-display": "^5.3.0"
+  }
+}
