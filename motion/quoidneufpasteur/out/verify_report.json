@@ -1,0 +1,683 @@
+{
+  "file": "/home/user/le-scribe/motion/quoidneufpasteur/build/final.mp4",
+  "container": {
+    "w": 1080,
+    "h": 1920,
+    "fps": "60/1",
+    "frames": 1800,
+    "vdur": 30,
+    "adur": 30,
+    "vstart": 0,
+    "astart": 0,
+    "vcodec": "h264",
+    "pix": "yuv420p",
+    "acodec": "aac",
+    "abr": 268973,
+    "size": 69032509,
+    "br": 18408669
+  },
+  "loudness": {
+    "integrated": -14,
+    "lra": 1.8,
+    "truePeak": -4.6
+  },
+  "sync": {
+    "rows": [
+      {
+        "id": "hook0",
+        "type": "boom",
+        "t": 0,
+        "audioMs": 31,
+        "frameK": 1,
+        "frameT": 0.016666666666666666,
+        "visOk": false,
+        "offsetMs": 14,
+        "rise": 2.8,
+        "delta": 19.7,
+        "around": [
+          0,
+          19.7,
+          17.2,
+          7.7,
+          8.5
+        ]
+      },
+      {
+        "id": "hook1",
+        "type": "boom",
+        "t": 1,
+        "audioMs": 12,
+        "frameK": 60,
+        "frameT": 1,
+        "visOk": true,
+        "offsetMs": 12,
+        "rise": 14.9,
+        "delta": 67.6,
+        "around": [
+          0.5,
+          0.8,
+          67.6,
+          21,
+          19.6,
+          10.7,
+          9.1
+        ]
+      },
+      {
+        "id": "hook2",
+        "type": "boom",
+        "t": 2,
+        "audioMs": 13,
+        "frameK": 120,
+        "frameT": 2,
+        "visOk": true,
+        "offsetMs": 13,
+        "rise": 3.4,
+        "delta": 62.9,
+        "around": [
+          0.8,
+          1.5,
+          62.9,
+          22.4,
+          18.2,
+          10.3,
+          11
+        ]
+      },
+      {
+        "id": "drop",
+        "type": "boom",
+        "t": 4,
+        "audioMs": -2,
+        "frameK": 240,
+        "frameT": 4,
+        "visOk": true,
+        "offsetMs": -2,
+        "rise": 74,
+        "delta": 223.1,
+        "around": [
+          0,
+          0,
+          223.1,
+          15.3,
+          22,
+          28.3,
+          32.1
+        ]
+      },
+      {
+        "id": "s1",
+        "type": "hit",
+        "t": 5,
+        "audioMs": 11,
+        "frameK": 300,
+        "frameT": 5,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 16.1,
+        "delta": 28.3,
+        "around": [
+          71.3,
+          99.5,
+          28.3,
+          18.3,
+          15.6,
+          14.2,
+          12.5
+        ]
+      },
+      {
+        "id": "s2",
+        "type": "hit",
+        "t": 5.5,
+        "audioMs": 11,
+        "frameK": 330,
+        "frameT": 5.5,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 24.1,
+        "delta": 38.4,
+        "around": [
+          17.8,
+          25.4,
+          38.4,
+          21.2,
+          21.4,
+          19.2,
+          17.7
+        ]
+      },
+      {
+        "id": "s3",
+        "type": "hit",
+        "t": 6,
+        "audioMs": 11,
+        "frameK": 360,
+        "frameT": 6,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 16.8,
+        "delta": 49,
+        "around": [
+          44.3,
+          45.8,
+          49,
+          28.5,
+          24.6,
+          23.5,
+          25.2
+        ]
+      },
+      {
+        "id": "s4",
+        "type": "hit",
+        "t": 6.5,
+        "audioMs": 11,
+        "frameK": 390,
+        "frameT": 6.5,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 31.9,
+        "delta": 39.4,
+        "around": [
+          11.2,
+          10.6,
+          39.4,
+          21.3,
+          19.6,
+          18.9,
+          17.9
+        ]
+      },
+      {
+        "id": "c1",
+        "type": "pop",
+        "t": 7,
+        "audioMs": 11,
+        "frameK": 420,
+        "frameT": 7,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 36.2,
+        "delta": 42,
+        "around": [
+          23,
+          32.6,
+          42,
+          26.5,
+          24.2,
+          20.5,
+          20.4
+        ]
+      },
+      {
+        "id": "c2",
+        "type": "pop",
+        "t": 7.5,
+        "audioMs": 11,
+        "frameK": 450,
+        "frameT": 7.5,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 35.8,
+        "delta": 26,
+        "around": [
+          0.9,
+          0.8,
+          25.9,
+          25.4,
+          26,
+          21.4,
+          20.7
+        ]
+      },
+      {
+        "id": "c3",
+        "type": "pop",
+        "t": 8,
+        "audioMs": 11,
+        "frameK": 480,
+        "frameT": 8,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 16.7,
+        "delta": 27.8,
+        "around": [
+          0.9,
+          0.8,
+          24.8,
+          23.6,
+          27.8,
+          21.7,
+          22
+        ]
+      },
+      {
+        "id": "c4",
+        "type": "pop",
+        "t": 8.5,
+        "audioMs": 11,
+        "frameK": 510,
+        "frameT": 8.5,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 38.9,
+        "delta": 27.3,
+        "around": [
+          0.9,
+          0.8,
+          27.1,
+          25.5,
+          27.3,
+          21.6,
+          20.9
+        ]
+      },
+      {
+        "id": "c5",
+        "type": "pop",
+        "t": 9,
+        "audioMs": 11,
+        "frameK": 540,
+        "frameT": 9,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 38.1,
+        "delta": 27.8,
+        "around": [
+          0.9,
+          0.8,
+          26.3,
+          25.2,
+          27.8,
+          22.1,
+          20.9
+        ]
+      },
+      {
+        "id": "c6",
+        "type": "pop",
+        "t": 9.5,
+        "audioMs": 11,
+        "frameK": 570,
+        "frameT": 9.5,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 43.1,
+        "delta": 28,
+        "around": [
+          0.9,
+          0.9,
+          25.9,
+          27.1,
+          28,
+          22.7,
+          20.7
+        ]
+      },
+      {
+        "id": "c7",
+        "type": "pop",
+        "t": 10,
+        "audioMs": 12,
+        "frameK": 600,
+        "frameT": 10,
+        "visOk": true,
+        "offsetMs": 12,
+        "rise": 24,
+        "delta": 30.3,
+        "around": [
+          0.9,
+          0.9,
+          26,
+          28.9,
+          30.3,
+          24.1,
+          22.8
+        ]
+      },
+      {
+        "id": "c8",
+        "type": "pop",
+        "t": 10.5,
+        "audioMs": 11,
+        "frameK": 630,
+        "frameT": 10.5,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 40.5,
+        "delta": 67.8,
+        "around": [
+          0.9,
+          0.9,
+          67.8,
+          33.9,
+          23.9,
+          26.1,
+          25.5
+        ]
+      },
+      {
+        "id": "p1",
+        "type": "hit",
+        "t": 11,
+        "audioMs": 11,
+        "frameK": 660,
+        "frameT": 11,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 46.1,
+        "delta": 42.1,
+        "around": [
+          0.9,
+          0.9,
+          42.1,
+          6.9,
+          8.4,
+          7.3,
+          6.1
+        ]
+      },
+      {
+        "id": "p2",
+        "type": "hit",
+        "t": 11.5,
+        "audioMs": 11,
+        "frameK": 690,
+        "frameT": 11.5,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 40,
+        "delta": 22,
+        "around": [
+          3.6,
+          7.1,
+          22,
+          6.9,
+          6.2,
+          5,
+          3.8
+        ]
+      },
+      {
+        "id": "p3",
+        "type": "hit",
+        "t": 12,
+        "audioMs": 11,
+        "frameK": 720,
+        "frameT": 12,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 16.4,
+        "delta": 19.6,
+        "around": [
+          3.1,
+          5.2,
+          19.6,
+          6.3,
+          5.6,
+          5.1,
+          4.1
+        ]
+      },
+      {
+        "id": "p4",
+        "type": "hit",
+        "t": 12.5,
+        "audioMs": 11,
+        "frameK": 750,
+        "frameT": 12.5,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 41.6,
+        "delta": 20.5,
+        "around": [
+          3.2,
+          4.5,
+          20.5,
+          7.6,
+          8.9,
+          7.8,
+          6.8
+        ]
+      },
+      {
+        "id": "p5",
+        "type": "hit",
+        "t": 13,
+        "audioMs": 11,
+        "frameK": 780,
+        "frameT": 13,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 39.2,
+        "delta": 24.7,
+        "around": [
+          4.5,
+          8,
+          24.7,
+          7.2,
+          7.7,
+          7.4,
+          6.4
+        ]
+      },
+      {
+        "id": "manifesto",
+        "type": "boom",
+        "t": 14,
+        "audioMs": 11,
+        "frameK": 840,
+        "frameT": 14,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 44.7,
+        "delta": 92.2,
+        "around": [
+          0.7,
+          0.6,
+          92.2,
+          13.8,
+          10.3,
+          7.4,
+          5.4
+        ]
+      },
+      {
+        "id": "logo0",
+        "type": "boom",
+        "t": 24,
+        "audioMs": -2,
+        "frameK": 1440,
+        "frameT": 24,
+        "visOk": true,
+        "offsetMs": -2,
+        "rise": 82.1,
+        "delta": 30.4,
+        "around": [
+          0,
+          0,
+          25.1,
+          20,
+          27,
+          30.4,
+          28.7
+        ]
+      },
+      {
+        "id": "lock",
+        "type": "boom",
+        "t": 25,
+        "audioMs": 11,
+        "frameK": 1500,
+        "frameT": 25,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 16,
+        "delta": 139,
+        "around": [
+          1,
+          1.5,
+          139,
+          27.2,
+          28.2,
+          28.9,
+          25.7
+        ]
+      },
+      {
+        "id": "wordmark",
+        "type": "hit",
+        "t": 26,
+        "audioMs": 12,
+        "frameK": 1560,
+        "frameT": 26,
+        "visOk": true,
+        "offsetMs": 12,
+        "rise": 19.1,
+        "delta": 3.5,
+        "around": [
+          0.5,
+          0.6,
+          2.3,
+          3.5,
+          2.8,
+          2.7,
+          3.1
+        ]
+      },
+      {
+        "id": "handle",
+        "type": "pop",
+        "t": 26.5,
+        "audioMs": 11,
+        "frameK": 1590,
+        "frameT": 26.5,
+        "visOk": false,
+        "offsetMs": 11,
+        "rise": 25.7,
+        "delta": 0.5,
+        "around": [
+          0.4,
+          0.4,
+          0.5,
+          0.4,
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "id": "cta",
+        "type": "hit",
+        "t": 27,
+        "audioMs": 11,
+        "frameK": 1620,
+        "frameT": 27,
+        "visOk": false,
+        "offsetMs": 11,
+        "rise": 36.1,
+        "delta": 1,
+        "around": [
+          0.3,
+          0.5,
+          0.7,
+          1,
+          0.9,
+          0.6,
+          0.6
+        ]
+      },
+      {
+        "id": "button",
+        "type": "pop",
+        "t": 27.5,
+        "audioMs": 11,
+        "frameK": 1651,
+        "frameT": 27.516666666666666,
+        "visOk": true,
+        "offsetMs": -6,
+        "rise": 29.1,
+        "delta": 33.2,
+        "around": [
+          0.4,
+          0.4,
+          11,
+          25.9,
+          33.2,
+          29.2,
+          21.6
+        ]
+      },
+      {
+        "id": "tap",
+        "type": "click",
+        "t": 28,
+        "audioMs": 11,
+        "frameK": 1680,
+        "frameT": 28,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 15,
+        "delta": 45.5,
+        "around": [
+          0.5,
+          0.7,
+          45.5,
+          11.5,
+          8.8,
+          7.3,
+          7.6
+        ]
+      },
+      {
+        "id": "end",
+        "type": "boom",
+        "t": 29,
+        "audioMs": 11,
+        "frameK": 1740,
+        "frameT": 29,
+        "visOk": true,
+        "offsetMs": 11,
+        "rise": 30.9,
+        "delta": 120.5,
+        "around": [
+          0.7,
+          0.9,
+          120.5,
+          20.6,
+          22.4,
+          28,
+          27.8
+        ]
+      }
+    ],
+    "measured": 26,
+    "total": 30,
+    "meanMs": 9.461538461538462,
+    "worstMs": 12,
+    "xcorr": {
+      "bestLagFrames": 0,
+      "r": 0.31998419710011516,
+      "curve": {
+        "0": 0.32,
+        "1": 0.111,
+        "2": 0.092,
+        "3": 0.097,
+        "4": 0.104,
+        "5": 0.114,
+        "6": 0.091,
+        "-6": 0.084,
+        "-5": 0.124,
+        "-4": 0.14,
+        "-3": 0.152,
+        "-2": 0.168,
+        "-1": 0.275
+      }
+    }
+  },
+  "flash": {
+    "maxTransitionsPerSecond": 4,
+    "flashesPerSecond": 2
+  }
+}
