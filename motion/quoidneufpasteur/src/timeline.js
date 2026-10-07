@@ -222,7 +222,7 @@ CAPTIONS.filter((c) => c.kind === 'verse').forEach((c) => {
   const words = c.text.split(' ');
   const offs = verseWordOffsets(words.length);
   const mel = VERSE_MELODY[c.id];
-  offs.forEach((o, i) => cue('word', c.t0 + o, { midi: mel[i], v: i === 0 ? 1 : 0.85, id: c.id + '_' + i, verse: c.id, wi: i, sync: i === 0 }));
+  offs.forEach((o, i) => cue('word', c.t0 + o, { midi: mel[i], v: i === 0 ? 1 : 0.85, id: c.id + '_' + i, verse: c.id, wi: i, sync: false }));
 });
 // battement sourd (cœur) puis shaker, puis tension
 for (let b = 28; b < 48; b++) {

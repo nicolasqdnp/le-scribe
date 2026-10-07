@@ -12,7 +12,7 @@ const WORKERS = +arg('workers', 4);
 const FROM = +arg('from', 0);
 const TO = +arg('to', 1800);
 const OUT = path.resolve(ROOT, arg('out', 'build/video.mp4'));
-const CRF = arg('crf', '15');
+const CRF = arg('crf', '18');
 const SAMPLES = arg('samples', null);
 const W = 1080, H = 1920;
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
@@ -23,7 +23,7 @@ const ff = spawn('ffmpeg', [
   '-vf', 'vflip,scale=out_color_matrix=bt709:out_range=tv,format=yuv420p',
   '-c:v', 'libx264', '-preset', 'slow', '-crf', CRF, '-profile:v', 'high', '-level:v', '4.2',
   '-g', '60', '-bf', '3', '-x264-params', 'aq-mode=3:aq-strength=0.9:deblock=-1,-1:psy-rd=1.0,0.15',
-  '-maxrate', '45M', '-bufsize', '90M',
+  '-maxrate', '16M', '-bufsize', '32M',
   '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
   '-r', '60', '-movflags', '+faststart', OUT,
 ], { stdio: ['pipe', 'inherit', 'inherit'] });
@@ -75,14 +75,16 @@ async function worker(id) {
     }
     if (!ok) throw new Error('image ' + f + ' impossible');
   }
-  await browser.close();
+  await Promise.race([browser.close(), new Promise((r) => setTimeout(r, 4000))]);
 }
 
 await Promise.all(Array.from({ length: WORKERS }, (_, i) => worker(i)));
 while (nextWrite < TO) await new Promise((r) => setTimeout(r, 50));
+const closed = new Promise((r) => ff.on('close', r));
 ff.stdin.end();
-await new Promise((r) => ff.on('close', r));
+await closed;
 server.close();
 // rapport (zone sûre, échantillons) pour verify.mjs
-fs.writeFileSync(path.join(ROOT, 'build', 'frame_report.json'), JSON.stringify([...infos.entries()].sort((a, b) => a[0] - b[0]).map(([f, i]) => ({ f, t: i.t, black: i.black, shatterP: i.shatterP, samples: i.samples, report: i.report }))));
+fs.writeFileSync(path.join(ROOT, 'build', `frame_report_${FROM}.json`), JSON.stringify([...infos.entries()].sort((a, b) => a[0] - b[0]).map(([f, i]) => ({ f, t: i.t, black: i.black, shatterP: i.shatterP, samples: i.samples, report: i.report }))));
 console.log(`rendu terminé en ${((Date.now() - t0) / 60000).toFixed(1)} min → ${OUT}`);
+process.exit(0);

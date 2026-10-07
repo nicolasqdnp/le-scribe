@@ -2,10 +2,18 @@
   "name": "quoidneufpasteur-motion",
   "private": true,
   "type": "module",
-  "description": "Motion design 30s @quoidneufpasteur — Canvas + WebGL + Web Audio, rendu Playwright, encodage ffmpeg",
-  "dependencies": {
-    "@fontsource/anton": "^5.3.0",
-    "@fontsource/inter": "^5.3.0",
-    "@fontsource/playfair-display": "^5.3.0"
+  "description": "Motion design 30 s @quoidneufpasteur — Canvas + WebGL2 + Web Audio, rendu Playwright, encodage ffmpeg",
+  "scripts": {
+    "audio": "node tools/build-audio.mjs",
+    "render": "node tools/render.mjs --workers=3",
+    "mux": "node tools/mux.mjs",
+    "safe": "node tools/safe.mjs",
+    "verify": "node tools/verify.mjs build/final.mp4",
+    "still": "node tools/still.mjs"
+  },
+  "devDependencies": {
+    "@fontsource/anton": "^5.2.0",
+    "@fontsource/inter": "^5.2.0",
+    "@fontsource/playfair-display": "^5.2.0"
   }
 }

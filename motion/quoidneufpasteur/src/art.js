@@ -221,7 +221,7 @@ export function drawButton() {
   const tw = c.measureText(label).width - 5;
   const content = 52 + 34 + tw;
   const x0 = (w - content) / 2;
-  c.fillStyle = '#1a1209';
+  c.fillStyle = '#0a0602';
   const cx = x0 + 26, cy = h / 2;
   rr(c, cx - 26, cy - 5, 52, 10, 5);
   c.fill();

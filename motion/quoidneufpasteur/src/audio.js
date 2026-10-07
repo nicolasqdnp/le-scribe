@@ -352,7 +352,7 @@ export async function renderAudio(OfflineCtx) {
     const hook = id === 'hookRiser';
     const g = G();
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(hook ? 0.8 : 0.5, t + dur * 0.97);
+    g.gain.exponentialRampToValueAtTime(hook ? 0.5 : 0.5, t + dur * 0.97);
     g.gain.linearRampToValueAtTime(0, t + dur);
     const bp = F('bandpass', 250, 1.4);
     bp.frequency.setValueAtTime(250, t);
@@ -380,7 +380,7 @@ export async function renderAudio(OfflineCtx) {
       o.frequency.exponentialRampToValueAtTime(55, t + dur);
       const og = G();
       og.gain.setValueAtTime(0.0001, t);
-      og.gain.exponentialRampToValueAtTime(0.7, t + dur * 0.9);
+      og.gain.exponentialRampToValueAtTime(0.35, t + dur * 0.9);
       og.gain.linearRampToValueAtTime(0, t + dur);
       o.connect(og).connect(fxBus);
     }
@@ -608,8 +608,8 @@ export async function renderAudio(OfflineCtx) {
       const s = osc('sine', f, n.t, n.dur + 0.1);
       const sg = G();
       sg.gain.setValueAtTime(0.0001, n.t);
-      sg.gain.exponentialRampToValueAtTime(0.5, n.t + 1.5);
-      sg.gain.linearRampToValueAtTime(0.7, n.t + n.dur);
+      sg.gain.exponentialRampToValueAtTime(0.18, n.t + 1.5);
+      sg.gain.linearRampToValueAtTime(0.26, n.t + n.dur);
       s.connect(sg).connect(fxBus);
     }
   }

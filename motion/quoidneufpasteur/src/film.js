@@ -108,8 +108,8 @@ export class Film {
       const words = c.text.split(' ');
       const lead = words.slice(0, -1).join(' ');
       const key = words[words.length - 1];
-      const ls = Math.min(150, ts.fit('play', lead, 720, 999));
-      const ks = Math.min(250, ts.fit(A, key, 720, 999));
+      const ls = Math.min(175, ts.fit('play', lead, 720, 999));
+      const ks = Math.min(290, ts.fit(A, key, 720, 999));
       this.blocks[c.id] = ts.block([
         { text: lead, font: 'play', size: ls, tint: CREAM, glow: 1.5 },
         { text: key, font: A, size: ks, tint: GOLD, tint2: GOLDH, glow: 2.0, gap: ls * 0.3 },
@@ -223,7 +223,7 @@ export class Film {
       const tint = [1, lerp(1, 0.1, red), lerp(1, 0.08, red)];
       return {
         dx: (hsh(g.idx * 7 + Math.floor(t * 30)) - 0.5) * 70 * jit, dy: (hsh(g.idx * 5 + 2) - 0.5) * 30 * jit,
-        split: 9 * jit + 1.5 + 5 * thump, alpha: fl * sstep(0, 0.012, u), tint, glow: 1.9 + 1.3 * red * (0.4 + heart) + 1.2 * jit,
+        split: 6 * jit + 1.5 + 4 * thump, alpha: fl * sstep(0, 0.012, u), tint, glow: 1.9 + 1.3 * red * (0.4 + heart) + 1.2 * jit,
       };
     }, S.sprites, { caption: cap.id, exiting: u < 0.04 });
     this.scrim(S, 0.55, 1500, 1300);
@@ -237,7 +237,7 @@ export class Film {
     const p = t > 3.0 ? Math.pow(clamp((t - 3.0) / 0.5), 1.8) : 0;
     S.warp.shatter = { p, seed: 3.7, reveal: crack };
     S.warp.crack = crack > 0 ? 0.9 * (1 - 0.5 * p) : 0;
-    S.warp.glitch = [0.85 * jit + (hsh(Math.floor(t * 24)) > 0.97 ? 0.25 : 0) + (t > 3.0 ? 0.5 * p : 0), Math.floor(t * 60), 14 * jit + 3];
+    S.warp.glitch = [0.6 * jit + (hsh(Math.floor(t * 24)) > 0.97 ? 0.25 : 0) + (t > 3.0 ? 0.5 * p : 0), Math.floor(t * 60), 14 * jit + 3];
     // post : grain dur, vignette lourde, flash sur chaque impact
     const f = pulse(t, ['boom'], 0.05);
     S.post = { ca: 0.005 + 0.02 * jit + 0.02 * p, bloom: 0.6, streak: 0.3, grain: 0.1, vig: 0.85, exposure: 1.0, flash: 0.22 * f, flashCol: [1, 0.9 - 0.4 * red, 0.85 - 0.5 * red], fade: 0, sat: 1.0, bloomThr: 0.8, shadow: [-0.3, 0.0, 0.2] };
@@ -362,7 +362,7 @@ export class Film {
       const sp = spring(u - 0.0, 20, 12);
       const hero = cd.hero;
       let alpha = sstep(0, 0.04, u) * Math.max(0, 1 - 0.3 * a);
-      let z = 2600 * fly - 190 * a, y = 34 * a + (hero ? 30 : 0), x = (k % 2 ? 1 : -1) * 22 * a;
+      let z = 1500 * fly - 190 * a, y = 34 * a + (hero ? 30 : 0), x = (k % 2 ? 1 : -1) * 22 * a;
       let rx = -0.6 * fly + 0.1 * a, ry = (k % 2 ? 1 : -1) * 0.9 * fly + (k % 2 ? -1 : 1) * 0.05 * a, rz = tilt * (1 - 0.4 * fly) + (k % 2 ? 0.035 : -0.035) * a;
       let lod = a * 1.1;
       let sc = 1 + 0.12 * (sp - 1) * 0 + 0.06 * Math.exp(-u / 0.08);
@@ -374,7 +374,7 @@ export class Film {
       const M = M4.mul(M4.mul(M4.mul(M4.mul(M4.translate(x, CYW + y, z), M4.rotZ(rz)), M4.rotY(ry)), M4.rotX(rx)), M4.scale(sc, sc, 1));
       const ph = cd.ch + 80; // taille de la texture (avec marge d'ombre)
       const cz = M4.mul(V, M)[14];
-      S.sprites.push({ sortZ: cz, tex: cd.tex, w: cd.art.canvas.width, h: cd.art.canvas.height, matrix: M, alpha, glow: 1.15 + 1.6 * Math.exp(-u / 0.1) * (hero ? 1.5 : 1), lod, split: 5 * fly + 0.8, caption: id, kind: 'carte', safeRect: [cd.cw / 2, cd.ch / 2], exiting: fly > 0.08 || (!hero && t >= heroT) });
+      S.sprites.push({ sortZ: cz, tex: cd.tex, w: cd.art.canvas.width, h: cd.art.canvas.height, matrix: M, alpha, glow: 1.15 + (hero ? 0.7 : 1.5) * Math.exp(-u / 0.1), lod, split: 5 * fly + 0.8, caption: id, kind: 'carte', safeRect: [cd.cw / 2, cd.ch / 2], exiting: fly > 0.08 || (!hero && t >= heroT) });
       // texte posé sur la carte (sous l'en-tête)
       const tM = M4.mul(M, M4.translate(0, -(92 / 2) + 0 + 0, 6));
       const tb = M4.mul(tM, M4.translate(0, 0, 0));
@@ -399,7 +399,7 @@ export class Film {
     });
     this.scrim(S, 0.35, 1600, 1500, CYW, -400);
     this.motes(t, S, 0.55);
-    S.post = { ca: 0.003 + 0.006 * pop + 0.004 * kick, bloom: 0.7, streak: 0.3, grain: 0.05, vig: 0.65, exposure: 1.0, flash: 0.14 * pulse(t, ['pop'], 0.05) + 0.4 * pulse(t, ['pop'], 0.05) * (t >= heroT ? 1 : 0), flashCol: [1, 0.88, 0.62], fade: 0, sat: 1.08, bloomThr: 0.8 };
+    S.post = { ca: 0.003 + 0.006 * pop + 0.004 * kick, bloom: 0.7, streak: 0.3, grain: 0.05, vig: 0.65, exposure: 1.0, flash: 0.14 * pulse(t, ['pop'], 0.05) + 0.18 * pulse(t, ['pop'], 0.05) * (t >= heroT ? 1 : 0), flashCol: [1, 0.88, 0.62], fade: 0, sat: 1.08, bloomThr: 0.8 };
     S.fast = true;
   }
 
@@ -448,7 +448,7 @@ export class Film {
       const y = ((s.v * 0.3 + t * (120 + s.w * 260)) % 2600) - 1300;
       this.part(Math.cos(s.a * 3) * 700, y, s.w * 400 - 200, 5 + s.s * 0.5, s.w > 0.5 ? GOLDH : FLAME, 0.5, 4, 0, 1);
     }
-    S.post = { ca: 0.003 + 0.006 * hit + 0.004 * kick, bloom: 0.8 + 0.5 * build, streak: 0.35 + 0.3 * build, grain: 0.05, vig: 0.6, exposure: 1.0 + 0.05 * build, flash: 0.1 * pulse(t, ['hit'], 0.05) + 0.85 * sstep(13.6, 13.98, t) * (t < 14 ? 1 : 0), flashCol: [1, 0.9, 0.7], fade: 0, sat: 1.1, bloomThr: 0.8 };
+    S.post = { ca: 0.003 + 0.006 * hit + 0.004 * kick, bloom: 0.8 + 0.5 * build, streak: 0.35 + 0.3 * build, grain: 0.05, vig: 0.6, exposure: 1.0 + 0.05 * build, flash: 0.1 * pulse(t, ['hit'], 0.05) + 0.5 * sstep(13.6, 13.98, t) * (t < 14 ? 1 : 0), flashCol: [1, 0.9, 0.7], fade: 0, sat: 1.1, bloomThr: 0.8 };
     S.warp.glitch = [0.25 * Math.exp(-u / 0.06), Math.floor(t * 60), 6];
     S.fast = true;
   }
@@ -498,8 +498,8 @@ export class Film {
       });
     });
     const white = sstep(22.9, 23.9, t) * 0.8 + (t >= 23.9 ? 0.2 : 0);
-    S.post = { ca: 0.0025 + 0.012 * boom, bloom: 0.85 + 0.6 * build, streak: 0.4 + 0.3 * build, grain: 0.045, vig: 0.6 - 0.2 * build, exposure: 1.0, flash: white * white * 0.9 + (t >= 23.9 ? 0.1 : 0) + 0.7 * pulse(t, ['boom'], 0.08) * (t < 14.3 ? 1 : 0), flashCol: [1, 0.93, 0.8], fade: 0, sat: 1.12, bloomThr: 0.7, shadow: [-0.2, 0.1, 0.5] };
-    if (t >= 23.9) { S.post.flash = 1.6; S.bg.glow[0] = 1.5; }
+    S.post = { ca: 0.0025 + 0.012 * boom, bloom: 0.85 + 0.6 * build, streak: 0.4 + 0.3 * build, grain: 0.045, vig: 0.6 - 0.2 * build, exposure: 1.0, flash: white * white * 0.9 + (t >= 23.9 ? 0.1 : 0) + 0.22 * pulse(t, ['boom'], 0.06) * (t < 14.3 ? 1 : 0), flashCol: [1, 0.93, 0.8], fade: 0, sat: 1.12, bloomThr: 0.7, shadow: [-0.2, 0.1, 0.5] };
+    if (t >= 23.9) { S.post.flash = 2.4; S.bg.glow[0] = 1.5; }
   }
 
   // ═══ LOGO + S'ABONNER ═══════════════════════════════════════════════════════
@@ -517,8 +517,9 @@ export class Film {
       base: [0.005, 0.004, 0.005], rays: [0.62, 0.0, 0.55, 9], tint: [1, 0.7, 0.36], tint2: [1, 0.93, 0.8],
       glow: [0.22 + 0.3 * sstep(0.9, 1.1, u) * Math.exp(-Math.max(lockU, 0) / 1.0) + 0.12 * boom, 0, cyW / 960, 0.9],
       burst: [(lockU > 0 && lockU < 1.2 ? 0.4 : 0) + (endU > 0 && endU < 1 ? 0.35 : 0), lockU > 0 && lockU < 1.2 ? lockU : endU, 0, cyW / 960],
-      liquid: [0.12, 0.9, 0.05, 8],
+      liquid: [0.12, 0.9, 0.05, 8], gain: 0.11,
     };
+    this.scrim(S, 0.5 * sstep(1.2, 1.8, u), 1500, 1250, WY(990));
     S.cam = { dz: 24 * boom, dx: snoise(t, 2) * 14 * boom, dy: snoise(t, 4) * 14 * boom, roll: snoise(t, 6) * 0.012 * boom, yaw: 0.03 * Math.sin(t * 0.5) };
     this.motes(t, S, 0.8);
     // — particules qui convergent vers la marque (24.0 → 25.0)
@@ -537,7 +538,7 @@ export class Film {
         const sp = Math.hypot(vx, vy);
         const settled = sp < 40;
         const tw = 0.5 + 0.5 * Math.sin(t * 6 + c.tw);
-        const alpha = u < 1 ? 1 : lerp(1, 0.18 + 0.5 * tw * (c.hot > 0.8 ? 1 : 0.4), sstep(1.0, 1.5, u)) * (1 - sstep(1.7, 2.2, u));
+        const alpha = u < 1 ? 0.3 + 0.7 * sstep(0, 0.45, u) : lerp(1, 0.18 + 0.5 * tw * (c.hot > 0.8 ? 1 : 0.4), sstep(1.0, 1.5, u)) * (1 - sstep(1.7, 2.2, u));
         const col = c.hot > 0.82 ? [1, 0.55, 0.2] : c.hot > 0.4 ? [1, 0.82, 0.5] : [1, 0.95, 0.8];
         if (settled) this.part(p0[0], p0[1], p0[2], c.s * (1 + 0.8 * (c.hot > 0.9 ? 1 : 0)), col, alpha * 0.9, 0, 0, 1);
         else this.part(p0[0], p0[1], p0[2], c.s * 1.3, col, alpha * 0.95, 2, Math.atan2(vy, vx), 1 + Math.min(sp / 260, 22));
@@ -593,12 +594,13 @@ export class Film {
     let btnCenter = [0, WY(1160)];
     if (bu > 0) {
       const press = tapU > 0 ? (tapU < 0.07 ? tapU / 0.07 : 1 - spring(tapU - 0.07, 16, 8)) : 0;
-      const sc0 = spring(bu, 16, 9);
+      const sc0 = spring(bu + 0.03, 16, 9);
       const idle = 1 + 0.012 * Math.sin(t * 4) * sstep(28.4, 28.8, t);
       const sc = Math.max(0.001, sc0) * (1 - 0.07 * clamp(tapU > 0 ? (tapU < 0.07 ? tapU / 0.07 : Math.max(0, 1 - (tapU - 0.07) / 0.18)) : 0)) * idle * (1 + 0.04 * endPump);
       const M = M4.mul(M4.translate(btnCenter[0], btnCenter[1], 0), M4.scale(sc, sc, 1));
       const sw = tapU > 0.05 && tapU < 0.6 ? lerp(-1.3, 1.5, (tapU - 0.05) / 0.55) : 5;
-      S.sprites.push({ tex: this.btn.tex, w: this.btn.w, h: this.btn.h, matrix: M, alpha: sstep(0, 0.05, bu), glow: 1.0 + 1.4 * Math.exp(-bu / 0.12) + 1.0 * Math.exp(-Math.max(tapU, 0) / 0.18) * (tapU > 0 ? 1 : 0), sheen: 0.8, sheenPos: sw, caption: 'bouton', kind: 'bouton', exiting: bu < 0.4, safeRect: [this.btn.bw / 2, this.btn.bh / 2] });
+      S.sprites.push({ tex: this.btn.tex, w: this.btn.w, h: this.btn.h, matrix: M, alpha: 1, glow: 0.82 + 1.4 * Math.exp(-bu / 0.12) + 1.0 * Math.exp(-Math.max(tapU, 0) / 0.18) * (tapU > 0 ? 1 : 0), sheen: 0.8, sheenPos: sw, caption: 'bouton', kind: 'bouton', exiting: bu < 0.4, safeRect: [this.btn.bw / 2, this.btn.bh / 2] });
+      if (bu < 0.5) this.part(btnCenter[0], btnCenter[1], 10, 500 + 1500 * eoe(bu / 0.4), [1, 0.85, 0.5], 0.5 * Math.exp(-bu / 0.2), 3, 0, 1);
       this.part(btnCenter[0], btnCenter[1], -10, 900, [1, 0.7, 0.3], 0.3 * sstep(0, 0.2, bu) * (1 + 1.2 * Math.exp(-Math.max(tapU, 0) / 0.3) * (tapU > 0 ? 1 : 0)), 0, 0, 1.9);
     }
     // — doigt (indicateur de tap) + ondulations + gerbe
@@ -628,8 +630,8 @@ export class Film {
       this.part(0, cyW, -20, 3200 * eoe(endU / 0.8), [1, 0.85, 0.55], 0.6 * Math.exp(-endU / 0.3), 3, 0, 1);
     }
     const f = 0.55 * pulse(t, ['boom'], 0.06) * (t < 24.5 ? 1.2 : 1) + 0.25 * pulse(t, ['click'], 0.06);
-    S.post = { ca: 0.003 + 0.016 * boom + 0.012 * pulse(t, ['click'], 0.12), bloom: 0.9, streak: 0.45, grain: 0.045, vig: 0.55, exposure: 1.0, flash: f, flashCol: [1, 0.93, 0.8], fade: 0, sat: 1.12, bloomThr: 0.7, shadow: [-0.2, 0.1, 0.5] };
-    if (u < 0.12) { S.post.flash = Math.max(S.post.flash, 1.0 * Math.exp(-u / 0.05)); }
+    S.post = { ca: 0.003 + 0.016 * boom + 0.012 * pulse(t, ['click'], 0.12), bloom: 0.65, streak: 0.3, grain: 0.045, vig: 0.6, exposure: 1.0, flash: f, flashCol: [1, 0.93, 0.8], fade: 0, sat: 1.12, bloomThr: 0.95, shadow: [-0.2, 0.1, 0.5] };
+    if (u < 0.12) { S.post.flash = Math.max(S.post.flash, 0.3 * Math.exp(-u / 0.05)); }
     S.fast = (u < 2.2) || (t > 27.4 && t < 28.6) || (t > 28.95 && t < 29.4);
   }
 }
