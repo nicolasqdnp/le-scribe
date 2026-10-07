@@ -119,7 +119,11 @@ export class Film {
     this.blocks.mark1 = ts.block([{ text: 'QUOI DE NEUF,', font: A, size: 92, tint: CREAM, glow: 1.7 }]);
     this.blocks.mark2 = ts.block([{ text: 'PASTEUR ?', font: A, size: Math.min(150, ts.fit(A, 'PASTEUR ?', 760, 999)), tint: GOLD, tint2: GOLDH, glow: 2.2 }]);
     this.blocks.handle = ts.block([{ text: '@quoidneufpasteur', font: 'inter', size: Math.min(50, ts.fit('inter', '@quoidneufpasteur', 760, 999)), tint: [0.95, 0.84, 0.62], glow: 1.5 }]);
-    this.blocks.cta = ts.block([{ text: 'REJOINS LA CONVERSATION', font: A, size: Math.min(64, ts.fit(A, 'REJOINS LA CONVERSATION', 780, 999)), tint: CREAM, glow: 1.6 }]);
+    {
+      const l1 = 'TES QUESTIONS', l2 = 'ONT DES RÉPONSES';
+      const sz = Math.min(66, ts.fit(A, l2, 700, 999), ts.fit(A, l1, 700, 999));
+      this.blocks.cta = ts.block([{ text: l1, font: A, size: sz, tint: CREAM, glow: 1.6 }, { text: l2, font: A, size: sz, tint: GOLDH, glow: 1.7 }], { lineGap: 0.2 });
+    }
 
     // ── particules : graines déterministes ──
     const rnd = mulberry32(2024);
@@ -129,7 +133,7 @@ export class Film {
     this.sparks = Array.from({ length: 420 }, () => ({ a: rnd() * Math.PI * 2, v: 500 + Math.pow(rnd(), 1.6) * 3200, s: 6 + rnd() * 14, w: rnd(), l: 0.5 + rnd() * 0.8 }));
     this.embers = Array.from({ length: 150 }, () => ({ x: rnd() * 1800 - 900, y: rnd() * 2800, z: rnd() * 800 - 300, s: 5 + rnd() * 20, sp: 40 + rnd() * 120, ph: rnd() * 6.28 }));
     // marque : particules qui convergent vers le logo
-    this.MARK = { size: 380, cy: 488 };
+    this.MARK = { size: 340, cy: 462 };
     const pts = sampleLogoPoints(5200, mulberry32(77));
     const ks = this.MARK.size / 900;
     this.convergers = pts.map(([px, py], i) => {
@@ -561,14 +565,14 @@ export class Film {
     // — marque verbale
     const m1u = t - 25.5, m2u = t - 26.0;
     if (m1u > 0) {
-      blockSprites(this.blocks.mark1, M4.translate(0, WY(735), 0), (g) => {
+      blockSprites(this.blocks.mark1, M4.translate(0, WY(692), 0), (g) => {
         const gu = m1u - g.idx * 0.018;
         const e = eoq(gu / 0.3);
         return { dy: -55 * (1 - e), alpha: sstep(0, 0.08, gu), lod: 2.5 * (1 - sstep(0, 0.14, gu)), glow: 1.7 + 1.2 * Math.exp(-Math.max(gu, 0) / 0.15) };
       }, S.sprites, { caption: 'logo' });
     }
     if (m2u > 0) {
-      blockSprites(this.blocks.mark2, M4.translate(0, WY(850), 0), (g) => {
+      blockSprites(this.blocks.mark2, M4.translate(0, WY(802), 0), (g) => {
         const gu = m2u - g.idx * 0.014;
         const k = 1 + 1.1 * Math.exp(-Math.max(gu, 0) / 0.05);
         return { s: k, alpha: sstep(0, 0.02, gu), split: 8 * Math.exp(-Math.max(gu, 0) / 0.12) + 0.5, glow: 2.2 + 2.2 * Math.exp(-Math.max(gu, 0) / 0.12), dz: 0 };
@@ -576,14 +580,14 @@ export class Film {
     }
     const hu = t - 26.5;
     if (hu > 0) {
-      blockSprites(this.blocks.handle, M4.translate(0, WY(960), 0), (g) => {
+      blockSprites(this.blocks.handle, M4.translate(0, WY(908), 0), (g) => {
         const gu = hu - g.idx * 0.01;
         return { alpha: sstep(0, 0.12, gu), dy: -22 * (1 - eoc(gu / 0.3)), lod: 2 * (1 - sstep(0, 0.14, gu)), glow: 1.5 + 0.9 * Math.exp(-Math.max(gu, 0) / 0.15) };
       }, S.sprites, { caption: 'handle' });
     }
     const cu = t - 27.0;
     if (cu > 0) {
-      blockSprites(this.blocks.cta, M4.translate(0, WY(1050), 0), (g) => {
+      blockSprites(this.blocks.cta, M4.translate(0, WY(1014), 0), (g) => {
         const gu = cu - g.word * 0.11 - g.idx * 0.004;
         const k = backOut(gu / 0.25, 2.2);
         return { alpha: sstep(0, 0.05, gu), s: lerp(1.5, 1, clamp(k)), dy: -30 * (1 - eoc(gu / 0.3)), glow: 1.6 + 1.5 * Math.exp(-Math.max(gu, 0) / 0.12), split: 5 * Math.exp(-Math.max(gu, 0) / 0.1) };

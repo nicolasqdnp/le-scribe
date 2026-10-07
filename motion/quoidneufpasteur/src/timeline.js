@@ -108,12 +108,12 @@ export const CAPTIONS = [
   { id: 'm4', t0: 17.0, t1: 18.0, text: 'PAS DE PERFORMANCE', kind: 'verse' },
   { id: 'm5', t0: 18.0, t1: 19.0, text: 'JUSTE LA VÉRITÉ', kind: 'verse' },
   { id: 'm6', t0: 19.0, t1: 20.0, text: 'DITE AVEC AMOUR', kind: 'verse' },
-  { id: 'm7', t0: 20.0, t1: 21.0, text: 'POUR LES FATIGUÉS', kind: 'verse' },
+  { id: 'm7', t0: 20.0, t1: 21.0, text: 'POUR LES SCEPTIQUES', kind: 'verse' },
   { id: 'm8', t0: 21.0, t1: 22.0, text: 'POUR LES BRISÉS', kind: 'verse' },
   { id: 'm9', t0: 22.0, t1: 23.0, text: 'UNE PORTE OUVERTE', kind: 'verse' },
   { id: 'm10', t0: 23.0, t1: 23.9, text: 'UNE LUMIÈRE ALLUMÉE', kind: 'verse' },
   // Appel à l'action (le logo et le handle sont des éléments de marque, pas des légendes)
-  { id: 'x1', t0: 27.0, t1: 30.0, text: 'REJOINS LA CONVERSATION', kind: 'cta' },
+  { id: 'x1', t0: 27.0, t1: 30.0, text: 'TES QUESTIONS ONT DES RÉPONSES', kind: 'cta' },
 ];
 
 // Gamme (ré mineur naturel) pour la mélodie du manifeste : une note / mot.
