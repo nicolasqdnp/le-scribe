@@ -97,7 +97,7 @@ Produis un plan de livre complet. Réponds UNIQUEMENT avec un JSON valide, sans 
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 8000,
+      max_tokens: 16000,
       messages: [{ role: 'user', content: prompt }],
     })
 
@@ -106,9 +106,14 @@ Produis un plan de livre complet. Réponds UNIQUEMENT avec un JSON valide, sans 
     try {
       plan = JSON.parse(raw)
     } catch {
+      // Extraire le JSON le plus complet possible
       const match = raw.match(/\{[\s\S]*\}/)
-      if (!match) return NextResponse.json({ error: 'Réponse IA invalide' }, { status: 500 })
-      plan = JSON.parse(match[0])
+      if (!match) return NextResponse.json({ error: 'Réponse IA invalide — plan non généré' }, { status: 500 })
+      try {
+        plan = JSON.parse(match[0])
+      } catch {
+        return NextResponse.json({ error: 'Le plan généré est trop long — réessaie en réduisant le nombre de chapitres' }, { status: 500 })
+      }
     }
 
     plan = fixObj(plan) as Record<string, unknown>
