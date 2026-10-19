@@ -46,6 +46,10 @@ export async function POST(req: NextRequest) {
       .filter((s: { type: string; contenu_brut: string }) => s.type === 'youtube' && s.contenu_brut)
       .map((s: { contenu_brut: string }) => s.contenu_brut.slice(0, 6000).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, ' '))
 
+    const documents = (sources || [])
+      .filter((s: { type: string; contenu_brut: string }) => s.type === 'document' && s.contenu_brut)
+      .map((s: { label?: string; contenu_brut: string }) => ({ label: s.label, text: s.contenu_brut.slice(0, 6000).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, ' ') }))
+
     const notes = (sources || [])
       .filter((s: { type: string }) => s.type === 'note')
       .map((s: { contenu_brut: string }) => s.contenu_brut)
@@ -62,6 +66,7 @@ export async function POST(req: NextRequest) {
 
     const sourcesSection = [
       ...transcripts.map((t: string, i: number) => `### Transcription source ${i + 1}\n${t}`),
+      ...documents.map((d, i) => `### Document source ${i + 1}${d.label ? ` — ${d.label}` : ''}\n${d.text}`),
       notes ? `### Notes de l'auteur\n${notes}` : ''
     ].filter(Boolean).join('\n\n') || 'Aucune source fournie.'
 

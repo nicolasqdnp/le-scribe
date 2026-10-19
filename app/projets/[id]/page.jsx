@@ -40,6 +40,8 @@ function AnalyseEnCours({ projetId }) {
   const [generatingPlan, setGeneratingPlan] = useState(false)
   const [planError, setPlanError] = useState('')
   const [errors, setErrors] = useState({})
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
 
   useEffect(() => {
     const supabase = createClient()
@@ -51,8 +53,10 @@ function AnalyseEnCours({ projetId }) {
   }, [projetId])
 
   const ytSources = sources.filter(s => s.type === 'youtube')
+  const docSources = sources.filter(s => s.type === 'document')
   const allTranscribed = ytSources.length > 0 && ytSources.every(s => s.contenu_brut)
   const nextToTranscribe = ytSources.find(s => !s.contenu_brut)
+  const canGenerate = allTranscribed || ytSources.length === 0
 
   async function transcrire(source) {
     setTranscribing(source.id); setErrors(prev => ({ ...prev, [source.id]: null }))
@@ -63,6 +67,23 @@ function AnalyseEnCours({ projetId }) {
       setSources(prev => prev.map(s => s.id === source.id ? { ...s, contenu_brut: 'done' } : s))
     } catch (e) { setErrors(prev => ({ ...prev, [source.id]: e.message })) }
     setTranscribing(null)
+  }
+
+  async function uploadDoc(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true); setUploadError('')
+    try {
+      const fd = new FormData()
+      fd.append('projetId', projetId)
+      fd.append('file', file)
+      const res = await fetch('/api/add-source', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Erreur upload')
+      setSources(prev => [...prev, { id: json.sourceId, label: file.name, type: 'document', contenu_brut: 'done' }])
+    } catch (e) { setUploadError(e.message) }
+    setUploading(false)
+    e.target.value = ''
   }
 
   async function genererPlan() {
@@ -89,40 +110,70 @@ function AnalyseEnCours({ projetId }) {
       </header>
       <div className="max-w-xl mx-auto px-6 py-12">
         <h1 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-cream mb-2">Préparer les sources</h1>
-        <p className="text-muted text-sm mb-8">Transcris chaque vidéo une par une, puis génère le plan du livre.</p>
+        <p className="text-muted text-sm mb-8">Ajoute tes sources (vidéos YouTube ou fichiers PDF/Word), puis génère le plan du livre.</p>
 
-        <div className="space-y-3 mb-8">
-          {ytSources.map((source, i) => {
-            const done = !!source.contenu_brut
-            const isLoading = transcribing === source.id
-            const err = errors[source.id]
-            const isNext = !done && source.id === nextToTranscribe?.id
-            return (
-              <div key={source.id} className={`rounded-xl border p-4 flex items-center justify-between gap-4 ${done ? 'border-ok/30 bg-ok/5' : 'border-border bg-surface'}`}>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${done ? 'bg-ok/10 text-ok border-ok/20' : 'bg-surface2 text-muted border-border'}`}>
-                      {done ? '✓ Transcrite' : `Vidéo ${i + 1}`}
-                    </span>
+        {/* Sources YouTube */}
+        {ytSources.length > 0 && (
+          <div className="space-y-3 mb-6">
+            {ytSources.map((source, i) => {
+              const done = !!source.contenu_brut
+              const isLoading = transcribing === source.id
+              const err = errors[source.id]
+              const isNext = !done && source.id === nextToTranscribe?.id
+              return (
+                <div key={source.id} className={`rounded-xl border p-4 flex items-center justify-between gap-4 ${done ? 'border-ok/30 bg-ok/5' : 'border-border bg-surface'}`}>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${done ? 'bg-ok/10 text-ok border-ok/20' : 'bg-surface2 text-muted border-border'}`}>
+                        {done ? '✓ Transcrite' : `Vidéo ${i + 1}`}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted2 mt-1 truncate">{source.url}</p>
+                    {err && <p className="text-xs text-err mt-1">{err}</p>}
                   </div>
-                  <p className="text-xs text-muted2 mt-1 truncate">{source.url}</p>
-                  {err && <p className="text-xs text-err mt-1">{err}</p>}
+                  {!done && (
+                    <button onClick={() => transcrire(source)} disabled={!!transcribing || !isNext}
+                      className="flex-shrink-0 text-sm bg-gold text-bg px-4 py-2 rounded-lg hover:bg-gold2 transition disabled:opacity-40 font-medium">
+                      {isLoading ? '⏳ En cours…' : 'Transcrire →'}
+                    </button>
+                  )}
                 </div>
-                {!done && (
-                  <button onClick={() => transcrire(source)} disabled={!!transcribing || !isNext}
-                    className="flex-shrink-0 text-sm bg-gold text-bg px-4 py-2 rounded-lg hover:bg-gold2 transition disabled:opacity-40 font-medium">
-                    {isLoading ? '⏳ En cours…' : 'Transcrire →'}
-                  </button>
-                )}
+              )
+            })}
+          </div>
+        )}
+
+        {/* Sources documents (PDF / DOCX) */}
+        {docSources.length > 0 && (
+          <div className="space-y-2 mb-6">
+            {docSources.map(source => (
+              <div key={source.id} className="rounded-xl border border-ok/30 bg-ok/5 p-4 flex items-center gap-3">
+                <span className="text-ok text-sm">✓</span>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-ok">Importé</p>
+                  <p className="text-xs text-muted2 mt-0.5 truncate">{source.label || 'Document'}</p>
+                </div>
               </div>
-            )
-          })}
+            ))}
+          </div>
+        )}
+
+        {/* Upload PDF / DOCX */}
+        <div className="mb-8">
+          <label className={`flex items-center justify-center gap-2 w-full border border-dashed rounded-xl px-4 py-3 text-sm cursor-pointer transition
+            ${uploading ? 'border-gold/30 text-gold/50' : 'border-border text-muted hover:border-gold/30 hover:text-gold'}`}>
+            <span>{uploading ? '⏳ Import en cours…' : '+ Ajouter un PDF ou Word'}</span>
+            <input type="file" accept=".pdf,.docx,.doc" className="hidden" onChange={uploadDoc} disabled={uploading} />
+          </label>
+          {uploadError && <p className="text-xs text-err mt-2">{uploadError}</p>}
         </div>
 
-        {(allTranscribed || ytSources.length === 0) && (
+        {canGenerate && (
           <div className="rounded-xl border border-gold/20 bg-gold/5 p-6 text-center">
             <p className="text-sm text-stone-700 font-medium mb-4">
-              {ytSources.length === 0 ? 'Aucune vidéo YouTube — génère directement le plan.' : '✓ Toutes les vidéos sont transcrites. L\'IA peut maintenant générer le plan.'}
+              {sources.length === 0
+                ? 'Aucune source — génère le plan à partir de ta description.'
+                : `✓ ${sources.length} source${sources.length > 1 ? 's' : ''} prête${sources.length > 1 ? 's' : ''}. L'IA peut maintenant générer le plan.`}
             </p>
             {planError && (
               <div className="mb-4 bg-err/10 border border-err/20 rounded-lg px-4 py-3 text-left">
